@@ -5,10 +5,12 @@
 Starts from the SPEX v1 spike's layout A config (experiments/rtl_spike/layouts/a/config.json: fp5's PDN recipe and
 stripe step, macro routing obstructions, obstruction-aware CTS, 200 um repair wire length, strict global routing,
 30-pass detailed routing at density 40 %, LVS / Magic / IR drop off) and changes only the macros and the tile:
-  u_rec0  1P_256x64  (3.36, 3.78)    FS, pins up    } the location store, 256 x 128 bits
-  u_rec1  1P_256x64  (3.36, 544.32)  N,  pins down  } (record macros on opposite edges, pins facing the logic)
-  u_cov   1P_256x32  (801.40, 3.78)  FS, pins up    coverage
-  corridor: placement blocked above u_rec1 (y 663.10-706.86) for the TT I/O pins on the top edge (x 29.8-191.0)
+  u_rec0  1P_256x64  (486.68, 3.78)    FS, pins up    } the location store, 256 x 128 bits
+  u_rec1  1P_256x64  (486.68, 544.32)  N,  pins down  } (record macros on opposite edges, pins facing the logic)
+  u_cov   1P_256x32  (3.36, 3.78)      FS, pins up    coverage
+  corridor: placement blocked above u_rec1 (x 486.68-1286.40, y 663.10-706.86). The TT I/O pins on the top edge
+  (x 29.8-191.0) stay clear of it and of every macro, as in the spike (run 40074391783 put u_rec1 under the pins at
+  x 3.36: the corridor then covered them and detailed placement could not place the 17 input buffers, DPL-0036).
 x = 3.36 + 11.24 i keeps the macros on the stripe grid; the two 256x64 share an x range at the same x (same columns).
 """
 import collections
@@ -20,7 +22,7 @@ BASE = os.path.join(HERE, "..", "..", "..", "experiments", "rtl_spike", "layouts
 P = "pdk_dir::libs.ref/sg13cmos5l_sram"
 M64, M32 = "RM_IHPSG13_1P_256x64_c2_bm_bist", "RM_IHPSG13_1P_256x32_c2_bm_bist"
 SIZE = {M64: (784.48, 118.78), M32: (416.64, 118.78)}            # LEF, IHP-Open-PDK 2bbec755
-TILES = [("u_rec0", M64, 3.36, 3.78, "FS"), ("u_rec1", M64, 3.36, 544.32, "N"), ("u_cov", M32, 801.40, 3.78, "FS")]
+TILES = [("u_rec0", M64, 486.68, 3.78, "FS"), ("u_rec1", M64, 486.68, 544.32, "N"), ("u_cov", M32, 3.36, 3.78, "FS")]
 CORE = (2.88, 3.78, 1286.40, 706.86)                                # 6x4 die 1289.28 x 710.64
 PIN_GAP = 2.6
 
@@ -48,7 +50,7 @@ def main():
         obs += [f"{layer} {x:.2f} {y0:.2f} {x + w:.2f} {y1:.2f}" for layer in ("Metal2", "Metal3", "Metal4")]
     d["ROUTING_OBSTRUCTIONS"] = obs
     d["PDN_MACRO_CONNECTIONS"] = [f"{i} VPWR VGND {pw} VSS!" for i, *_ in TILES for pw in ("VDD!", "VDDARRAY!")]
-    d["FP_OBSTRUCTIONS"] = [[CORE[0], 544.32 + 118.78, 790.0, CORE[3]]]
+    d["FP_OBSTRUCTIONS"] = [[486.68, 544.32 + 118.78, CORE[2], CORE[3]]]
     os.makedirs(os.path.join(HERE, "src"), exist_ok=True)
     with open(os.path.join(HERE, "src", "config.json"), "w") as f:
         json.dump(d, f, indent=2)

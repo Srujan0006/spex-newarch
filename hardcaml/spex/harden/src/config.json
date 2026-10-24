@@ -21,14 +21,14 @@
       "instances": {
         "u_rec0": {
           "location": [
-            3.36,
+            486.68,
             3.78
           ],
           "orientation": "FS"
         },
         "u_rec1": {
           "location": [
-            3.36,
+            486.68,
             544.32
           ],
           "orientation": "N"
@@ -62,7 +62,7 @@
       "instances": {
         "u_cov": {
           "location": [
-            801.4,
+            3.36,
             3.78
           ],
           "orientation": "FS"
@@ -107,15 +107,15 @@
   "FP_MACRO_HORIZONTAL_HALO": 2.0,
   "FP_MACRO_VERTICAL_HALO": 0.48,
   "ROUTING_OBSTRUCTIONS": [
-    "Metal2 3.36 3.78 787.84 119.96",
-    "Metal3 3.36 3.78 787.84 119.96",
-    "Metal4 3.36 3.78 787.84 119.96",
-    "Metal2 3.36 546.92 787.84 663.10",
-    "Metal3 3.36 546.92 787.84 663.10",
-    "Metal4 3.36 546.92 787.84 663.10",
-    "Metal2 801.40 3.78 1218.04 119.96",
-    "Metal3 801.40 3.78 1218.04 119.96",
-    "Metal4 801.40 3.78 1218.04 119.96"
+    "Metal2 486.68 3.78 1271.16 119.96",
+    "Metal3 486.68 3.78 1271.16 119.96",
+    "Metal4 486.68 3.78 1271.16 119.96",
+    "Metal2 486.68 546.92 1271.16 663.10",
+    "Metal3 486.68 546.92 1271.16 663.10",
+    "Metal4 486.68 546.92 1271.16 663.10",
+    "Metal2 3.36 3.78 420.00 119.96",
+    "Metal3 3.36 3.78 420.00 119.96",
+    "Metal4 3.36 3.78 420.00 119.96"
   ],
   "MAGIC_MACRO_STD_CELL_SOURCE": "PDK",
   "MAGIC_EXT_ABSTRACT_CELLS": [
@@ -150,9 +150,9 @@
   "//2spike": "v2 floorplan (2026-10-22): the 64x64 pair faces one 200 um logic channel (A_DOUT along the whole long edge, address at its middle, LEF 2bbec755); location-word macro left of the channel; density 45; post-GRT repair as PRISM.",
   "FP_OBSTRUCTIONS": [
     [
-      2.88,
+      486.68,
       663.1,
-      790.0,
+      1286.4,
       706.86
     ]
   ],
