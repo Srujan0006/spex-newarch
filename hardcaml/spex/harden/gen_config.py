@@ -4,7 +4,8 @@
 
 Starts from the SPEX v1 spike's layout A config (experiments/rtl_spike/layouts/a/config.json: fp5's PDN recipe and
 stripe step, macro routing obstructions, obstruction-aware CTS, 200 um repair wire length, strict global routing,
-30-pass detailed routing at density 40 %, LVS / Magic / IR drop off) and changes only the macros and the tile:
+30-pass detailed routing at density 40 %) and changes only the macros and the tile. LVS, Magic stream-out / LEF and the
+IR-drop report are back on (the spike skipped them): this run is for sign-off and precheck, not only timing.
   u_rec0  1P_256x64  (486.68, 3.78)    FS, pins up    } the location store, 256 x 128 bits
   u_rec1  1P_256x64  (486.68, 544.32)  N,  pins down  } (record macros on opposite edges, pins facing the logic)
   u_cov   1P_256x32  (3.36, 3.78)      FS, pins up    coverage
@@ -50,6 +51,8 @@ def main():
         obs += [f"{layer} {x:.2f} {y0:.2f} {x + w:.2f} {y1:.2f}" for layer in ("Metal2", "Metal3", "Metal4")]
     d["ROUTING_OBSTRUCTIONS"] = obs
     d["PDN_MACRO_CONNECTIONS"] = [f"{i} VPWR VGND {pw} VSS!" for i, *_ in TILES for pw in ("VDD!", "VDDARRAY!")]
+    for k in ("RUN_LVS", "RUN_MAGIC_STREAMOUT", "RUN_MAGIC_WRITE_LEF", "RUN_IRDROP_REPORT"):
+        d[k] = True
     d["FP_OBSTRUCTIONS"] = [[486.68, 544.32 + 118.78, CORE[2], CORE[3]]]
     os.makedirs(os.path.join(HERE, "src"), exist_ok=True)
     with open(os.path.join(HERE, "src", "config.json"), "w") as f:

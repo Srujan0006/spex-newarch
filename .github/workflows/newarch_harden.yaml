@@ -1,5 +1,6 @@
 # new_arch (Hardcaml SPEX v0.1) at 6x4: decision option C, 2026-10-24. Hardens hardcaml/spex/harden with the SPEX v1
-# spike's layout-A recipe and reports the routing violation count and per-path timing at every corner.
+# spike's layout-A recipe and reports the routing violation count and per-path timing at every corner; LVS, Magic
+# stream-out and the Tiny Tapeout precheck run too (2026-10-24).
 name: newarch_harden
 on:
   workflow_dispatch:
@@ -58,3 +59,10 @@ jobs:
           path: runs/
           retention-days: 14
           if-no-files-found: warn
+
+  precheck:
+    needs: gds
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Run Tiny Tapeout Precheck
+        uses: TinyTapeout/tt-gds-action/precheck@3412659307918422f3f0727917cf9b499aaca588  # ihp-cmos5l, pinned 2026-10-21
