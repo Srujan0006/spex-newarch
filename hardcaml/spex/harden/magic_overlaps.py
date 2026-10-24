@@ -49,22 +49,22 @@ for f, text in hits:
     if m:   # magic feedback: "scale <n> <d> [<nm per lambda>]"; a box unit is n/d lambda
         nm = float(m.group(3)) if m.group(3) else 10.0
         scale = int(m.group(1)) / int(m.group(2)) * nm / 1000.0
-    if scale is None:   # no scale line: list every box in raw Magic units
-        raw = re.findall(r"^box\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)", text, re.M)
-        print(f"{os.path.basename(f)}: no scale line; {len(raw)} raw boxes (llx lly urx ury):")
-        for r in raw:
-            print("RAWBOX", *r)
-        continue
+    if scale is None:
+        # no scale line: Magic's internal unit for this PDK is 0.005 um. Checked on run 40079086558: the boxes
+        # repeat every 4496 units (22.48 um = 2 x the 11.24 um SRAM column step) and reach x = 253099 units,
+        # which only fits the 1289.28 um die at 0.005 um.
+        scale = 0.005
     print(f"{os.path.basename(f)}: 1 box unit = {scale} um")
     for b in re.finditer(r"^box\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)", text, re.M):
         llx, lly, urx, ury = (int(v) * scale for v in b.groups())
-        boxes.append((f, (llx + urx) / 2, (lly + ury) / 2))
+        boxes.append((f, llx, lly, urx, ury))
 
-print(f"\nfeedback boxes: {len(boxes)} (centres in um)")
+print(f"\nfeedback boxes: {len(boxes)} (um)")
 inside = {name: 0 for name, *_ in macros}
 outside = []
-for f, cx, cy in boxes:
-    where = [n for n, x0, y0, x1, y1 in macros if x0 <= cx <= x1 and y0 <= cy <= y1]
+for f, bx0, by0, bx1, by1 in boxes:
+    cx, cy = (bx0 + bx1) / 2, (by0 + by1) / 2
+    where = [n for n, x0, y0, x1, y1 in macros if x0 <= bx0 and bx1 <= x1 and y0 <= by0 and by1 <= y1]
     if where:
         inside[where[0]] += 1
     else:
