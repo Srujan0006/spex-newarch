@@ -75,6 +75,9 @@ let model_inputs (t : t) : Model.inputs =
   ; cov_addr = get h.cov_addr
   ; cov_we = getb h.cov_we
   ; cov_wdata = get h.cov_wdata
+  ; lane0 = Layout.Lane_cfg.map h.lane0 ~f:get
+  ; lane1 = Layout.Lane_cfg.map h.lane1 ~f:get
+  ; pin_src = get h.pin_src
   }
 ;;
 
@@ -103,6 +106,7 @@ let rtl_outputs (t : t) : Model.outputs =
   ; rx_overflow = getb s.rx_overflow
   ; vlog_overflow = getb s.vlog_overflow
   ; cov_overrun = getb s.cov_overrun
+  ; lane_status = get s.lane_status
   }
 ;;
 

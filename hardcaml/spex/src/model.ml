@@ -28,7 +28,12 @@ type inputs =
   ; cov_addr : int
   ; cov_we : bool
   ; cov_wdata : int
+  ; lane0 : int Lane_cfg.t
+  ; lane1 : int Lane_cfg.t
+  ; pin_src : int
   }
+
+let zero_lane_cfg = Lane_cfg.map Lane_cfg.port_widths ~f:(fun _ -> 0)
 
 let idle_inputs =
   { pins_in = 0
@@ -51,6 +56,9 @@ let idle_inputs =
   ; cov_addr = 0
   ; cov_we = false
   ; cov_wdata = 0
+  ; lane0 = zero_lane_cfg
+  ; lane1 = zero_lane_cfg
+  ; pin_src = 0
   }
 ;;
 
@@ -79,6 +87,7 @@ type outputs =
   ; rx_overflow : bool
   ; vlog_overflow : bool
   ; cov_overrun : bool
+  ; lane_status : int
   }
 [@@deriving sexp_of, equal]
 
@@ -124,12 +133,18 @@ type t =
   ; mutable taken_edge : int
   ; mutable viol : bool
   ; mutable viol_kind : int
+  ; lanes : Lane_model.t array
+  ; rx_wait : int option array (* lane 1, engine: one-entry wait buffers *)
+  ; mutable pre : int
   ; (* coverage pipeline *)
     mutable s1 : (int * int) option (* addr, offset *)
   ; mutable s2 : (int * int * int * int) option (* addr, n, min, max *)
   }
 
 let fifo_depth = 8
+
+(** Bit lanes in the chip; must match [Engine.num_lanes]. *)
+let num_lanes = 2
 
 let decode_now t =
   let record = Hardcaml.Bits.concat_lsb (Array.to_list t.beats) in
@@ -176,6 +191,9 @@ let create () =
     ; taken_edge = 0
     ; viol = false
     ; viol_kind = 0
+    ; lanes = Array.init num_lanes ~f:(fun _ -> Lane_model.create ())
+    ; rx_wait = Array.create ~len:2 None
+    ; pre = 0
     ; s1 = None
     ; s2 = None
     }
@@ -188,9 +206,49 @@ let bit v k = (v lsr k) land 1 = 1
 let b2i b = if b then 1 else 0
 let in_idle t = match t.phase with Idle -> true | _ -> false
 
+let lane_out t l = if l < num_lanes then t.lanes.(l).Lane_model.out else 1
+
+(** ENGINE.md, Pins: the value of each pin by its source select. *)
+let pin_values t (i : inputs) =
+  List.init 8 ~f:(fun p ->
+    let e = (t.pout lsr p) land 1
+    and l0 = lane_out t 0
+    and l1 = lane_out t 1 in
+    let v =
+      match (i.pin_src lsr (3 * p)) land 7 with
+      | 0 -> e
+      | 1 -> l0
+      | 2 -> 1 - l0
+      | 3 -> l0 land e
+      | 4 -> (1 - l0) land e
+      | 5 -> l1
+      | 6 -> 1 - l1
+      | _ -> l1 land e
+    in
+    v lsl p)
+  |> List.fold ~init:0 ~f:( lor )
+;;
+
+let lane_status t =
+  List.init 2 ~f:(fun l ->
+    if l >= num_lanes
+    then 0
+    else (
+      let s = t.lanes.(l) in
+      let b x = if x then 1 else 0 in
+      ((b (Lane_model.equal_mode s.mode Done) lsl 7)
+       lor (b s.crc_ok lsl 6)
+       lor (b s.sync_hit lsl 5)
+       lor (b s.error lsl 4)
+       lor s.kind)
+      lsl (8 * l)))
+  |> List.fold ~init:0 ~f:( lor )
+;;
+
 let outputs t (i : inputs) =
-  { pins_out = t.pout land lnot i.open_drain land 0xFF
-  ; pins_oe = t.poe land lnot (i.open_drain land t.pout) land 0xFF
+  let v = pin_values t i in
+  { pins_out = v land lnot i.open_drain land 0xFF
+  ; pins_oe = t.poe land lnot (i.open_drain land v) land 0xFF
   ; running = not (in_idle t)
   ; in_entry = (match t.phase with Fetch _ -> true | _ -> false)
   ; cur_loc = t.cur_loc
@@ -216,6 +274,7 @@ let outputs t (i : inputs) =
   ; rx_overflow = t.rx_ovf
   ; vlog_overflow = t.vlog_ovf
   ; cov_overrun = t.cov_ovr
+  ; lane_status = lane_status t
   }
 ;;
 
@@ -247,7 +306,10 @@ let step t (i : inputs) =
     | 5 -> rx_full
     | 6 -> bit t.lfsr 0
     | 7 -> (t.rx_sr lsr 1) land 0x7F = i.match_addr land 0x7F
-    | _ -> false
+    | f ->
+      (* lane (f - 8) / 4: done, crc_ok, sync_hit, error *)
+      let l = (f - 8) / 4 in
+      l < num_lanes && List.nth_exn (Lane_model.flags t.lanes.(l)) ((f - 8) % 4)
   in
   let stress = t.role = Role.stress in
   (* ENGINE.md: a pin change is judged against the clocks as they were when it was
@@ -359,10 +421,35 @@ let step t (i : inputs) =
       | 2 -> 7
       | _ -> 8)
   in
+  (* prescaler of the record in the record registers *)
+  let tick =
+    match h.prescale with
+    | 0 -> true
+    | 1 -> t.pre land 7 = 7
+    | 2 -> t.pre land 63 = 63
+    | _ -> t.pre = 511
+  in
   let n_clocks =
     Array.mapi t.clocks ~f:(fun k c ->
-      if act_en && bit a_rst k then 0 else if c = 0xFFFF then c else c + 1)
+      if act_en && bit a_rst k then 0 else if c = 0xFFFF || not tick then c else c + 1)
   in
+  (* bit lanes: the winning edge's tx_pin field is the command when tx_pin_en = 0 *)
+  let cmd = if any_fire && we.tx_pin_en = 0 then we.tx_pin else 0 in
+  let tx_head = Queue.peek t.tx_fifo in
+  let lane_steps =
+    Array.mapi t.lanes ~f:(fun l lane ->
+      let k : Lane_model.cmd =
+        { go = cmd = Lane_cmd.go l
+        ; end_ = cmd = Lane_cmd.end_ l
+        ; crc = cmd = Lane_cmd.crc l
+        ; reset = cmd = Lane_cmd.reset
+        }
+      in
+      let cfg = if l = 0 then i.lane0 else i.lane1 in
+      Lane_model.step lane cfg k ~pins_s:t.pins_s ~pins_q:t.pins_q ~tx_head)
+  in
+  let lane_pop = Array.exists lane_steps ~f:(fun s -> s.Lane_model.pop) in
+  let lane_push l = if l < num_lanes then lane_steps.(l).Lane_model.push else None in
   (* coverage *)
   let cov_fire = any_fire && i.cover_en in
   let cov_addr_now = (t.cur_loc lsl 2) lor w in
@@ -415,7 +502,7 @@ let step t (i : inputs) =
       false)
     else ovf
   in
-  let tx_pop_now = tx_pop && not tx_empty in
+  let tx_pop_now = (tx_pop || lane_pop) && not tx_empty in
   let rx_pop_now = i.rx_pop && not (Queue.is_empty t.rx_fifo) in
   let vlog_pop_now = i.vlog_pop && not (Queue.is_empty t.vlog_fifo) in
   let tx_full_now = Queue.length t.tx_fifo = fifo_depth in
@@ -432,11 +519,34 @@ let step t (i : inputs) =
   if tx_pop_now then ignore (Queue.dequeue_exn t.tx_fifo : int);
   if i.tx_push && not tx_full_now then Queue.enqueue t.tx_fifo i.tx_data;
   if rx_pop_now then ignore (Queue.dequeue_exn t.rx_fifo : int);
-  if rx_push && not rx_full_now then Queue.enqueue t.rx_fifo t.rx_sr;
+  (* RX FIFO: lane 0, then lane 1, then the engine; a push that loses waits in its
+     one-entry buffer, a push into a full buffer is dropped *)
+  let news = [| lane_push 1; (if rx_push then Some t.rx_sr else None) |] in
+  let reqs = Array.mapi news ~f:(fun s n -> if Option.is_some t.rx_wait.(s) then t.rx_wait.(s) else n) in
+  let accepted =
+    match lane_push 0 with
+    | Some b -> Some (b, -1)
+    | None ->
+      (match reqs.(0), reqs.(1) with
+       | Some b, _ -> Some (b, 0)
+       | None, Some b -> Some (b, 1)
+       | None, None -> None)
+  in
+  let buf_drop = ref false in
+  Array.iteri news ~f:(fun s n ->
+    let won = match accepted with Some (_, w) -> w = s | None -> false in
+    match t.rx_wait.(s), n, won with
+    | Some _, Some nb, true -> t.rx_wait.(s) <- Some nb
+    | Some _, None, true -> t.rx_wait.(s) <- None
+    | None, Some nb, false -> t.rx_wait.(s) <- Some nb
+    | Some _, Some _, false -> buf_drop := true
+    | _ -> ());
+  let rx_push = Option.is_some accepted in
+  Option.iter accepted ~f:(fun (b, _) -> if not rx_full_now then Queue.enqueue t.rx_fifo b);
   if vlog_pop_now then ignore (Queue.dequeue_exn t.vlog_fifo : int);
   if viol_now && not vlog_full_now then Queue.enqueue t.vlog_fifo vlog_word;
   ignore push;
-  if rx_push && rx_full_now then t.rx_ovf <- true;
+  if (rx_push && rx_full_now) || !buf_drop then t.rx_ovf <- true;
   if viol_now && vlog_full_now then t.vlog_ovf <- true;
   if drop_now then t.cov_ovr <- true;
   (* ---- registers ---- *)
@@ -491,6 +601,7 @@ let step t (i : inputs) =
   then (
     t.phase <- Idle;
     t.poe <- 0);
+  t.pre <- (t.pre + 1) land 511;
   if i.start
   then (
     t.phase <- Fetch 0;
@@ -504,7 +615,8 @@ let step t (i : inputs) =
     t.rx_ovf <- false;
     t.vlog_ovf <- false;
     t.cov_ovr <- false;
-    Array.fill t.clocks ~pos:0 ~len:3 0);
+    Array.fill t.clocks ~pos:0 ~len:3 0;
+    t.pre <- 0);
   t.taken <- any_fire;
   t.taken_edge <- (match winner with Some k -> k | None -> 3);
   t.viol <- viol_now;

@@ -35,6 +35,9 @@ module Host_in = struct
     ; cov_addr : 'a [@bits 8] (** {loc, edge}; read data appears next cycle *)
     ; cov_we : 'a (** ignored while running *)
     ; cov_wdata : 'a [@bits 32]
+    ; lane0 : 'a Lane_cfg.t [@rtlprefix "lane0_"] (** bit lane CSRs (ENGINE.md, Bit lanes) *)
+    ; lane1 : 'a Lane_cfg.t [@rtlprefix "lane1_"]
+    ; pin_src : 'a [@bits 24] (** 3 bits per pin, [Pin_src] *)
     }
   [@@deriving hardcaml]
 end
@@ -62,6 +65,8 @@ module Status = struct
     ; rx_overflow : 'a
     ; vlog_overflow : 'a
     ; cov_overrun : 'a
+    ; lane_status : 'a [@bits 16]
+        (** per lane, lane 1 in the high byte: {done, crc_ok, sync_hit, error, 0, kind 3} *)
     }
   [@@deriving hardcaml]
 end
@@ -135,6 +140,9 @@ let phase_fetch = 1
 let phase_eval = 2
 let c2 n = Signal.of_int ~width:2 n
 
+(** Bit lanes in the chip (1 or 2; ENGINE.md). *)
+let num_lanes = 2
+
 let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let h = i.host in
   let spec = Reg_spec.create ~clock:i.clock ~clear:i.clear () in
@@ -187,9 +195,38 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     small_fifo spec ~depth:8 ~push:h.tx_push ~pop:tx_pop ~d:h.tx_data
   in
   let rx_push = wire 1 in
+  let rx_push_d = wire 8 in
   let rx_q, rx_empty, rx_full, rx_drop =
-    small_fifo spec ~depth:8 ~push:rx_push ~pop:h.rx_pop ~d:rx_sr.value
+    small_fifo spec ~depth:8 ~push:rx_push ~pop:h.rx_pop ~d:rx_push_d
   in
+  (* ---- bit lanes ---- *)
+  let lane_cmd = wire 3 in
+  let cmd_is k = lane_cmd ==:. k in
+  let lanes =
+    List.init num_lanes ~f:(fun l ->
+      Lane.create
+        (Scope.create ~flatten_design:true ())
+        { Lane.I.clock = i.clock
+        ; clear = i.clear
+        ; cfg = (if l = 0 then h.lane0 else h.lane1)
+        ; go = cmd_is (Lane_cmd.go l)
+        ; end_ = cmd_is (Lane_cmd.end_ l)
+        ; crc_cmd = cmd_is (Lane_cmd.crc l)
+        ; reset = cmd_is Lane_cmd.reset
+        ; pins_s
+        ; pins_q
+        ; tx_head = tx_q
+        ; tx_empty
+        })
+  in
+  let lane_flags =
+    List.init 2 ~f:(fun l ->
+      match List.nth lanes l with
+      | Some (o : _ Lane.O.t) -> [ o.done_; o.crc_ok; o.sync_hit; o.error ]
+      | None -> [ gnd; gnd; gnd; gnd ])
+    |> List.concat
+  in
+  let lane_out l = match List.nth lanes l with Some (o : _ Lane.O.t) -> o.out | None -> vdd in
   let vlog_push = wire 1 in
   let vlog_d = wire 48 in
   let vlog_q, vlog_empty, _, vlog_drop =
@@ -206,7 +243,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; lfsr.value.:(0)
     ; select rx_sr.value 7 1 ==: select h.match_addr 6 0
     ]
-    @ List.init 8 ~f:(fun _ -> gnd)
+    @ lane_flags
   in
   let changed_all = changed.value |: chg_now in
   let is_stress = role.value ==:. Role.stress in
@@ -343,7 +380,10 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let p2 = p1 &: ~:tmask |: (sresize tx_sr.value.:(0) 8 &: tmask) in
   let o2 = o1 |: tmask in
   let is_load = a_tx_op ==:. Tx_op.load |: (a_tx_op ==:. Tx_op.load_rev) in
-  tx_pop <== (act_en &: is_load);
+  (* a lane pop and an engine load in the same cycle both read the head; one pop *)
+  tx_pop <== (act_en &: is_load |: reduce ~f:( |: ) (gnd :: List.map lanes ~f:(fun o -> o.Lane.O.pop)));
+  (* lane commands: the winning edge's tx_pin field when tx_pin_en = 0 *)
+  lane_cmd <== mux2 (any_fire &: ~:(we.tx_pin_en)) we.tx_pin (zero 3);
   let loaded = mux2 tx_empty (ones 8) tx_q in
   let tx_next =
     mux a_tx_op [ tx_sr.value; loaded; reverse loaded; concat_msb [ vdd; select tx_sr.value 7 1 ] ]
@@ -358,7 +398,40 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ; rx_sr.value
       ]
   in
-  rx_push <== (act_en &: (a_rx_op ==:. Rx_op.push));
+  (* RX FIFO: lane 0, lane 1, engine; a push that loses waits in a one-entry buffer *)
+  let eng_push = act_en &: (a_rx_op ==:. Rx_op.push) in
+  let lane_push l =
+    match List.nth lanes l with
+    | Some (o : _ Lane.O.t) -> o.push, o.push_data
+    | None -> gnd, zero 8
+  in
+  let l0_push, l0_data = lane_push 0 in
+  let bufs =
+    List.map [ lane_push 1; eng_push, rx_sr.value ] ~f:(fun (n, nd) ->
+      let bv = Always.Variable.reg spec ~width:1 in
+      let bd = Always.Variable.reg spec ~width:8 in
+      n, nd, bv, bd)
+  in
+  let req (n, _, (bv : Always.Variable.t), _) = bv.value |: n in
+  let dat (_, nd, (bv : Always.Variable.t), (bd : Always.Variable.t)) = mux2 bv.value bd.value nd in
+  let b1, b2 = match bufs with [ a; b ] -> a, b | _ -> assert false in
+  let acc1 = ~:l0_push &: req b1 in
+  let acc2 = ~:l0_push &: ~:(req b1) &: req b2 in
+  rx_push <== (l0_push |: req b1 |: req b2);
+  rx_push_d <== mux2 l0_push l0_data (mux2 acc1 (dat b1) (dat b2));
+  let buf_drop = wire 1 in
+  let buf_logic =
+    List.map [ b1, acc1; b2, acc2 ] ~f:(fun ((n, nd, bv, bd), accepted) ->
+      let open Always in
+      ( if_
+          accepted
+          [ (* the buffered one went in; a new push takes its place *)
+            if_ (bv.value &: n) [ bd <-- nd ] [ bv <--. 0 ] ]
+          [ when_ (~:(bv.value) &: n) [ bv <--. 1; bd <-- nd ] ]
+      , bv.value &: n &: ~:accepted ))
+  in
+  Always.compile (List.map buf_logic ~f:fst);
+  buf_drop <== reduce ~f:( |: ) (List.map buf_logic ~f:snd);
   let cnt_next =
     mux a_cnt_op [ cnt.value; cnt.value -:. 1; of_int ~width:8 7; of_int ~width:8 8 ]
   in
@@ -417,12 +490,24 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   in
   let host_cov_we = h.cov_we &: in_idle &: ~:(s2_v.value) &: ~:(s1_v.value) in
   (* ---- sequential logic ---- *)
+  (* prescaler: a free-running 9-bit counter, 0 at start; with /N the clocks count in
+     cycles where its low log2 N bits are all 1 *)
+  let pre = rv 9 in
+  let tick =
+    mux
+      hdr.prescale
+      [ vdd
+      ; select pre.value 2 0 ==:. 7
+      ; select pre.value 5 0 ==:. 63
+      ; pre.value ==:. 511
+      ]
+  in
   let incr_clocks =
     List.mapi clocks ~f:(fun k c ->
       if_
         (act_en &: a_rst.:(k))
         [ c <--. 0 ]
-        [ when_ (c.value <>:. 0xFFFF) [ c <-- c.value +:. 1 ] ])
+        [ when_ (tick &: (c.value <>:. 0xFFFF)) [ c <-- c.value +:. 1 ] ])
   in
   compile
     [ lfsr
@@ -430,6 +515,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
             [ select lfsr.value 14 0
             ; lfsr.value.:(15) ^: lfsr.value.:(13) ^: lfsr.value.:(12) ^: lfsr.value.:(10)
             ]
+    ; pre <-- pre.value +:. 1
     ; proc incr_clocks
     ; when_ act_en [ to_logged <--. 0 ]
     ; when_
@@ -438,7 +524,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; when_ act_en [ tx_sr <-- tx_next; rx_sr <-- rx_next; cnt <-- cnt_next ]
     ; when_ (entry_now &: hdr.irq_on_entry) [ irq_flag <--. 1 ]
     ; when_ h.irq_ack [ irq_flag <--. 0 ]
-    ; when_ rx_drop [ rx_ovf <--. 1 ]
+    ; when_ (rx_drop |: buf_drop) [ rx_ovf <--. 1 ]
     ; when_ vlog_drop [ vlog_ovf <--. 1 ]
     ; when_ drop_now [ cov_ovr <--. 1 ]
     ; (* coverage pipeline *)
@@ -514,6 +600,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ; vlog_ovf <--. 0
         ; cov_ovr <--. 0
         ; proc (List.map clocks ~f:(fun c -> c <--. 0))
+        ; pre <--. 0
         ]
     ];
   (* ---- SRAM ports ---- *)
@@ -552,11 +639,30 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; rx_overflow = rx_ovf.value
     ; vlog_overflow = vlog_ovf.value
     ; cov_overrun = cov_ovr.value
+    ; lane_status =
+        concat_msb
+          (List.rev
+             (List.init 2 ~f:(fun l ->
+                match List.nth lanes l with
+                | Some (o : _ Lane.O.t) ->
+                  concat_msb [ o.done_; o.crc_ok; o.sync_hit; o.error; gnd; o.err_kind ]
+                | None -> zero 8)))
     }
   in
   (* open-drain pins drive only 0; a 1 releases the pin *)
-  { pins_out = pout.value &: ~:(h.open_drain)
-  ; pins_oe = poe.value &: ~:(h.open_drain &: pout.value)
+  (* pin source select, then the open-drain output stage *)
+  let pin_val =
+    List.init 8 ~f:(fun p ->
+      let e = pout.value.:(p) in
+      let l0 = lane_out 0
+      and l1 = lane_out 1 in
+      mux
+        (select h.pin_src ((3 * p) + 2) (3 * p))
+        [ e; l0; ~:l0; l0 &: e; ~:l0 &: e; l1; ~:l1; l1 &: e ])
+    |> concat_lsb
+  in
+  { pins_out = pin_val &: ~:(h.open_drain)
+  ; pins_oe = poe.value &: ~:(h.open_drain &: pin_val)
   ; status
   ; ram
   }

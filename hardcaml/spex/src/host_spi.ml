@@ -23,6 +23,14 @@
       byte 5 pops it and the address wraps to byte 0 of the next entry. 0 when empty.
     - 4 TX FIFO, write only: each data byte is pushed.
     - 5 RX FIFO, read only: each data byte read pops the head (0 when empty).
+    - 6 bit-lane configuration, write only: lane l at 32 l. Bytes 0-1 div_int, 2 div_frac,
+      3 {crc_inv, readback, lsb_first, code 2, clk_edge, clk_pin_en, dir}, 4 {data_pin 3,
+      clk_pin 3}, 5 {stuff_len 3, stuff 2}, 6 crc_width, 8-11 poly, 12-15 init, 16-17
+      sync, 18-19 sync_mask, 20-21 frame_bits (all little-endian).
+
+    CSRs 0x0C / 0x0D (read): lane 0 / 1 status {done, crc_ok, sync_hit, error, 0,
+    kind: lost arbitration, bit error, stuff error}. 0x10..0x12 (read/write): pin source
+    select, 3 bits per pin, pin 0 in bits 2:0 of 0x10 (little-endian 24 bits).
 
     STATUS = {running, halted_viol, irq, accepting, rx_avail, vlog_avail, tx_full,
     in_entry}. FLAGS = {rx_overflow, vlog_overflow, cov_overrun, tx_empty, 4'b0}. *)
@@ -59,7 +67,36 @@ module Space = struct
   let vlog = 3
   let tx = 4
   let rx = 5
+  let lanes = 6
 end
+
+let lane_bytes = 22
+
+(** The lane configuration from its CSR bytes (layout in the module comment). *)
+let lane_cfg_of (b : Signal.t list) : Signal.t Layout.Lane_cfg.t =
+  let b k = List.nth_exn b k in
+  let le ks = concat_msb (List.rev_map ks ~f:b) in
+  { dir = (b 3).:(0)
+  ; div_int = le [ 0; 1 ]
+  ; div_frac = b 2
+  ; clk_pin_en = (b 3).:(1)
+  ; clk_edge = (b 3).:(2)
+  ; code = select (b 3) 4 3
+  ; lsb_first = (b 3).:(5)
+  ; readback = (b 3).:(6)
+  ; crc_inv = (b 3).:(7)
+  ; clk_pin = select (b 4) 2 0
+  ; data_pin = select (b 4) 5 3
+  ; stuff = select (b 5) 1 0
+  ; stuff_len = select (b 5) 4 2
+  ; crc_width = select (b 6) 5 0
+  ; poly = le [ 8; 9; 10; 11 ]
+  ; init = le [ 12; 13; 14; 15 ]
+  ; sync = le [ 16; 17 ]
+  ; sync_mask = le [ 18; 19 ]
+  ; frame_bits = le [ 20; 21 ]
+  }
+;;
 
 let status_byte (st : Signal.t Engine.Status.t) =
   concat_msb
@@ -109,6 +146,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let open_drain = rv 8 in
   let match_addr = rv 8 in
   let ts_snap = rv 24 in
+  let pin_src = List.init 3 ~f:(fun _ -> rv 8) in
+  let lane_regs = List.init 2 ~f:(fun _ -> List.init lane_bytes ~f:(fun _ -> rv 8)) in
   (* host-side strobes and data, one cycle after the byte that causes them *)
   let start_p = rv 1 in
   let stop_p = rv 1 in
@@ -152,8 +191,17 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ; select ts_snap.value 7 0
       ; select ts_snap.value 15 8
       ; select ts_snap.value 23 16
+      ; select st.lane_status 7 0
+      ; select st.lane_status 15 8
+      ; zero 8
       ; zero 8
       ]
+  in
+  let csr_rd =
+    mux2
+      a.:(4)
+      (mux (select a 1 0) (List.map pin_src ~f:(fun r -> r.value) @ [ zero 8 ]))
+      csr_rd
   in
   let data_rd =
     mux
@@ -192,7 +240,17 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ]
     ; (* writes *)
       when_
-        (wr_data &: sp Space.csr)
+        (wr_data &: sp Space.csr &: a.:(4))
+        [ proc (List.mapi pin_src ~f:(fun k r -> when_ (select a 1 0 ==:. k) [ r <-- byte ])) ]
+    ; when_
+        (wr_data &: sp Space.lanes)
+        [ proc
+            (List.concat_mapi lane_regs ~f:(fun l regs ->
+               List.mapi regs ~f:(fun k r ->
+                 when_ ((a.:(5) ==:. l) &: (select a 4 0 ==:. k)) [ r <-- byte ])))
+        ]
+    ; when_
+        (wr_data &: sp Space.csr &: ~:(a.:(4)))
         [ switch
             (select a 3 0)
             [ ( of_int ~width:4 0
@@ -257,6 +315,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; cov_addr = mux2 cov_we_p.value cov_waddr.value (select a 9 2)
     ; cov_we = cov_we_p.value
     ; cov_wdata = cov_w.value
+    ; lane0 = lane_cfg_of (List.map (List.nth_exn lane_regs 0) ~f:(fun r -> r.value))
+    ; lane1 = lane_cfg_of (List.map (List.nth_exn lane_regs 1) ~f:(fun r -> r.value))
+    ; pin_src = concat_msb (List.rev_map pin_src ~f:(fun r -> r.value))
     }
   in
   { host; miso = active &: out_sr.value.:(7); dbg_sel = select config.value 5 4 }
