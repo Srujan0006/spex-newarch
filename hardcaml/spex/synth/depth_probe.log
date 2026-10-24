@@ -1,0 +1,1132 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Executing script file `depth_probe.ys' --
+
+1. Executing Verilog-2005 frontend: /mnt/project-files/architecture/area-probe/spex_core.v
+Parsing Verilog input from `/mnt/project-files/architecture/area-probe/spex_core.v' to AST representation.
+Generating RTLIL representation for module `\spex_core'.
+Warning: Replacing memory \clk_r with list of registers. See /mnt/project-files/architecture/area-probe/spex_core.v:116
+Successfully finished Verilog frontend.
+
+2. Executing SYNTH pass.
+
+2.1. Executing HIERARCHY pass (managing design hierarchy).
+
+2.1.1. Analyzing design hierarchy..
+Top module:  \spex_core
+
+2.1.2. Analyzing design hierarchy..
+Top module:  \spex_core
+Removed 0 unused modules.
+
+2.2. Executing PROC pass (convert processes to netlists).
+
+2.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$/mnt/project-files/architecture/area-probe/spex_core.v:0$253 in module spex_core.
+Marked 6 switch rules as full_case in process $proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183 in module spex_core.
+Marked 4 switch rules as full_case in process $proc$/mnt/project-files/architecture/area-probe/spex_core.v:95$164 in module spex_core.
+Marked 12 switch rules as full_case in process $proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19 in module spex_core.
+Removed a total of 0 dead cases.
+
+2.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 5 redundant assignments.
+Promoted 56 assignments to connections.
+
+2.2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \rst_n in `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+
+2.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~39 debug messages>
+
+2.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:0$253'.
+     1/1: $1$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:101$14_DATA[15:0]$255
+Creating decoders for process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+     1/41: $4$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_DATA[15:0]$236
+     2/41: $4\k[31:0]
+     3/41: $3$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_DATA[15:0]$235
+     4/41: $3$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_ADDR[1:0]$234
+     5/41: $3\k[31:0]
+     6/41: $2$lookahead\rec$182[511:0]$212
+     7/41: $2$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_DATA[15:0]$211
+     8/41: $2$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_ADDR[1:0]$210
+     9/41: $2$bitselwrite$sel$/mnt/project-files/architecture/area-probe/spex_core.v:131$9[31:0]$209
+    10/41: $2$bitselwrite$data$/mnt/project-files/architecture/area-probe/spex_core.v:131$8[511:0]$208
+    11/41: $2$bitselwrite$mask$/mnt/project-files/architecture/area-probe/spex_core.v:131$7[511:0]$207
+    12/41: $2\k[31:0]
+    13/41: $1$lookahead\rec$182[511:0]$196
+    14/41: $1$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_DATA[15:0]$195
+    15/41: $1$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_ADDR[1:0]$194
+    16/41: $1$bitselwrite$sel$/mnt/project-files/architecture/area-probe/spex_core.v:131$9[31:0]$193
+    17/41: $1$bitselwrite$data$/mnt/project-files/architecture/area-probe/spex_core.v:131$8[511:0]$192
+    18/41: $1$bitselwrite$mask$/mnt/project-files/architecture/area-probe/spex_core.v:131$7[511:0]$191
+    19/41: $1\k[31:0]
+    20/41: $0\viol[0:0]
+    21/41: $0\taken[0:0]
+    22/41: $0\lfsr[15:0]
+    23/41: $0\pins_q[7:0]
+    24/41: $0\timestamp[31:0]
+    25/41: $0\clk_r[2][15:0]
+    26/41: $0\clk_r[1][15:0]
+    27/41: $0\clk_r[0][15:0]
+    28/41: $0\cnt[7:0]
+    29/41: $0\changed[7:0]
+    30/41: $0\beat[3:0]
+    31/41: $0\state[1:0]
+    32/41: $0\crc[15:0]
+    33/41: $0\rx_sr[15:0]
+    34/41: $0\tx_sr[15:0]
+    35/41: $0\cur_loc[5:0]
+    36/41: $0\viol_kind[1:0]
+    37/41: $0\taken_offset[15:0]
+    38/41: $0\taken_edge[1:0]
+    39/41: $0\pins_oe[7:0]
+    40/41: $0\pins_out[7:0]
+    41/41: $0\sram_addr[9:0]
+Creating decoders for process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:95$164'.
+     1/4: $4\win_idx[1:0]
+     2/4: $3\win_idx[1:0]
+     3/4: $2\win_idx[1:0]
+     4/4: $1\win_idx[1:0]
+Creating decoders for process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+     1/12: $2$for_loop$1[3].ev.str_ok[0:0]$158
+     2/12: $1$for_loop$1[3].ev.str_ok[0:0]$151
+     3/12: $1$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$13_DATA[15:0]$137
+     4/12: $2$for_loop$1[2].ev.str_ok[0:0]$131
+     5/12: $1$for_loop$1[2].ev.str_ok[0:0]$124
+     6/12: $1$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$12_DATA[15:0]$110
+     7/12: $2$for_loop$1[1].ev.str_ok[0:0]$104
+     8/12: $1$for_loop$1[1].ev.str_ok[0:0]$97
+     9/12: $1$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$11_DATA[15:0]$83
+    10/12: $2$for_loop$1[0].ev.str_ok[0:0]$77
+    11/12: $1$for_loop$1[0].ev.str_ok[0:0]$70
+    12/12: $1$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$10_DATA[15:0]$56
+
+2.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:101$14_DATA' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:0$253'.
+No latch inferred for signal `\spex_core.\i' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:95$164'.
+No latch inferred for signal `\spex_core.\win_idx' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:95$164'.
+No latch inferred for signal `\spex_core.\fire' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.\inwin' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.\i' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[0].ev.e' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[0].ev.c' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[0].ev.pin_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[0].ev.chg_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[0].ev.win_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[0].ev.dat_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[0].ev.str_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[1].ev.e' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[1].ev.c' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[1].ev.pin_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[1].ev.chg_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[1].ev.win_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[1].ev.dat_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[1].ev.str_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[2].ev.e' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[2].ev.c' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[2].ev.pin_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[2].ev.chg_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[2].ev.win_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[2].ev.dat_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[2].ev.str_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[3].ev.e' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[3].ev.c' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[3].ev.pin_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[3].ev.chg_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[3].ev.win_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[3].ev.dat_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$for_loop$1[3].ev.str_ok' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$10_ADDR' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$10_DATA' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$11_ADDR' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$11_DATA' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$12_ADDR' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$12_DATA' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$13_ADDR' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+No latch inferred for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:77$13_DATA' from process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+
+2.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spex_core.\sram_addr' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$592' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\pins_out' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$593' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\pins_oe' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$594' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\taken' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$595' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\taken_edge' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$596' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\taken_offset' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$597' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\viol' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$598' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\viol_kind' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$599' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\timestamp' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$600' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\cur_loc' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$601' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\tx_sr' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$602' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\rx_sr' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$603' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\crc' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$604' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\state' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$605' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\beat' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$606' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\rec' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$607' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\pins_q' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$608' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\changed' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$609' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\cnt' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$610' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\lfsr' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$611' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\k' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$612' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.$bitselwrite$mask$/mnt/project-files/architecture/area-probe/spex_core.v:131$7' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$613' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.$bitselwrite$data$/mnt/project-files/architecture/area-probe/spex_core.v:131$8' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$614' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.$bitselwrite$sel$/mnt/project-files/architecture/area-probe/spex_core.v:131$9' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$615' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\clk_r[0]' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$616' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\clk_r[1]' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$617' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.\clk_r[2]' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$618' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_ADDR' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$619' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_DATA' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$620' with positive edge clock and negative level reset.
+Creating register for signal `\spex_core.$lookahead\rec$182' using process `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+  created $adff cell `$procdff$621' with positive edge clock and negative level reset.
+
+2.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:0$253'.
+Removing empty process `spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:0$253'.
+Found and cleaned up 22 empty switches in `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+Removing empty process `spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:109$183'.
+Found and cleaned up 4 empty switches in `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:95$164'.
+Removing empty process `spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:95$164'.
+Found and cleaned up 12 empty switches in `\spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+Removing empty process `spex_core.$proc$/mnt/project-files/architecture/area-probe/spex_core.v:71$19'.
+Cleaned up 39 empty switches.
+
+2.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~34 debug messages>
+
+2.3. Executing FLATTEN pass (flatten design).
+
+2.4. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~7 debug messages>
+
+2.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 32 unused cells and 263 unused wires.
+<suppressed ~38 debug messages>
+
+2.6. Executing CHECK pass (checking for obvious problems).
+Checking module spex_core...
+Found and reported 0 problems.
+
+2.7. Executing OPT pass (performing simple optimizations).
+
+2.7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~153 debug messages>
+Removed a total of 51 cells.
+
+2.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $procmux$268.
+    dead port 2/2 on $mux $procmux$270.
+Removed 2 multiplexer ports.
+<suppressed ~35 debug messages>
+
+2.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 53 unused wires.
+<suppressed ~1 debug messages>
+
+2.7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~35 debug messages>
+
+2.7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.7.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.7.16. Finished OPT passes. (There is nothing left to do.)
+
+2.8. Executing FSM pass (extract and optimize FSM).
+
+2.8.1. Executing FSM_DETECT pass (finding FSMs in design).
+Not marking spex_core.state as FSM state register:
+    Circuit seems to be self-resetting.
+Not marking spex_core.taken_edge as FSM state register:
+    Register is connected to module port.
+    Users of register don't seem to benefit from recoding.
+
+2.8.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+2.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+2.8.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+2.8.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+2.8.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+2.8.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+2.9. Executing OPT pass (performing simple optimizations).
+
+2.9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~35 debug messages>
+
+2.9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$610 ($adff) from module spex_core (D = $procmux$388_Y, Q = \cnt).
+Adding EN signal on $procdff$609 ($adff) from module spex_core (D = $0\changed[7:0], Q = \changed).
+Adding EN signal on $procdff$607 ($adff) from module spex_core (D = $or$/mnt/project-files/architecture/area-probe/spex_core.v:0$225_Y, Q = \rec).
+Adding EN signal on $procdff$606 ($adff) from module spex_core (D = $0\beat[3:0], Q = \beat).
+Adding EN signal on $procdff$605 ($adff) from module spex_core (D = $0\state[1:0], Q = \state).
+Adding EN signal on $procdff$604 ($adff) from module spex_core (D = $xor$/mnt/project-files/architecture/area-probe/spex_core.v:156$249_Y, Q = \crc).
+Adding EN signal on $procdff$603 ($adff) from module spex_core (D = { \rx_sr [14:0] $shiftx$/mnt/project-files/architecture/area-probe/spex_core.v:0$244_Y }, Q = \rx_sr).
+Adding EN signal on $procdff$601 ($adff) from module spex_core (D = $0\cur_loc[5:0], Q = \cur_loc).
+Adding EN signal on $procdff$599 ($adff) from module spex_core (D = { \timeout \unexp }, Q = \viol_kind).
+Adding EN signal on $procdff$597 ($adff) from module spex_core (D = $4$mem2reg_rd$\clk_r$/mnt/project-files/architecture/area-probe/spex_core.v:146$15_DATA[15:0]$236, Q = \taken_offset).
+Adding EN signal on $procdff$596 ($adff) from module spex_core (D = \win_idx, Q = \taken_edge).
+Adding EN signal on $procdff$594 ($adff) from module spex_core (D = $0\pins_oe[7:0], Q = \pins_oe).
+Adding EN signal on $procdff$593 ($adff) from module spex_core (D = $0\pins_out[7:0], Q = \pins_out).
+Adding EN signal on $procdff$592 ($adff) from module spex_core (D = $0\sram_addr[9:0], Q = \sram_addr).
+
+2.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 16 unused cells and 16 unused wires.
+<suppressed ~17 debug messages>
+
+2.9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~7 debug messages>
+
+2.9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~30 debug messages>
+
+2.9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~57 debug messages>
+Removed a total of 19 cells.
+
+2.9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 19 unused wires.
+<suppressed ~1 debug messages>
+
+2.9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~30 debug messages>
+
+2.9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.9.23. Finished OPT passes. (There is nothing left to do.)
+
+2.10. Executing WREDUCE pass (reducing word size of cells).
+Removed top 25 bits (of 28) from port B of cell spex_core.$mul$/mnt/project-files/architecture/area-probe/spex_core.v:100$166 ($mul).
+Removed top 23 bits (of 28) from port Y of cell spex_core.$mul$/mnt/project-files/architecture/area-probe/spex_core.v:100$166 ($mul).
+Removed top 25 bits (of 32) from port A of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:100$167 ($add).
+Removed top 23 bits (of 32) from port B of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:100$167 ($add).
+Removed top 22 bits (of 32) from port Y of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:100$167 ($add).
+Removed top 21 bits (of 32) from port B of cell spex_core.$shiftx$/mnt/project-files/architecture/area-probe/spex_core.v:0$169 ($shiftx).
+Removed top 12 bits (of 112) from port Y of cell spex_core.$shiftx$/mnt/project-files/architecture/area-probe/spex_core.v:0$169 ($shiftx).
+Removed top 1 bits (of 2) from port B of cell spex_core.$eq$/mnt/project-files/architecture/area-probe/spex_core.v:106$181 ($eq).
+Removed top 31 bits (of 32) from port B of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:118$197 ($add).
+Removed top 31 bits (of 32) from port B of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$202 ($add).
+Removed top 16 bits (of 32) from port Y of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$202 ($add).
+Removed top 31 bits (of 32) from port B of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$204 ($add).
+Removed top 16 bits (of 32) from port Y of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$204 ($add).
+Removed top 31 bits (of 32) from port B of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$206 ($add).
+Removed top 16 bits (of 32) from port Y of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$206 ($add).
+Removed top 21 bits (of 33) from port A of cell spex_core.$neg$/mnt/project-files/architecture/area-probe/spex_core.v:0$217 ($neg).
+Converting cell spex_core.$neg$/mnt/project-files/architecture/area-probe/spex_core.v:0$217 ($neg) from signed to unsigned.
+Removed top 1 bits (of 12) from port A of cell spex_core.$neg$/mnt/project-files/architecture/area-probe/spex_core.v:0$217 ($neg).
+Removed top 31 bits (of 32) from port B of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:132$226 ($add).
+Removed top 22 bits (of 32) from port Y of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:132$226 ($add).
+Removed top 31 bits (of 32) from port B of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:133$227 ($add).
+Removed top 28 bits (of 32) from port Y of cell spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:133$227 ($add).
+Removed top 2 bits (of 4) from port B of cell spex_core.$eq$/mnt/project-files/architecture/area-probe/spex_core.v:134$228 ($eq).
+Removed top 31 bits (of 32) from port B of cell spex_core.$sub$/mnt/project-files/architecture/area-probe/spex_core.v:155$245 ($sub).
+Removed top 24 bits (of 32) from port Y of cell spex_core.$sub$/mnt/project-files/architecture/area-probe/spex_core.v:155$245 ($sub).
+Removed top 1 bits (of 2) from port B of cell spex_core.$eq$/mnt/project-files/architecture/area-probe/spex_core.v:164$251 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$259_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$266_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$auto$opt_dff.cc:195:make_patterns_logic$652 ($ne).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$443_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$546_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$551_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$559_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$564_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$572_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$577_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$585_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$590_CMP0 ($eq).
+Removed top 22 bits (of 32) from wire spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:0$168_Y.
+Removed top 16 bits (of 32) from wire spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$202_Y.
+Removed top 16 bits (of 32) from wire spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$204_Y.
+Removed top 16 bits (of 32) from wire spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:121$206_Y.
+Removed top 22 bits (of 32) from wire spex_core.$add$/mnt/project-files/architecture/area-probe/spex_core.v:132$226_Y.
+Removed top 23 bits (of 32) from wire spex_core.$mul$/mnt/project-files/architecture/area-probe/spex_core.v:100$166_Y.
+Removed top 24 bits (of 32) from wire spex_core.$sub$/mnt/project-files/architecture/area-probe/spex_core.v:155$245_Y.
+Removed top 12 bits (of 112) from wire spex_core.we.
+
+2.11. Executing PEEPOPT pass (run peephole optimizers).
+
+2.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 8 unused wires.
+<suppressed ~1 debug messages>
+
+2.13. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module spex_core:
+  creating $macc model for $add$/mnt/project-files/architecture/area-probe/spex_core.v:100$167 ($add).
+  creating $macc model for $add$/mnt/project-files/architecture/area-probe/spex_core.v:118$197 ($add).
+  creating $macc model for $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$202 ($add).
+  creating $macc model for $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$204 ($add).
+  creating $macc model for $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$206 ($add).
+  creating $macc model for $add$/mnt/project-files/architecture/area-probe/spex_core.v:132$226 ($add).
+  creating $macc model for $add$/mnt/project-files/architecture/area-probe/spex_core.v:133$227 ($add).
+  creating $macc model for $mul$/mnt/project-files/architecture/area-probe/spex_core.v:100$166 ($mul).
+  creating $macc model for $neg$/mnt/project-files/architecture/area-probe/spex_core.v:0$217 ($neg).
+  creating $macc model for $sub$/mnt/project-files/architecture/area-probe/spex_core.v:155$245 ($sub).
+  creating $alu model for $macc $sub$/mnt/project-files/architecture/area-probe/spex_core.v:155$245.
+  creating $alu model for $macc $neg$/mnt/project-files/architecture/area-probe/spex_core.v:0$217.
+  creating $alu model for $macc $add$/mnt/project-files/architecture/area-probe/spex_core.v:133$227.
+  creating $alu model for $macc $add$/mnt/project-files/architecture/area-probe/spex_core.v:132$226.
+  creating $alu model for $macc $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$206.
+  creating $alu model for $macc $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$204.
+  creating $alu model for $macc $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$202.
+  creating $alu model for $macc $add$/mnt/project-files/architecture/area-probe/spex_core.v:118$197.
+  creating $alu model for $macc $add$/mnt/project-files/architecture/area-probe/spex_core.v:100$167.
+  creating $macc cell for $mul$/mnt/project-files/architecture/area-probe/spex_core.v:100$166: $auto$alumacc.cc:365:replace_macc$724
+  creating $alu model for $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$119 ($ge): new $alu
+  creating $alu model for $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$146 ($ge): new $alu
+  creating $alu model for $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$65 ($ge): new $alu
+  creating $alu model for $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$92 ($ge): new $alu
+  creating $alu model for $gt$/mnt/project-files/architecture/area-probe/spex_core.v:102$170 ($gt): new $alu
+  creating $alu model for $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$120 ($le): new $alu
+  creating $alu model for $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$147 ($le): new $alu
+  creating $alu model for $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$66 ($le): new $alu
+  creating $alu model for $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$93 ($le): new $alu
+  creating $alu model for $eq$/mnt/project-files/architecture/area-probe/spex_core.v:84$125 ($eq): merged with $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$119.
+  creating $alu model for $eq$/mnt/project-files/architecture/area-probe/spex_core.v:84$152 ($eq): merged with $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$146.
+  creating $alu model for $eq$/mnt/project-files/architecture/area-probe/spex_core.v:84$71 ($eq): merged with $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$65.
+  creating $alu model for $eq$/mnt/project-files/architecture/area-probe/spex_core.v:84$98 ($eq): merged with $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$92.
+  creating $alu model for $eq$/mnt/project-files/architecture/area-probe/spex_core.v:85$126 ($eq): merged with $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$120.
+  creating $alu model for $eq$/mnt/project-files/architecture/area-probe/spex_core.v:85$153 ($eq): merged with $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$147.
+  creating $alu model for $eq$/mnt/project-files/architecture/area-probe/spex_core.v:85$72 ($eq): merged with $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$66.
+  creating $alu model for $eq$/mnt/project-files/architecture/area-probe/spex_core.v:85$99 ($eq): merged with $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$93.
+  creating $alu cell for $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$93, $eq$/mnt/project-files/architecture/area-probe/spex_core.v:85$99: $auto$alumacc.cc:485:replace_alu$734
+  creating $alu cell for $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$66, $eq$/mnt/project-files/architecture/area-probe/spex_core.v:85$72: $auto$alumacc.cc:485:replace_alu$747
+  creating $alu cell for $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$147, $eq$/mnt/project-files/architecture/area-probe/spex_core.v:85$153: $auto$alumacc.cc:485:replace_alu$760
+  creating $alu cell for $le$/mnt/project-files/architecture/area-probe/spex_core.v:80$120, $eq$/mnt/project-files/architecture/area-probe/spex_core.v:85$126: $auto$alumacc.cc:485:replace_alu$769
+  creating $alu cell for $gt$/mnt/project-files/architecture/area-probe/spex_core.v:102$170: $auto$alumacc.cc:485:replace_alu$778
+  creating $alu cell for $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$92, $eq$/mnt/project-files/architecture/area-probe/spex_core.v:84$98: $auto$alumacc.cc:485:replace_alu$789
+  creating $alu cell for $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$65, $eq$/mnt/project-files/architecture/area-probe/spex_core.v:84$71: $auto$alumacc.cc:485:replace_alu$798
+  creating $alu cell for $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$146, $eq$/mnt/project-files/architecture/area-probe/spex_core.v:84$152: $auto$alumacc.cc:485:replace_alu$807
+  creating $alu cell for $ge$/mnt/project-files/architecture/area-probe/spex_core.v:80$119, $eq$/mnt/project-files/architecture/area-probe/spex_core.v:84$125: $auto$alumacc.cc:485:replace_alu$820
+  creating $alu cell for $add$/mnt/project-files/architecture/area-probe/spex_core.v:100$167: $auto$alumacc.cc:485:replace_alu$833
+  creating $alu cell for $add$/mnt/project-files/architecture/area-probe/spex_core.v:118$197: $auto$alumacc.cc:485:replace_alu$836
+  creating $alu cell for $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$202: $auto$alumacc.cc:485:replace_alu$839
+  creating $alu cell for $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$204: $auto$alumacc.cc:485:replace_alu$842
+  creating $alu cell for $add$/mnt/project-files/architecture/area-probe/spex_core.v:121$206: $auto$alumacc.cc:485:replace_alu$845
+  creating $alu cell for $add$/mnt/project-files/architecture/area-probe/spex_core.v:132$226: $auto$alumacc.cc:485:replace_alu$848
+  creating $alu cell for $add$/mnt/project-files/architecture/area-probe/spex_core.v:133$227: $auto$alumacc.cc:485:replace_alu$851
+  creating $alu cell for $neg$/mnt/project-files/architecture/area-probe/spex_core.v:0$217: $auto$alumacc.cc:485:replace_alu$854
+  creating $alu cell for $sub$/mnt/project-files/architecture/area-probe/spex_core.v:155$245: $auto$alumacc.cc:485:replace_alu$857
+  created 18 $alu and 1 $macc cells.
+
+2.14. Executing SHARE pass (SAT-based resource sharing).
+
+2.15. Executing OPT pass (performing simple optimizations).
+
+2.15.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.15.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.15.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~30 debug messages>
+
+2.15.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.15.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.15.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.15.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 17 unused wires.
+<suppressed ~1 debug messages>
+
+2.15.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.15.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.15.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~30 debug messages>
+
+2.15.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.15.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.15.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.15.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.15.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.15.16. Finished OPT passes. (There is nothing left to do.)
+
+2.16. Executing MEMORY pass.
+
+2.16.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+2.16.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+2.16.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+2.16.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+2.16.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+2.16.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.16.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+2.16.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+2.16.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.16.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.18. Executing OPT pass (performing simple optimizations).
+
+2.18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~46 debug messages>
+
+2.18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.18.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.18.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 6 unused cells and 29 unused wires.
+<suppressed ~7 debug messages>
+
+2.18.5. Finished fast OPT passes.
+
+2.19. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+2.20. Executing OPT pass (performing simple optimizations).
+
+2.20.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.20.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.20.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~29 debug messages>
+
+2.20.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+    New ctrl vector for $pmux cell $procmux$395: \sram_en
+    New ctrl vector for $pmux cell $procmux$405: \sram_en
+    Consolidated identical input bits for $mux cell $procmux$417:
+      Old ports: A=2'00, B=2'01, Y=$procmux$417_Y
+      New ports: A=1'0, B=1'1, Y=$procmux$417_Y [0]
+      New connections: $procmux$417_Y [1] = 1'0
+    Consolidated identical input bits for $mux cell $procmux$538:
+      Old ports: A=2'00, B=2'11, Y=$1\win_idx[1:0]
+      New ports: A=1'0, B=1'1, Y=$1\win_idx[1:0] [0]
+      New connections: $1\win_idx[1:0] [1] = $1\win_idx[1:0] [0]
+  Optimizing cells in module \spex_core.
+    Consolidated identical input bits for $mux cell $procmux$419:
+      Old ports: A=2'00, B=$procmux$417_Y, Y=$procmux$419_Y
+      New ports: A=1'0, B=$procmux$417_Y [0], Y=$procmux$419_Y [0]
+      New connections: $procmux$419_Y [1] = 1'0
+  Optimizing cells in module \spex_core.
+Performed a total of 5 changes.
+
+2.20.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.20.6. Executing OPT_SHARE pass.
+
+2.20.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.20.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.20.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~3 debug messages>
+
+2.20.10. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.20.11. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~29 debug messages>
+
+2.20.12. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.20.13. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.20.14. Executing OPT_SHARE pass.
+
+2.20.15. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.20.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 2 unused wires.
+<suppressed ~1 debug messages>
+
+2.20.17. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.20.18. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.20.19. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~29 debug messages>
+
+2.20.20. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.20.21. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.20.22. Executing OPT_SHARE pass.
+
+2.20.23. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.20.24. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.20.25. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.20.26. Finished OPT passes. (There is nothing left to do.)
+
+2.21. Executing TECHMAP pass (map to technology primitives).
+
+2.21.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+2.21.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $xor.
+Using extmapper simplemap for cells of type $logic_not.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $reduce_or.
+Using extmapper simplemap for cells of type $or.
+Using template $paramod$constmap:83a29f4a7f63a3d3f44c557902d852be7e60c862$paramod$92adee9538f2381d8e5006822c900eb986d754e8\_90_shift_shiftx for cells of type $shiftx.
+Using template $paramod$0d149ffe75563ef6fcc1a3dddc59d00af28651a7\_90_pmux for cells of type $pmux.
+Using template $paramod$6df0329addda9228fcc2546de2aaf14ad26c98e1\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $not.
+Using extmapper simplemap for cells of type $ne.
+Using extmapper simplemap for cells of type $adffe.
+Using template $paramod$bfceb922395790c0ce92e9f9b5b428d4fc72cc30\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $reduce_bool.
+Using extmapper simplemap for cells of type $reduce_and.
+Using template $paramod$6a42b6fefed750f8a1c58eab59479d960557103c\_90_alu for cells of type $alu.
+Using template $paramod$constmap:4254cc6fb7a87200142c6417d83af189ee23c1a1$paramod$bf498f060aef752daa32e448c6eae584099ae61e\_90_shift_shiftx for cells of type $shiftx.
+Using extmapper simplemap for cells of type $eq.
+Using template $paramod$2af30114e9bd4ccb04dad757b3f0a8f6bf0615b0\_90_alu for cells of type $alu.
+Using template $paramod$754650b284649a026620fc6856e5b6886cbfe794\_90_alu for cells of type $alu.
+Using template $paramod$403a3c2fa431a154c52a6a5429d7a6260b5d144f\_90_alu for cells of type $alu.
+Using template $paramod$31b3272de9494c923ffcf0520c4f324d36c33cf5\_90_alu for cells of type $alu.
+Using template $paramod$constmap:91e06720604f81a77ca4ab1f791c566b9ec88dcb$paramod$46e3ac32b373eaf3026f028b03792f8384f10bd6\_90_shift_shiftx for cells of type $shift.
+Analyzing pattern of constant bits for this cell:
+Creating constmapped module `$paramod$constmap:1c881c7522eedfd6bf67dd69ce12e054d9e6ff0a$paramod$46e3ac32b373eaf3026f028b03792f8384f10bd6\_90_shift_shiftx'.
+
+2.21.34. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod$constmap:1c881c7522eedfd6bf67dd69ce12e054d9e6ff0a$paramod$46e3ac32b373eaf3026f028b03792f8384f10bd6\_90_shift_shiftx..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $procmux$1742.
+    dead port 2/2 on $mux $procmux$1736.
+    dead port 2/2 on $mux $procmux$1730.
+    dead port 2/2 on $mux $procmux$1724.
+    dead port 2/2 on $mux $procmux$1718.
+    dead port 2/2 on $mux $procmux$1712.
+    dead port 2/2 on $mux $procmux$1706.
+    dead port 2/2 on $mux $procmux$1700.
+    dead port 2/2 on $mux $procmux$1694.
+    dead port 2/2 on $mux $procmux$1688.
+Removed 10 multiplexer ports.
+<suppressed ~1075 debug messages>
+
+2.21.35. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$constmap:1c881c7522eedfd6bf67dd69ce12e054d9e6ff0a$paramod$46e3ac32b373eaf3026f028b03792f8384f10bd6\_90_shift_shiftx.
+<suppressed ~24 debug messages>
+Removed 0 unused cells and 15 unused wires.
+Using template $paramod$constmap:1c881c7522eedfd6bf67dd69ce12e054d9e6ff0a$paramod$46e3ac32b373eaf3026f028b03792f8384f10bd6\_90_shift_shiftx for cells of type $shift.
+Using template $paramod$32a7b7b86c07519b7537abc18e96f0331f97914d\_90_alu for cells of type $alu.
+Analyzing pattern of constant bits for this cell:
+Creating constmapped module `$paramod$constmap:ee5af906ae0d3d414c6a0471604c553ef70c8e09$paramod$92adee9538f2381d8e5006822c900eb986d754e8\_90_shift_shiftx'.
+
+2.21.38. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod$constmap:ee5af906ae0d3d414c6a0471604c553ef70c8e09$paramod$92adee9538f2381d8e5006822c900eb986d754e8\_90_shift_shiftx..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $procmux$1054.
+    dead port 2/2 on $mux $procmux$1048.
+    dead port 2/2 on $mux $procmux$1042.
+Removed 3 multiplexer ports.
+<suppressed ~41 debug messages>
+
+2.21.39. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$constmap:ee5af906ae0d3d414c6a0471604c553ef70c8e09$paramod$92adee9538f2381d8e5006822c900eb986d754e8\_90_shift_shiftx.
+<suppressed ~3 debug messages>
+Removed 0 unused cells and 10 unused wires.
+Using template $paramod$constmap:ee5af906ae0d3d414c6a0471604c553ef70c8e09$paramod$92adee9538f2381d8e5006822c900eb986d754e8\_90_shift_shiftx for cells of type $shiftx.
+Using extmapper simplemap for cells of type $mux.
+Using template $paramod$97565c3687be688407d1272a293bd9d0ae6852dc\_90_pmux for cells of type $pmux.
+Using extmapper maccmap for cells of type $macc.
+  add 3'111 * \win_idx (3x2 bits, unsigned)
+Using template $paramod$5fa769bd6f6ca230a24c9bbc0e120f15bcfea838\_90_pmux for cells of type $pmux.
+Using template $paramod$d629d85c8826a74239b9178d1930215a43b0ceb0\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $adff.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000010000 for cells of type $lcu.
+Using extmapper simplemap for cells of type $pos.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000100 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000100000 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001010 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001000 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000100001 for cells of type $lcu.
+Using template $paramod$b18e16801adf491a64caa0542270798e5d4ac6b6\_90_alu for cells of type $alu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000101 for cells of type $lcu.
+No more expansions possible.
+<suppressed ~2722 debug messages>
+
+2.22. Executing OPT pass (performing simple optimizations).
+
+2.22.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~40274 debug messages>
+
+2.22.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~10041 debug messages>
+Removed a total of 3347 cells.
+
+2.22.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 3611 unused cells and 2041 unused wires.
+<suppressed ~3612 debug messages>
+
+2.22.5. Finished fast OPT passes.
+
+2.23. Executing ABC pass (technology mapping using ABC).
+
+2.23.1. Extracting gate netlist of module `\spex_core' to `<abc-temp-dir>/input.blif'..
+Extracted 6410 gates and 7258 wires to a netlist network with 845 inputs and 691 outputs.
+
+2.23.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+2.23.1.2. Re-integrating ABC results.
+ABC RESULTS:               MUX cells:     1230
+ABC RESULTS:              XNOR cells:       52
+ABC RESULTS:               NOT cells:      543
+ABC RESULTS:               NOR cells:       69
+ABC RESULTS:             ORNOT cells:      227
+ABC RESULTS:                OR cells:     2109
+ABC RESULTS:              NAND cells:      142
+ABC RESULTS:            ANDNOT cells:     1842
+ABC RESULTS:               AND cells:       63
+ABC RESULTS:               XOR cells:      258
+ABC RESULTS:        internal signals:     5722
+ABC RESULTS:           input signals:      845
+ABC RESULTS:          output signals:      691
+Removing temp directory.
+
+2.24. Executing OPT pass (performing simple optimizations).
+
+2.24.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~553 debug messages>
+
+2.24.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~15 debug messages>
+Removed a total of 5 cells.
+
+2.24.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 2 unused cells and 1871 unused wires.
+<suppressed ~10 debug messages>
+
+2.24.5. Finished fast OPT passes.
+
+2.25. Executing HIERARCHY pass (managing design hierarchy).
+
+2.25.1. Analyzing design hierarchy..
+Top module:  \spex_core
+
+2.25.2. Analyzing design hierarchy..
+Top module:  \spex_core
+Removed 0 unused modules.
+
+2.26. Printing statistics.
+
+=== spex_core ===
+
+   Number of wires:               6425
+   Number of wire bits:           7575
+   Number of public wires:          45
+   Number of public wire bits:    1004
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               7246
+     $_ANDNOT_                    1841
+     $_AND_                         63
+     $_DFFE_PN0P_                  580
+     $_DFFE_PN1P_                   16
+     $_DFF_PN0_                    114
+     $_DFF_PN1_                      8
+     $_MUX_                       1230
+     $_NAND_                       142
+     $_NOR_                         66
+     $_NOT_                        541
+     $_ORNOT_                      227
+     $_OR_                        2108
+     $_XNOR_                        52
+     $_XOR_                        258
+
+2.27. Executing CHECK pass (checking for obvious problems).
+Checking module spex_core...
+Found and reported 0 problems.
+
+3. Executing ABC pass (technology mapping using ABC).
+
+3.1. Extracting gate netlist of module `\spex_core' to `<abc-temp-dir>/input.blif'..
+Extracted 6528 gates and 7373 wires to a netlist network with 845 inputs and 689 outputs.
+
+3.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 11 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &fraig -x 
+ABC: + &put 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &dch -f 
+ABC: + &nf 
+ABC: + &put 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+3.1.2. Re-integrating ABC results.
+ABC RESULTS:               NOT cells:       36
+ABC RESULTS:                OR cells:      432
+ABC RESULTS:               NOR cells:       86
+ABC RESULTS:               MUX cells:      319
+ABC RESULTS:              NAND cells:     1815
+ABC RESULTS:               XOR cells:      129
+ABC RESULTS:              XNOR cells:      116
+ABC RESULTS:               AND cells:      979
+ABC RESULTS:        internal signals:     5839
+ABC RESULTS:           input signals:      845
+ABC RESULTS:          output signals:      689
+Removing temp directory.
+
+4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 206 unused cells and 7517 unused wires.
+<suppressed ~207 debug messages>
+
+5. Executing LTP pass (find longest path).
+
+Longest topological path in spex_core (length=36):
+    0: \rec [312]
+    1: $abc$62407$new_n1544_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62417)
+    2: $abc$62407$new_n1561_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62434)
+    3: $abc$62407$new_n1691_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62564)
+    4: $abc$62407$new_n1692_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62565)
+    5: $abc$62407$new_n1693_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62566)
+    6: $abc$62407$new_n1696_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62569)
+    7: $abc$62407$new_n1697_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62570)
+    8: $abc$62407$new_n1702_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62575)
+    9: $abc$62407$new_n1703_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62576)
+   10: $abc$62407$new_n1706_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62579)
+   11: $abc$62407$new_n1707_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62580)
+   12: $abc$62407$new_n1708_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62581)
+   13: $abc$62407$new_n1709_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62582)
+   14: $abc$62407$new_n1710_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62583)
+   15: $abc$62407$new_n1711_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62584)
+   16: $abc$62407$new_n1712_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62585)
+   17: $abc$62407$new_n1713_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62586)
+   18: $abc$62407$new_n1714_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62587)
+   19: $abc$62407$new_n1715_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62588)
+   20: $abc$62407$new_n1730_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62603)
+   21: $abc$62407$new_n1731_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62604)
+   22: $abc$62407$new_n1927_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$62800)
+   23: $abc$62407$new_n2884_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$63757)
+   24: $abc$62407$new_n2885_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$63758)
+   25: \win_idx [0] (via $abc$62407$auto$blifparse.cc:386:parse_blif$63759)
+   26: $abc$62407$new_n2893_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$63766)
+   27: $abc$62407$new_n3157_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$64030)
+   28: $abc$62407$new_n3159_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$64032)
+   29: $abc$62407$new_n3160_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$64033)
+   30: $abc$62407$new_n3161_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$64034)
+   31: $abc$62407$new_n3166_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$64039)
+   32: $abc$62407$new_n3167_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$64040)
+   33: $shiftx$/mnt/project-files/architecture/area-probe/spex_core.v:0$244.Y (via $abc$62407$auto$blifparse.cc:386:parse_blif$64041)
+   34: $abc$62407$new_n3169_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$64042)
+   35: $abc$62407$new_n3920_ (via $abc$62407$auto$blifparse.cc:386:parse_blif$64793)
+   36: $abc$55871$auto$opt_expr.cc:205:group_cell_inputs$860[14] (via $abc$62407$auto$blifparse.cc:386:parse_blif$64794)
+   ff: \crc [15] (via $auto$ff.cc:266:slice$4536)
+
+Warnings: 1 unique messages, 1 total
+End of script. Logfile hash: 979340f8ab, CPU: user 7.23s system 0.15s, MEM: 186.89 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 26% 41x opt_expr (2 sec), 16% 2x abc (1 sec), ...

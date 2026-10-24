@@ -1,0 +1,8 @@
+read_verilog ../out/spex_core.v
+synth -top spex_core -flatten
+dfflegalize -cell $_DFF_P_ 01
+dfflibmap -liberty mini.lib
+abc -liberty mini.lib
+opt_clean
+stat -liberty mini.lib
+ltp -noff

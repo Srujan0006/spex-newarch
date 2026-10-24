@@ -1,0 +1,6 @@
+(library
+ (name spex_test)
+ (libraries base stdio hardcaml hardcaml_waveterm spex)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane ppx_expect)))

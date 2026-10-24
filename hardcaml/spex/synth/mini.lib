@@ -1,0 +1,21 @@
+/* Approximate IHP sg13 cell areas (um^2) for area estimation only. No timing. */
+library(mini) {
+  delay_model : table_lookup;
+  time_unit : "1ns"; voltage_unit : "1V"; current_unit : "1mA"; capacitive_load_unit(1,pf); pulling_resistance_unit : "1kohm"; leakage_power_unit : "1nW";
+  cell(INV)   { area : 5.44;  pin(A){direction:input;} pin(Y){direction:output; function:"!A";} }
+  cell(BUF)   { area : 7.26;  pin(A){direction:input;} pin(Y){direction:output; function:"A";} }
+  cell(NAND2) { area : 7.26;  pin(A){direction:input;} pin(B){direction:input;} pin(Y){direction:output; function:"!(A&B)";} }
+  cell(NOR2)  { area : 7.26;  pin(A){direction:input;} pin(B){direction:input;} pin(Y){direction:output; function:"!(A|B)";} }
+  cell(AND2)  { area : 9.07;  pin(A){direction:input;} pin(B){direction:input;} pin(Y){direction:output; function:"(A&B)";} }
+  cell(OR2)   { area : 9.07;  pin(A){direction:input;} pin(B){direction:input;} pin(Y){direction:output; function:"(A|B)";} }
+  cell(XOR2)  { area : 14.52; pin(A){direction:input;} pin(B){direction:input;} pin(Y){direction:output; function:"(A^B)";} }
+  cell(XNOR2) { area : 14.52; pin(A){direction:input;} pin(B){direction:input;} pin(Y){direction:output; function:"!(A^B)";} }
+  cell(AOI21) { area : 9.07;  pin(A){direction:input;} pin(B){direction:input;} pin(C){direction:input;} pin(Y){direction:output; function:"!((A&B)|C)";} }
+  cell(OAI21) { area : 9.07;  pin(A){direction:input;} pin(B){direction:input;} pin(C){direction:input;} pin(Y){direction:output; function:"!((A|B)&C)";} }
+  cell(MUX2)  { area : 18.14; pin(A0){direction:input;} pin(A1){direction:input;} pin(S){direction:input;} pin(X){direction:output; function:"(A0&!S)|(A1&S)";} }
+  cell(DFFR)  { area : 49.0;  ff(IQ,IQN){clocked_on:"CLK"; next_state:"D"; clear:"!RN";}
+                pin(CLK){direction:input; clock:true;} pin(D){direction:input;} pin(RN){direction:input;} pin(Q){direction:output; function:"IQ";} }
+
+  cell(DFF)   { area : 49.0;  ff(IQ,IQN){clocked_on:"CLK"; next_state:"D";}
+                pin(CLK){direction:input; clock:true;} pin(D){direction:input;} pin(Q){direction:output; function:"IQ";} }
+}

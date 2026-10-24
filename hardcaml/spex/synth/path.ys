@@ -1,0 +1,5 @@
+read_verilog ../out/spex_core.v
+synth -top spex_core -flatten
+abc -g AND,NAND,OR,NOR,XOR,XNOR,MUX
+opt_clean
+write_json net.json

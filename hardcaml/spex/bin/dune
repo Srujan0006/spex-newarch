@@ -1,0 +1,5 @@
+(executable
+ (name gen)
+ (libraries base stdio hardcaml spex)
+ (preprocess
+  (pps ppx_jane)))

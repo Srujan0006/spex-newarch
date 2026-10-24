@@ -1,0 +1,2114 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Executing script file `synth.ys' --
+
+1. Executing Verilog-2005 frontend: ../out/spex_core.v
+Parsing Verilog input from `../out/spex_core.v' to AST representation.
+Generating RTLIL representation for module `\spex_core'.
+Successfully finished Verilog frontend.
+
+2. Executing SYNTH pass.
+
+2.1. Executing HIERARCHY pass (managing design hierarchy).
+
+2.1.1. Analyzing design hierarchy..
+Top module:  \spex_core
+
+2.1.2. Analyzing design hierarchy..
+Top module:  \spex_core
+Removed 0 unused modules.
+
+2.2. Executing PROC pass (convert processes to netlists).
+
+2.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3142$704 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3128$697 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3095$677 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3084$672 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3054$657 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3047$656 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3029$651 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3010$639 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:3004$638 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2985$631 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2972$624 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2957$620 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2950$619 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2935$611 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2885$600 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2877$598 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2863$596 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2850$594 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2832$592 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2818$590 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2805$588 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2791$585 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2755$570 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2749$569 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2739$566 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2730$563 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2720$560 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2711$557 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2702$554 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2693$551 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2684$548 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2675$545 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2666$542 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2638$539 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2624$537 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2611$535 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2585$534 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2573$533 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2549$531 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2528$518 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2501$510 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2486$508 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2445$484 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2403$480 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2387$477 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2361$466 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2330$449 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2320$448 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2300$438 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2289$433 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2278$428 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2246$412 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2204$408 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2188$405 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2148$382 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2106$378 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2090$375 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2052$351 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2033$348 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:2012$343 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1986$341 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1945$323 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1923$313 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1906$307 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1900$306 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1894$305 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1888$304 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1879$303 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1855$301 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1849$300 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1839$297 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1831$294 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1821$291 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1812$288 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1803$285 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1794$282 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1785$279 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1776$276 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1767$273 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1745$270 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1739$269 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1726$264 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1706$254 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1679$242 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1653$227 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1625$210 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1599$195 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1569$176 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1543$161 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1515$144 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1489$129 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1466$116 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1449$109 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1438$106 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1428$103 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1418$100 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1408$97 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1399$94 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1389$91 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1379$88 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1363$80 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1347$70 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1334$65 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1324$61 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1314$57 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1301$51 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1288$46 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1268$40 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1259$38 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1227$24 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1203$13 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1187$10 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1175$9 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1167$8 in module spex_core.
+Marked 1 switch rules as full_case in process $proc$../out/spex_core.v:1160$7 in module spex_core.
+Removed a total of 0 dead cases.
+
+2.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 91 redundant assignments.
+Promoted 0 assignments to connections.
+
+2.2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~139 debug messages>
+
+2.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3142$704'.
+     1/1: $0\_1071[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3128$697'.
+     1/1: $0\_139[1:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3095$677'.
+     1/1: $0\_144[127:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3084$672'.
+     1/1: $0\_488[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3054$657'.
+     1/1: $0\_552[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3047$656'.
+     1/1: $0\_190[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3029$651'.
+     1/1: $0\_1283[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3010$639'.
+     1/1: $0\_162[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:3004$638'.
+     1/1: $0\_159[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2985$631'.
+     1/1: $0\_175[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2972$624'.
+     1/1: $0\_178[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2957$620'.
+     1/1: $0\_273[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2950$619'.
+     1/1: $0\_193[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2935$611'.
+     1/1: $0\_196[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2885$600'.
+     1/1: $0\_283[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2877$598'.
+     1/1: $0\_209[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2863$596'.
+     1/1: $0\_1277[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2850$594'.
+     1/1: $0\_1270[1:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2832$592'.
+     1/1: $0\_214[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2818$590'.
+     1/1: $0\_1264[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2805$588'.
+     1/1: $0\_1183[1:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2791$585'.
+     1/1: $0\_1201[3:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2755$570'.
+     1/1: $0\_1250[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2749$569'.
+     1/1: $0\_1175[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2739$566'.
+     1/1: $0\_1207[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2730$563'.
+     1/1: $0\_1167[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2720$560'.
+     1/1: $0\_1213[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2711$557'.
+     1/1: $0\_1219[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2702$554'.
+     1/1: $0\_1225[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2693$551'.
+     1/1: $0\_1231[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2684$548'.
+     1/1: $0\_1237[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2675$545'.
+     1/1: $0\_1243[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2666$542'.
+     1/1: $0\_1249[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2638$539'.
+     1/1: $0\_218[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2624$537'.
+     1/1: $0\_1161[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2611$535'.
+     1/1: $0\_1127[1:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2585$534'.
+     1/1: $0\_1156[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2573$533'.
+     1/1: $0\_1147[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2549$531'.
+     1/1: $0\_1142[3:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2528$518'.
+     1/1: $0\_226[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2501$510'.
+     1/1: $0\_238[1:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2486$508'.
+     1/1: $0\_296[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2445$484'.
+     1/1: $0\_319[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2403$480'.
+     1/1: $0\_329[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2387$477'.
+     1/1: $0\_342[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2361$466'.
+     1/1: $0\_557[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2330$449'.
+     1/1: $0\_1099[5:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2320$448'.
+     1/1: $0\_418[5:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2300$438'.
+     1/1: $0\_147[127:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2289$433'.
+     1/1: $0\_150[127:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2278$428'.
+     1/1: $0\_153[127:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2246$412'.
+     1/1: $0\_197[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2204$408'.
+     1/1: $0\_232[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2188$405'.
+     1/1: $0\_250[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2148$382'.
+     1/1: $0\_383[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2106$378'.
+     1/1: $0\_393[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2090$375'.
+     1/1: $0\_406[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2052$351'.
+     1/1: $0\_1016[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2033$348'.
+     1/1: $0\_1382[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:2012$343'.
+     1/1: $0\_1035[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1986$341'.
+     1/1: $0\_1042[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1945$323'.
+     1/1: $0\_1011[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1923$313'.
+     1/1: $0\_1025[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1906$307'.
+     1/1: $0\_1000[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1900$306'.
+     1/1: $0\_997[1:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1894$305'.
+     1/1: $0\_994[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1888$304'.
+     1/1: $0\_991[1:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1879$303'.
+     1/1: $0\_602[31:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1855$301'.
+     1/1: $0\_984[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1849$300'.
+     1/1: $0\_932[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1839$297'.
+     1/1: $0\_941[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1831$294'.
+     1/1: $0\_924[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1821$291'.
+     1/1: $0\_947[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1812$288'.
+     1/1: $0\_953[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1803$285'.
+     1/1: $0\_959[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1794$282'.
+     1/1: $0\_965[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1785$279'.
+     1/1: $0\_971[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1776$276'.
+     1/1: $0\_977[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1767$273'.
+     1/1: $0\_983[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1745$270'.
+     1/1: $0\_919[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1739$269'.
+     1/1: $0\_867[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1726$264'.
+     1/1: $0\_864[3:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1706$254'.
+     1/1: $0\_876[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1679$242'.
+     1/1: $0\_771[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1653$227'.
+     1/1: $0\_749[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1625$210'.
+     1/1: $0\_727[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1599$195'.
+     1/1: $0\_705[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1569$176'.
+     1/1: $0\_683[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1543$161'.
+     1/1: $0\_661[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1515$144'.
+     1/1: $0\_639[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1489$129'.
+     1/1: $0\_617[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1466$116'.
+     1/1: $0\_608[28:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1449$109'.
+     1/1: $0\_596[2:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1438$106'.
+     1/1: $0\_882[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1428$103'.
+     1/1: $0\_888[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1418$100'.
+     1/1: $0\_894[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1408$97'.
+     1/1: $0\_900[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1399$94'.
+     1/1: $0\_906[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1389$91'.
+     1/1: $0\_912[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1379$88'.
+     1/1: $0\_918[47:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1363$80'.
+     1/1: $0\_528[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1347$70'.
+     1/1: $0\_537[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1334$65'.
+     1/1: $0\_521[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1324$61'.
+     1/1: $0\_513[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1314$57'.
+     1/1: $0\_503[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1301$51'.
+     1/1: $0\_414[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1288$46'.
+     1/1: $0\_422[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1268$40'.
+     1/1: $0\_427[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1259$38'.
+     1/1: $0\_481[7:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1227$24'.
+     1/1: $0\_433[0:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1203$13'.
+     1/1: $0\_448[11:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1187$10'.
+     1/1: $0\_356[15:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1175$9'.
+     1/1: $0\_355[1:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1167$8'.
+     1/1: $0\_451[11:0]
+Creating decoders for process `\spex_core.$proc$../out/spex_core.v:1160$7'.
+     1/1: $0\_363[11:0]
+
+2.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\spex_core.\_552' from process `\spex_core.$proc$../out/spex_core.v:3054$657'.
+No latch inferred for signal `\spex_core.\_1283' from process `\spex_core.$proc$../out/spex_core.v:3029$651'.
+No latch inferred for signal `\spex_core.\_273' from process `\spex_core.$proc$../out/spex_core.v:2957$620'.
+No latch inferred for signal `\spex_core.\_283' from process `\spex_core.$proc$../out/spex_core.v:2885$600'.
+No latch inferred for signal `\spex_core.\_1277' from process `\spex_core.$proc$../out/spex_core.v:2863$596'.
+No latch inferred for signal `\spex_core.\_1270' from process `\spex_core.$proc$../out/spex_core.v:2850$594'.
+No latch inferred for signal `\spex_core.\_1264' from process `\spex_core.$proc$../out/spex_core.v:2818$590'.
+No latch inferred for signal `\spex_core.\_1183' from process `\spex_core.$proc$../out/spex_core.v:2805$588'.
+No latch inferred for signal `\spex_core.\_1250' from process `\spex_core.$proc$../out/spex_core.v:2755$570'.
+No latch inferred for signal `\spex_core.\_1161' from process `\spex_core.$proc$../out/spex_core.v:2624$537'.
+No latch inferred for signal `\spex_core.\_1127' from process `\spex_core.$proc$../out/spex_core.v:2611$535'.
+No latch inferred for signal `\spex_core.\_1156' from process `\spex_core.$proc$../out/spex_core.v:2585$534'.
+No latch inferred for signal `\spex_core.\_1147' from process `\spex_core.$proc$../out/spex_core.v:2573$533'.
+No latch inferred for signal `\spex_core.\_296' from process `\spex_core.$proc$../out/spex_core.v:2486$508'.
+No latch inferred for signal `\spex_core.\_319' from process `\spex_core.$proc$../out/spex_core.v:2445$484'.
+No latch inferred for signal `\spex_core.\_329' from process `\spex_core.$proc$../out/spex_core.v:2403$480'.
+No latch inferred for signal `\spex_core.\_342' from process `\spex_core.$proc$../out/spex_core.v:2387$477'.
+No latch inferred for signal `\spex_core.\_1099' from process `\spex_core.$proc$../out/spex_core.v:2330$449'.
+No latch inferred for signal `\spex_core.\_197' from process `\spex_core.$proc$../out/spex_core.v:2246$412'.
+No latch inferred for signal `\spex_core.\_232' from process `\spex_core.$proc$../out/spex_core.v:2204$408'.
+No latch inferred for signal `\spex_core.\_250' from process `\spex_core.$proc$../out/spex_core.v:2188$405'.
+No latch inferred for signal `\spex_core.\_383' from process `\spex_core.$proc$../out/spex_core.v:2148$382'.
+No latch inferred for signal `\spex_core.\_393' from process `\spex_core.$proc$../out/spex_core.v:2106$378'.
+No latch inferred for signal `\spex_core.\_406' from process `\spex_core.$proc$../out/spex_core.v:2090$375'.
+No latch inferred for signal `\spex_core.\_1016' from process `\spex_core.$proc$../out/spex_core.v:2052$351'.
+No latch inferred for signal `\spex_core.\_1382' from process `\spex_core.$proc$../out/spex_core.v:2033$348'.
+No latch inferred for signal `\spex_core.\_1035' from process `\spex_core.$proc$../out/spex_core.v:2012$343'.
+No latch inferred for signal `\spex_core.\_1042' from process `\spex_core.$proc$../out/spex_core.v:1986$341'.
+No latch inferred for signal `\spex_core.\_1025' from process `\spex_core.$proc$../out/spex_core.v:1923$313'.
+No latch inferred for signal `\spex_core.\_984' from process `\spex_core.$proc$../out/spex_core.v:1855$301'.
+No latch inferred for signal `\spex_core.\_919' from process `\spex_core.$proc$../out/spex_core.v:1745$270'.
+No latch inferred for signal `\spex_core.\_356' from process `\spex_core.$proc$../out/spex_core.v:1187$10'.
+No latch inferred for signal `\spex_core.\_355' from process `\spex_core.$proc$../out/spex_core.v:1175$9'.
+
+2.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spex_core.\_1071' using process `\spex_core.$proc$../out/spex_core.v:3142$704'.
+  created $dff cell `$procdff$1228' with positive edge clock.
+Creating register for signal `\spex_core.\_139' using process `\spex_core.$proc$../out/spex_core.v:3128$697'.
+  created $dff cell `$procdff$1229' with positive edge clock.
+Creating register for signal `\spex_core.\_144' using process `\spex_core.$proc$../out/spex_core.v:3095$677'.
+  created $dff cell `$procdff$1230' with positive edge clock.
+Creating register for signal `\spex_core.\_488' using process `\spex_core.$proc$../out/spex_core.v:3084$672'.
+  created $dff cell `$procdff$1231' with positive edge clock.
+Creating register for signal `\spex_core.\_190' using process `\spex_core.$proc$../out/spex_core.v:3047$656'.
+  created $dff cell `$procdff$1232' with positive edge clock.
+Creating register for signal `\spex_core.\_162' using process `\spex_core.$proc$../out/spex_core.v:3010$639'.
+  created $dff cell `$procdff$1233' with positive edge clock.
+Creating register for signal `\spex_core.\_159' using process `\spex_core.$proc$../out/spex_core.v:3004$638'.
+  created $dff cell `$procdff$1234' with positive edge clock.
+Creating register for signal `\spex_core.\_175' using process `\spex_core.$proc$../out/spex_core.v:2985$631'.
+  created $dff cell `$procdff$1235' with positive edge clock.
+Creating register for signal `\spex_core.\_178' using process `\spex_core.$proc$../out/spex_core.v:2972$624'.
+  created $dff cell `$procdff$1236' with positive edge clock.
+Creating register for signal `\spex_core.\_193' using process `\spex_core.$proc$../out/spex_core.v:2950$619'.
+  created $dff cell `$procdff$1237' with positive edge clock.
+Creating register for signal `\spex_core.\_196' using process `\spex_core.$proc$../out/spex_core.v:2935$611'.
+  created $dff cell `$procdff$1238' with positive edge clock.
+Creating register for signal `\spex_core.\_209' using process `\spex_core.$proc$../out/spex_core.v:2877$598'.
+  created $dff cell `$procdff$1239' with positive edge clock.
+Creating register for signal `\spex_core.\_214' using process `\spex_core.$proc$../out/spex_core.v:2832$592'.
+  created $dff cell `$procdff$1240' with positive edge clock.
+Creating register for signal `\spex_core.\_1201' using process `\spex_core.$proc$../out/spex_core.v:2791$585'.
+  created $dff cell `$procdff$1241' with positive edge clock.
+Creating register for signal `\spex_core.\_1175' using process `\spex_core.$proc$../out/spex_core.v:2749$569'.
+  created $dff cell `$procdff$1242' with positive edge clock.
+Creating register for signal `\spex_core.\_1207' using process `\spex_core.$proc$../out/spex_core.v:2739$566'.
+  created $dff cell `$procdff$1243' with positive edge clock.
+Creating register for signal `\spex_core.\_1167' using process `\spex_core.$proc$../out/spex_core.v:2730$563'.
+  created $dff cell `$procdff$1244' with positive edge clock.
+Creating register for signal `\spex_core.\_1213' using process `\spex_core.$proc$../out/spex_core.v:2720$560'.
+  created $dff cell `$procdff$1245' with positive edge clock.
+Creating register for signal `\spex_core.\_1219' using process `\spex_core.$proc$../out/spex_core.v:2711$557'.
+  created $dff cell `$procdff$1246' with positive edge clock.
+Creating register for signal `\spex_core.\_1225' using process `\spex_core.$proc$../out/spex_core.v:2702$554'.
+  created $dff cell `$procdff$1247' with positive edge clock.
+Creating register for signal `\spex_core.\_1231' using process `\spex_core.$proc$../out/spex_core.v:2693$551'.
+  created $dff cell `$procdff$1248' with positive edge clock.
+Creating register for signal `\spex_core.\_1237' using process `\spex_core.$proc$../out/spex_core.v:2684$548'.
+  created $dff cell `$procdff$1249' with positive edge clock.
+Creating register for signal `\spex_core.\_1243' using process `\spex_core.$proc$../out/spex_core.v:2675$545'.
+  created $dff cell `$procdff$1250' with positive edge clock.
+Creating register for signal `\spex_core.\_1249' using process `\spex_core.$proc$../out/spex_core.v:2666$542'.
+  created $dff cell `$procdff$1251' with positive edge clock.
+Creating register for signal `\spex_core.\_218' using process `\spex_core.$proc$../out/spex_core.v:2638$539'.
+  created $dff cell `$procdff$1252' with positive edge clock.
+Creating register for signal `\spex_core.\_1142' using process `\spex_core.$proc$../out/spex_core.v:2549$531'.
+  created $dff cell `$procdff$1253' with positive edge clock.
+Creating register for signal `\spex_core.\_226' using process `\spex_core.$proc$../out/spex_core.v:2528$518'.
+  created $dff cell `$procdff$1254' with positive edge clock.
+Creating register for signal `\spex_core.\_238' using process `\spex_core.$proc$../out/spex_core.v:2501$510'.
+  created $dff cell `$procdff$1255' with positive edge clock.
+Creating register for signal `\spex_core.\_557' using process `\spex_core.$proc$../out/spex_core.v:2361$466'.
+  created $dff cell `$procdff$1256' with positive edge clock.
+Creating register for signal `\spex_core.\_418' using process `\spex_core.$proc$../out/spex_core.v:2320$448'.
+  created $dff cell `$procdff$1257' with positive edge clock.
+Creating register for signal `\spex_core.\_147' using process `\spex_core.$proc$../out/spex_core.v:2300$438'.
+  created $dff cell `$procdff$1258' with positive edge clock.
+Creating register for signal `\spex_core.\_150' using process `\spex_core.$proc$../out/spex_core.v:2289$433'.
+  created $dff cell `$procdff$1259' with positive edge clock.
+Creating register for signal `\spex_core.\_153' using process `\spex_core.$proc$../out/spex_core.v:2278$428'.
+  created $dff cell `$procdff$1260' with positive edge clock.
+Creating register for signal `\spex_core.\_1011' using process `\spex_core.$proc$../out/spex_core.v:1945$323'.
+  created $dff cell `$procdff$1261' with positive edge clock.
+Creating register for signal `\spex_core.\_1000' using process `\spex_core.$proc$../out/spex_core.v:1906$307'.
+  created $dff cell `$procdff$1262' with positive edge clock.
+Creating register for signal `\spex_core.\_997' using process `\spex_core.$proc$../out/spex_core.v:1900$306'.
+  created $dff cell `$procdff$1263' with positive edge clock.
+Creating register for signal `\spex_core.\_994' using process `\spex_core.$proc$../out/spex_core.v:1894$305'.
+  created $dff cell `$procdff$1264' with positive edge clock.
+Creating register for signal `\spex_core.\_991' using process `\spex_core.$proc$../out/spex_core.v:1888$304'.
+  created $dff cell `$procdff$1265' with positive edge clock.
+Creating register for signal `\spex_core.\_602' using process `\spex_core.$proc$../out/spex_core.v:1879$303'.
+  created $dff cell `$procdff$1266' with positive edge clock.
+Creating register for signal `\spex_core.\_932' using process `\spex_core.$proc$../out/spex_core.v:1849$300'.
+  created $dff cell `$procdff$1267' with positive edge clock.
+Creating register for signal `\spex_core.\_941' using process `\spex_core.$proc$../out/spex_core.v:1839$297'.
+  created $dff cell `$procdff$1268' with positive edge clock.
+Creating register for signal `\spex_core.\_924' using process `\spex_core.$proc$../out/spex_core.v:1831$294'.
+  created $dff cell `$procdff$1269' with positive edge clock.
+Creating register for signal `\spex_core.\_947' using process `\spex_core.$proc$../out/spex_core.v:1821$291'.
+  created $dff cell `$procdff$1270' with positive edge clock.
+Creating register for signal `\spex_core.\_953' using process `\spex_core.$proc$../out/spex_core.v:1812$288'.
+  created $dff cell `$procdff$1271' with positive edge clock.
+Creating register for signal `\spex_core.\_959' using process `\spex_core.$proc$../out/spex_core.v:1803$285'.
+  created $dff cell `$procdff$1272' with positive edge clock.
+Creating register for signal `\spex_core.\_965' using process `\spex_core.$proc$../out/spex_core.v:1794$282'.
+  created $dff cell `$procdff$1273' with positive edge clock.
+Creating register for signal `\spex_core.\_971' using process `\spex_core.$proc$../out/spex_core.v:1785$279'.
+  created $dff cell `$procdff$1274' with positive edge clock.
+Creating register for signal `\spex_core.\_977' using process `\spex_core.$proc$../out/spex_core.v:1776$276'.
+  created $dff cell `$procdff$1275' with positive edge clock.
+Creating register for signal `\spex_core.\_983' using process `\spex_core.$proc$../out/spex_core.v:1767$273'.
+  created $dff cell `$procdff$1276' with positive edge clock.
+Creating register for signal `\spex_core.\_867' using process `\spex_core.$proc$../out/spex_core.v:1739$269'.
+  created $dff cell `$procdff$1277' with positive edge clock.
+Creating register for signal `\spex_core.\_864' using process `\spex_core.$proc$../out/spex_core.v:1726$264'.
+  created $dff cell `$procdff$1278' with positive edge clock.
+Creating register for signal `\spex_core.\_876' using process `\spex_core.$proc$../out/spex_core.v:1706$254'.
+  created $dff cell `$procdff$1279' with positive edge clock.
+Creating register for signal `\spex_core.\_771' using process `\spex_core.$proc$../out/spex_core.v:1679$242'.
+  created $dff cell `$procdff$1280' with positive edge clock.
+Creating register for signal `\spex_core.\_749' using process `\spex_core.$proc$../out/spex_core.v:1653$227'.
+  created $dff cell `$procdff$1281' with positive edge clock.
+Creating register for signal `\spex_core.\_727' using process `\spex_core.$proc$../out/spex_core.v:1625$210'.
+  created $dff cell `$procdff$1282' with positive edge clock.
+Creating register for signal `\spex_core.\_705' using process `\spex_core.$proc$../out/spex_core.v:1599$195'.
+  created $dff cell `$procdff$1283' with positive edge clock.
+Creating register for signal `\spex_core.\_683' using process `\spex_core.$proc$../out/spex_core.v:1569$176'.
+  created $dff cell `$procdff$1284' with positive edge clock.
+Creating register for signal `\spex_core.\_661' using process `\spex_core.$proc$../out/spex_core.v:1543$161'.
+  created $dff cell `$procdff$1285' with positive edge clock.
+Creating register for signal `\spex_core.\_639' using process `\spex_core.$proc$../out/spex_core.v:1515$144'.
+  created $dff cell `$procdff$1286' with positive edge clock.
+Creating register for signal `\spex_core.\_617' using process `\spex_core.$proc$../out/spex_core.v:1489$129'.
+  created $dff cell `$procdff$1287' with positive edge clock.
+Creating register for signal `\spex_core.\_608' using process `\spex_core.$proc$../out/spex_core.v:1466$116'.
+  created $dff cell `$procdff$1288' with positive edge clock.
+Creating register for signal `\spex_core.\_596' using process `\spex_core.$proc$../out/spex_core.v:1449$109'.
+  created $dff cell `$procdff$1289' with positive edge clock.
+Creating register for signal `\spex_core.\_882' using process `\spex_core.$proc$../out/spex_core.v:1438$106'.
+  created $dff cell `$procdff$1290' with positive edge clock.
+Creating register for signal `\spex_core.\_888' using process `\spex_core.$proc$../out/spex_core.v:1428$103'.
+  created $dff cell `$procdff$1291' with positive edge clock.
+Creating register for signal `\spex_core.\_894' using process `\spex_core.$proc$../out/spex_core.v:1418$100'.
+  created $dff cell `$procdff$1292' with positive edge clock.
+Creating register for signal `\spex_core.\_900' using process `\spex_core.$proc$../out/spex_core.v:1408$97'.
+  created $dff cell `$procdff$1293' with positive edge clock.
+Creating register for signal `\spex_core.\_906' using process `\spex_core.$proc$../out/spex_core.v:1399$94'.
+  created $dff cell `$procdff$1294' with positive edge clock.
+Creating register for signal `\spex_core.\_912' using process `\spex_core.$proc$../out/spex_core.v:1389$91'.
+  created $dff cell `$procdff$1295' with positive edge clock.
+Creating register for signal `\spex_core.\_918' using process `\spex_core.$proc$../out/spex_core.v:1379$88'.
+  created $dff cell `$procdff$1296' with positive edge clock.
+Creating register for signal `\spex_core.\_528' using process `\spex_core.$proc$../out/spex_core.v:1363$80'.
+  created $dff cell `$procdff$1297' with positive edge clock.
+Creating register for signal `\spex_core.\_537' using process `\spex_core.$proc$../out/spex_core.v:1347$70'.
+  created $dff cell `$procdff$1298' with positive edge clock.
+Creating register for signal `\spex_core.\_521' using process `\spex_core.$proc$../out/spex_core.v:1334$65'.
+  created $dff cell `$procdff$1299' with positive edge clock.
+Creating register for signal `\spex_core.\_513' using process `\spex_core.$proc$../out/spex_core.v:1324$61'.
+  created $dff cell `$procdff$1300' with positive edge clock.
+Creating register for signal `\spex_core.\_503' using process `\spex_core.$proc$../out/spex_core.v:1314$57'.
+  created $dff cell `$procdff$1301' with positive edge clock.
+Creating register for signal `\spex_core.\_414' using process `\spex_core.$proc$../out/spex_core.v:1301$51'.
+  created $dff cell `$procdff$1302' with positive edge clock.
+Creating register for signal `\spex_core.\_422' using process `\spex_core.$proc$../out/spex_core.v:1288$46'.
+  created $dff cell `$procdff$1303' with positive edge clock.
+Creating register for signal `\spex_core.\_427' using process `\spex_core.$proc$../out/spex_core.v:1268$40'.
+  created $dff cell `$procdff$1304' with positive edge clock.
+Creating register for signal `\spex_core.\_481' using process `\spex_core.$proc$../out/spex_core.v:1259$38'.
+  created $dff cell `$procdff$1305' with positive edge clock.
+Creating register for signal `\spex_core.\_433' using process `\spex_core.$proc$../out/spex_core.v:1227$24'.
+  created $dff cell `$procdff$1306' with positive edge clock.
+Creating register for signal `\spex_core.\_448' using process `\spex_core.$proc$../out/spex_core.v:1203$13'.
+  created $dff cell `$procdff$1307' with positive edge clock.
+Creating register for signal `\spex_core.\_451' using process `\spex_core.$proc$../out/spex_core.v:1167$8'.
+  created $dff cell `$procdff$1308' with positive edge clock.
+Creating register for signal `\spex_core.\_363' using process `\spex_core.$proc$../out/spex_core.v:1160$7'.
+  created $dff cell `$procdff$1309' with positive edge clock.
+
+2.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3142$704'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3142$704'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3128$697'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3128$697'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3095$677'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3095$677'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3084$672'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3084$672'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3054$657'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3054$657'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3047$656'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3047$656'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3029$651'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3029$651'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3010$639'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3010$639'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:3004$638'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:3004$638'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2985$631'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2985$631'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2972$624'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2972$624'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2957$620'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2957$620'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2950$619'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2950$619'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2935$611'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2935$611'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2885$600'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2885$600'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2877$598'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2877$598'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2863$596'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2863$596'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2850$594'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2850$594'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2832$592'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2832$592'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2818$590'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2818$590'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2805$588'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2805$588'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2791$585'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2791$585'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2755$570'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2755$570'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2749$569'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2749$569'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:2739$566'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2739$566'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2730$563'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2730$563'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:2720$560'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2720$560'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:2711$557'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2711$557'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:2702$554'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2702$554'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:2693$551'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2693$551'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:2684$548'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2684$548'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:2675$545'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2675$545'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:2666$542'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2666$542'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2638$539'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2638$539'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2624$537'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2624$537'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2611$535'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2611$535'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2585$534'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2585$534'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2573$533'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2573$533'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2549$531'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2549$531'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2528$518'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2528$518'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2501$510'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2501$510'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2486$508'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2486$508'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2445$484'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2445$484'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2403$480'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2403$480'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2387$477'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2387$477'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2361$466'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2361$466'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2330$449'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2330$449'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2320$448'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2320$448'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2300$438'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2300$438'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2289$433'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2289$433'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2278$428'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2278$428'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2246$412'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2246$412'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2204$408'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2204$408'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2188$405'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2188$405'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2148$382'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2148$382'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2106$378'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2106$378'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2090$375'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2090$375'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2052$351'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2052$351'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2033$348'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2033$348'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:2012$343'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:2012$343'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1986$341'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1986$341'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1945$323'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1945$323'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1923$313'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1923$313'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1906$307'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1906$307'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1900$306'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1900$306'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1894$305'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1894$305'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1888$304'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1888$304'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1879$303'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1879$303'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1855$301'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1855$301'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1849$300'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1849$300'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1839$297'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1839$297'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1831$294'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1831$294'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1821$291'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1821$291'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1812$288'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1812$288'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1803$285'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1803$285'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1794$282'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1794$282'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1785$279'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1785$279'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1776$276'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1776$276'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1767$273'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1767$273'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1745$270'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1745$270'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1739$269'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1739$269'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1726$264'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1726$264'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1706$254'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1706$254'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1679$242'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1679$242'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1653$227'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1653$227'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1625$210'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1625$210'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1599$195'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1599$195'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1569$176'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1569$176'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1543$161'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1543$161'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1515$144'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1515$144'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1489$129'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1489$129'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1466$116'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1466$116'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1449$109'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1449$109'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1438$106'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1438$106'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1428$103'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1428$103'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1418$100'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1418$100'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1408$97'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1408$97'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1399$94'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1399$94'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1389$91'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1389$91'.
+Found and cleaned up 2 empty switches in `\spex_core.$proc$../out/spex_core.v:1379$88'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1379$88'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1363$80'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1363$80'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1347$70'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1347$70'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1334$65'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1334$65'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1324$61'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1324$61'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1314$57'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1314$57'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1301$51'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1301$51'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1288$46'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1288$46'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1268$40'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1268$40'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1259$38'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1259$38'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1227$24'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1227$24'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1203$13'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1203$13'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1187$10'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1187$10'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1175$9'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1175$9'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1167$8'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1167$8'.
+Found and cleaned up 1 empty switch in `\spex_core.$proc$../out/spex_core.v:1160$7'.
+Removing empty process `spex_core.$proc$../out/spex_core.v:1160$7'.
+Cleaned up 139 empty switches.
+
+2.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~67 debug messages>
+
+2.3. Executing FLATTEN pass (flatten design).
+
+2.4. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 4 unused cells and 848 unused wires.
+<suppressed ~9 debug messages>
+
+2.6. Executing CHECK pass (checking for obvious problems).
+Checking module spex_core...
+Found and reported 0 problems.
+
+2.7. Executing OPT pass (performing simple optimizations).
+
+2.7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~264 debug messages>
+Removed a total of 88 cells.
+
+2.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~136 debug messages>
+
+2.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+2.7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 36 unused wires.
+<suppressed ~1 debug messages>
+
+2.7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~134 debug messages>
+
+2.7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.7.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.7.16. Finished OPT passes. (There is nothing left to do.)
+
+2.8. Executing FSM pass (extract and optimize FSM).
+
+2.8.1. Executing FSM_DETECT pass (finding FSMs in design).
+Found FSM state register spex_core._139.
+Not marking spex_core._997 as FSM state register:
+    Register is connected to module port.
+    Users of register don't seem to benefit from recoding.
+
+2.8.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+Extracting FSM `\_139' from module `\spex_core'.
+  found $dff cell for state register: $procdff$1229
+  root of input selection tree: $0\_139[1:0]
+  found reset state: 2'00 (guessed from mux tree)
+  found ctrl input: \clear
+  found ctrl input: \host_start
+  found ctrl input: \host_stop
+  found ctrl input: \_1075
+  found ctrl input: \_1090
+  found ctrl input: \_1352
+  found state code: 2'00
+  found ctrl input: \_410
+  found ctrl input: \_568
+  found ctrl input: \_1355
+  found ctrl input: \_1092
+  found ctrl input: \_1357
+  found state code: 2'01
+  found ctrl input: \_1100
+  found ctrl input: \_531
+  found state code: 2'10
+  found ctrl output: \_1090
+  found ctrl output: \_1075
+  found ctrl output: \_468
+  found ctrl output: \_1352
+  ctrl inputs: { \_531 \_410 \_568 \_1100 \_1092 \_1355 \_1357 \host_start \host_stop \clear }
+  ctrl outputs: { $0\_139[1:0] \_1352 \_1090 \_1075 \_468 }
+  transition:       2'00 10'-------000 ->       2'00 6'000001
+  transition:       2'00 10'-------010 ->       2'00 6'000001
+  transition:       2'00 10'-------1-0 ->       2'01 6'010001
+  transition:       2'00 10'---------1 ->       2'00 6'000001
+  transition:       2'10 10'-00----000 ->       2'10 6'100100
+  transition:       2'10 10'-01-000000 ->       2'10 6'100100
+  transition:       2'10 10'-01-001000 ->       2'00 6'000100
+  transition:       2'10 10'-01-10-000 ->       2'01 6'010100
+  transition:       2'10 10'-01--1-000 ->       2'00 6'000100
+  transition:       2'10 10'-1-0---000 ->       2'01 6'010100
+  transition:       2'10 10'-1-1---000 ->       2'10 6'100100
+  transition:       2'10 10'-------010 ->       2'00 6'000100
+  transition:       2'10 10'-------1-0 ->       2'01 6'010100
+  transition:       2'10 10'---------1 ->       2'00 6'000100
+  transition:       2'01 10'0------000 ->       2'01 6'010010
+  transition:       2'01 10'1------000 ->       2'10 6'100010
+  transition:       2'01 10'-------010 ->       2'00 6'000010
+  transition:       2'01 10'-------1-0 ->       2'01 6'010010
+  transition:       2'01 10'---------1 ->       2'00 6'000010
+
+2.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+Optimizing FSM `$fsm$\_139$1310' from module `\spex_core'.
+  Merging pattern 10'-------000 and 10'-------010 from group (0 0 6'000001).
+  Merging pattern 10'-------010 and 10'-------000 from group (0 0 6'000001).
+
+2.8.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 18 unused cells and 19 unused wires.
+<suppressed ~32 debug messages>
+
+2.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+Optimizing FSM `$fsm$\_139$1310' from module `\spex_core'.
+  Removing unused output signal \_1352.
+  Removing unused output signal $0\_139[1:0] [0].
+  Removing unused output signal $0\_139[1:0] [1].
+
+2.8.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+Recoding FSM `$fsm$\_139$1310' from module `\spex_core' using `auto' encoding:
+  mapping auto encoding to `one-hot` for this FSM.
+  00 -> --1
+  10 -> -1-
+  01 -> 1--
+
+2.8.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+FSM `$fsm$\_139$1310' from module `spex_core':
+-------------------------------------
+
+  Information on FSM $fsm$\_139$1310 (\_139):
+
+  Number of input signals:   10
+  Number of output signals:   3
+  Number of state bits:       3
+
+  Input signals:
+    0: \clear
+    1: \host_stop
+    2: \host_start
+    3: \_1357
+    4: \_1355
+    5: \_1092
+    6: \_1100
+    7: \_568
+    8: \_410
+    9: \_531
+
+  Output signals:
+    0: \_468
+    1: \_1075
+    2: \_1090
+
+  State encoding:
+    0:      3'--1  <RESET STATE>
+    1:      3'-1-
+    2:      3'1--
+
+  Transition Table (state_in, ctrl_in, state_out, ctrl_out):
+      0:     0 10'-------0-0   ->     0 3'001
+      1:     0 10'---------1   ->     0 3'001
+      2:     0 10'-------1-0   ->     2 3'001
+      3:     1 10'-01-001000   ->     0 3'100
+      4:     1 10'-01--1-000   ->     0 3'100
+      5:     1 10'-------010   ->     0 3'100
+      6:     1 10'---------1   ->     0 3'100
+      7:     1 10'-01-000000   ->     1 3'100
+      8:     1 10'-1-1---000   ->     1 3'100
+      9:     1 10'-00----000   ->     1 3'100
+     10:     1 10'-01-10-000   ->     2 3'100
+     11:     1 10'-1-0---000   ->     2 3'100
+     12:     1 10'-------1-0   ->     2 3'100
+     13:     2 10'-------010   ->     0 3'010
+     14:     2 10'---------1   ->     0 3'010
+     15:     2 10'1------000   ->     1 3'010
+     16:     2 10'0------000   ->     2 3'010
+     17:     2 10'-------1-0   ->     2 3'010
+
+-------------------------------------
+
+2.8.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+Mapping FSM `$fsm$\_139$1310' from module `\spex_core'.
+
+2.9. Executing OPT pass (performing simple optimizations).
+
+2.9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~4 debug messages>
+
+2.9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~133 debug messages>
+
+2.9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$1308 ($dff) from module spex_core (D = \_448, Q = \_451, rval = 12'000000000000).
+Adding SRST signal on $procdff$1307 ($dff) from module spex_core (D = \_1, Q = \_448, rval = 12'000000000000).
+Adding SRST signal on $procdff$1306 ($dff) from module spex_core (D = \_4, Q = \_433, rval = 1'0).
+Adding SRST signal on $procdff$1305 ($dff) from module spex_core (D = \_422, Q = \_481, rval = 8'00000000).
+Adding SRST signal on $procdff$1304 ($dff) from module spex_core (D = \_414, Q = \_427, rval = 1'0).
+Adding SRST signal on $procdff$1303 ($dff) from module spex_core (D = { \_418 \_352 }, Q = \_422, rval = 8'00000000).
+Adding SRST signal on $procdff$1302 ($dff) from module spex_core (D = \_28, Q = \_414, rval = 1'0).
+Adding SRST signal on $procdff$1301 ($dff) from module spex_core (D = \_505, Q = \_503, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1376 ($sdff) from module spex_core (D = 1'1, Q = \_503).
+Adding SRST signal on $procdff$1300 ($dff) from module spex_core (D = \_515, Q = \_513, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1380 ($sdff) from module spex_core (D = 1'1, Q = \_513).
+Adding SRST signal on $procdff$1299 ($dff) from module spex_core (D = \_523, Q = \_521, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1384 ($sdff) from module spex_core (D = 1'1, Q = \_521).
+Adding SRST signal on $procdff$1298 ($dff) from module spex_core (D = \_539, Q = \_537, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1388 ($sdff) from module spex_core (D = 1'1, Q = \_537).
+Adding SRST signal on $procdff$1297 ($dff) from module spex_core (D = \_580, Q = \_528, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1392 ($sdff) from module spex_core (D = \_577, Q = \_528).
+Adding SRST signal on $procdff$1296 ($dff) from module spex_core (D = $procmux$1174_Y, Q = \_918, rval = 48'000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1402 ($sdff) from module spex_core (D = { \_848 \_849 \_418 \_559 \_567 \_162 }, Q = \_918).
+Adding SRST signal on $procdff$1295 ($dff) from module spex_core (D = $procmux$1169_Y, Q = \_912, rval = 48'000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1404 ($sdff) from module spex_core (D = { \_848 \_849 \_418 \_559 \_567 \_162 }, Q = \_912).
+Adding SRST signal on $procdff$1294 ($dff) from module spex_core (D = $procmux$1164_Y, Q = \_906, rval = 48'000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1406 ($sdff) from module spex_core (D = { \_848 \_849 \_418 \_559 \_567 \_162 }, Q = \_906).
+Adding SRST signal on $procdff$1293 ($dff) from module spex_core (D = $procmux$1159_Y, Q = \_900, rval = 48'000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1408 ($sdff) from module spex_core (D = { \_848 \_849 \_418 \_559 \_567 \_162 }, Q = \_900).
+Adding SRST signal on $procdff$1292 ($dff) from module spex_core (D = $procmux$1154_Y, Q = \_894, rval = 48'000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1410 ($sdff) from module spex_core (D = { \_848 \_849 \_418 \_559 \_567 \_162 }, Q = \_894).
+Adding SRST signal on $procdff$1291 ($dff) from module spex_core (D = $procmux$1149_Y, Q = \_888, rval = 48'000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1412 ($sdff) from module spex_core (D = { \_848 \_849 \_418 \_559 \_567 \_162 }, Q = \_888).
+Adding SRST signal on $procdff$1290 ($dff) from module spex_core (D = $procmux$1144_Y, Q = \_882, rval = 48'000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1414 ($sdff) from module spex_core (D = { \_848 \_849 \_418 \_559 \_567 \_162 }, Q = \_882).
+Adding SRST signal on $procdff$1289 ($dff) from module spex_core (D = \_47, Q = \_596, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1416 ($sdff) from module spex_core (D = \_598, Q = \_596).
+Adding SRST signal on $procdff$1288 ($dff) from module spex_core (D = \_48, Q = \_608, rval = 29'11111111111111111111111111111).
+Adding EN signal on $auto$ff.cc:266:slice$1418 ($sdff) from module spex_core (D = \_610, Q = \_608).
+Adding SRST signal on $procdff$1287 ($dff) from module spex_core (D = \_49, Q = \_617, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1420 ($sdff) from module spex_core (D = \_49, Q = \_617).
+Adding SRST signal on $procdff$1286 ($dff) from module spex_core (D = \_50, Q = \_639, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1428 ($sdff) from module spex_core (D = \_50, Q = \_639).
+Adding SRST signal on $procdff$1285 ($dff) from module spex_core (D = \_51, Q = \_661, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1436 ($sdff) from module spex_core (D = \_51, Q = \_661).
+Adding SRST signal on $procdff$1284 ($dff) from module spex_core (D = \_52, Q = \_683, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1444 ($sdff) from module spex_core (D = \_52, Q = \_683).
+Adding SRST signal on $procdff$1283 ($dff) from module spex_core (D = \_53, Q = \_705, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1452 ($sdff) from module spex_core (D = \_53, Q = \_705).
+Adding SRST signal on $procdff$1282 ($dff) from module spex_core (D = \_54, Q = \_727, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1460 ($sdff) from module spex_core (D = \_54, Q = \_727).
+Adding SRST signal on $procdff$1281 ($dff) from module spex_core (D = \_55, Q = \_749, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1468 ($sdff) from module spex_core (D = \_55, Q = \_749).
+Adding SRST signal on $procdff$1280 ($dff) from module spex_core (D = \_56, Q = \_771, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1476 ($sdff) from module spex_core (D = \_56, Q = \_771).
+Adding SRST signal on $procdff$1279 ($dff) from module spex_core (D = $procmux$1109_Y, Q = \_876, rval = 48'000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1484 ($sdff) from module spex_core (D = { \_848 \_849 \_418 \_559 \_567 \_162 }, Q = \_876).
+Adding SRST signal on $procdff$1278 ($dff) from module spex_core (D = \_861, Q = \_864, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$1486 ($sdff) from module spex_core (D = \_860, Q = \_864).
+Adding SRST signal on $procdff$1277 ($dff) from module spex_core (D = \_62, Q = \_867, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1488 ($sdff) from module spex_core (D = \_869, Q = \_867).
+Adding SRST signal on $procdff$1276 ($dff) from module spex_core (D = $procmux$1089_Y, Q = \_983, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1490 ($sdff) from module spex_core (D = \_218, Q = \_983).
+Adding SRST signal on $procdff$1275 ($dff) from module spex_core (D = $procmux$1084_Y, Q = \_977, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1492 ($sdff) from module spex_core (D = \_218, Q = \_977).
+Adding SRST signal on $procdff$1274 ($dff) from module spex_core (D = $procmux$1079_Y, Q = \_971, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1494 ($sdff) from module spex_core (D = \_218, Q = \_971).
+Adding SRST signal on $procdff$1273 ($dff) from module spex_core (D = $procmux$1074_Y, Q = \_965, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1496 ($sdff) from module spex_core (D = \_218, Q = \_965).
+Adding SRST signal on $procdff$1272 ($dff) from module spex_core (D = $procmux$1069_Y, Q = \_959, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1498 ($sdff) from module spex_core (D = \_218, Q = \_959).
+Adding SRST signal on $procdff$1271 ($dff) from module spex_core (D = $procmux$1064_Y, Q = \_953, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1500 ($sdff) from module spex_core (D = \_218, Q = \_953).
+Adding SRST signal on $procdff$1270 ($dff) from module spex_core (D = $procmux$1059_Y, Q = \_947, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1502 ($sdff) from module spex_core (D = \_218, Q = \_947).
+Adding SRST signal on $procdff$1269 ($dff) from module spex_core (D = \_65, Q = \_924, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1504 ($sdff) from module spex_core (D = \_926, Q = \_924).
+Adding SRST signal on $procdff$1268 ($dff) from module spex_core (D = $procmux$1051_Y, Q = \_941, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1506 ($sdff) from module spex_core (D = \_218, Q = \_941).
+Adding SRST signal on $procdff$1267 ($dff) from module spex_core (D = \_66, Q = \_932, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1508 ($sdff) from module spex_core (D = \_934, Q = \_932).
+Adding SRST signal on $procdff$1266 ($dff) from module spex_core (D = \_70, Q = \_602, rval = 0).
+Adding SRST signal on $procdff$1265 ($dff) from module spex_core (D = { \_559 \_567 }, Q = \_991, rval = 2'00).
+Adding SRST signal on $procdff$1264 ($dff) from module spex_core (D = \_568, Q = \_994, rval = 1'0).
+Adding SRST signal on $procdff$1263 ($dff) from module spex_core (D = \_352, Q = \_997, rval = 2'00).
+Adding SRST signal on $procdff$1262 ($dff) from module spex_core (D = \_410, Q = \_1000, rval = 1'0).
+Adding SRST signal on $procdff$1261 ($dff) from module spex_core (D = \_1064, Q = \_1011, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1515 ($sdff) from module spex_core (D = \_1063, Q = \_1011).
+Adding SRST signal on $procdff$1260 ($dff) from module spex_core (D = \_1079, Q = \_153, rval = 128'00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1519 ($sdff) from module spex_core (D = \ram_rec_rdata, Q = \_153).
+Adding SRST signal on $procdff$1259 ($dff) from module spex_core (D = \_1084, Q = \_150, rval = 128'00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1523 ($sdff) from module spex_core (D = \ram_rec_rdata, Q = \_150).
+Adding SRST signal on $procdff$1258 ($dff) from module spex_core (D = \_1089, Q = \_147, rval = 128'00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1527 ($sdff) from module spex_core (D = \ram_rec_rdata, Q = \_147).
+Adding SRST signal on $procdff$1257 ($dff) from module spex_core (D = \_1105, Q = \_418, rval = 6'000000).
+Adding EN signal on $auto$ff.cc:266:slice$1531 ($sdff) from module spex_core (D = \_1105, Q = \_418).
+Adding SRST signal on $procdff$1256 ($dff) from module spex_core (D = \_1112, Q = \_557, rval = 1'0).
+Adding SRST signal on $procdff$1255 ($dff) from module spex_core (D = \_1113, Q = \_238, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$1544 ($sdff) from module spex_core (D = \host_role, Q = \_238).
+Adding SRST signal on $procdff$1254 ($dff) from module spex_core (D = { \_226 [14:0] \_1121 }, Q = \_226, rval = 16'1010110011100001).
+Adding SRST signal on $procdff$1253 ($dff) from module spex_core (D = \_1139, Q = \_1142, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$1547 ($sdff) from module spex_core (D = \_1138, Q = \_1142).
+Adding SRST signal on $procdff$1252 ($dff) from module spex_core (D = \_105, Q = \_218, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1549 ($sdff) from module spex_core (D = \_1161, Q = \_218).
+Adding SRST signal on $procdff$1251 ($dff) from module spex_core (D = $procmux$850_Y, Q = \_1249, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1555 ($sdff) from module spex_core (D = \host_tx_data, Q = \_1249).
+Adding SRST signal on $procdff$1250 ($dff) from module spex_core (D = $procmux$845_Y, Q = \_1243, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1557 ($sdff) from module spex_core (D = \host_tx_data, Q = \_1243).
+Adding SRST signal on $procdff$1249 ($dff) from module spex_core (D = $procmux$840_Y, Q = \_1237, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1559 ($sdff) from module spex_core (D = \host_tx_data, Q = \_1237).
+Adding SRST signal on $procdff$1248 ($dff) from module spex_core (D = $procmux$835_Y, Q = \_1231, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1561 ($sdff) from module spex_core (D = \host_tx_data, Q = \_1231).
+Adding SRST signal on $procdff$1247 ($dff) from module spex_core (D = $procmux$830_Y, Q = \_1225, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1563 ($sdff) from module spex_core (D = \host_tx_data, Q = \_1225).
+Adding SRST signal on $procdff$1246 ($dff) from module spex_core (D = $procmux$825_Y, Q = \_1219, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1565 ($sdff) from module spex_core (D = \host_tx_data, Q = \_1219).
+Adding SRST signal on $procdff$1245 ($dff) from module spex_core (D = $procmux$820_Y, Q = \_1213, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1567 ($sdff) from module spex_core (D = \host_tx_data, Q = \_1213).
+Adding SRST signal on $procdff$1244 ($dff) from module spex_core (D = \_106, Q = \_1167, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1569 ($sdff) from module spex_core (D = \_1169, Q = \_1167).
+Adding SRST signal on $procdff$1243 ($dff) from module spex_core (D = $procmux$812_Y, Q = \_1207, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1571 ($sdff) from module spex_core (D = \host_tx_data, Q = \_1207).
+Adding SRST signal on $procdff$1242 ($dff) from module spex_core (D = \_109, Q = \_1175, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1573 ($sdff) from module spex_core (D = \_1177, Q = \_1175).
+Adding SRST signal on $procdff$1241 ($dff) from module spex_core (D = \_1198, Q = \_1201, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$1575 ($sdff) from module spex_core (D = \_1197, Q = \_1201).
+Adding SRST signal on $procdff$1240 ($dff) from module spex_core (D = \_114, Q = \_214, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1577 ($sdff) from module spex_core (D = \_1264, Q = \_214).
+Adding SRST signal on $procdff$1239 ($dff) from module spex_core (D = \_115, Q = \_209, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1583 ($sdff) from module spex_core (D = \_1277, Q = \_209).
+Adding SRST signal on $procdff$1238 ($dff) from module spex_core (D = \_1293, Q = \_196, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1589 ($sdff) from module spex_core (D = \_1292, Q = \_196).
+Adding SRST signal on $procdff$1237 ($dff) from module spex_core (D = \_1305, Q = \_193, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1593 ($sdff) from module spex_core (D = \_1304, Q = \_193).
+Adding SRST signal on $procdff$1236 ($dff) from module spex_core (D = \_162, Q = \_178, rval = 8'00000000).
+Adding SRST signal on $procdff$1235 ($dff) from module spex_core (D = \_1314, Q = \_175, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1598 ($sdff) from module spex_core (D = \_1314, Q = \_175).
+Adding SRST signal on $procdff$1234 ($dff) from module spex_core (D = \pins_in, Q = \_159, rval = 8'00000000).
+Adding SRST signal on $procdff$1233 ($dff) from module spex_core (D = \_159, Q = \_162, rval = 8'00000000).
+Adding SRST signal on $procdff$1232 ($dff) from module spex_core (D = \_1324, Q = \_190, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1606 ($sdff) from module spex_core (D = \_1323, Q = \_190).
+Adding SRST signal on $procdff$1231 ($dff) from module spex_core (D = \_1341, Q = \_488, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1610 ($sdff) from module spex_core (D = \_1341, Q = \_488).
+Adding SRST signal on $procdff$1230 ($dff) from module spex_core (D = \_127, Q = \_144, rval = 128'00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1624 ($sdff) from module spex_core (D = \ram_rec_rdata, Q = \_144).
+Adding SRST signal on $procdff$1228 ($dff) from module spex_core (D = \_1397, Q = \_1071, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1628 ($sdff) from module spex_core (D = \_1396, Q = \_1071).
+
+2.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 155 unused cells and 187 unused wires.
+<suppressed ~235 debug messages>
+
+2.9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~15 debug messages>
+
+2.9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~73 debug messages>
+
+2.9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~69 debug messages>
+Removed a total of 23 cells.
+
+2.9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 16 unused wires.
+<suppressed ~1 debug messages>
+
+2.9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~74 debug messages>
+
+2.9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.9.23. Finished OPT passes. (There is nothing left to do.)
+
+2.10. Executing WREDUCE pass (reducing word size of cells).
+Removed top 1 bits (of 6) from port B of cell spex_core.$auto$fsm_map.cc:77:implement_pattern_cache$1325 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$auto$fsm_map.cc:77:implement_pattern_cache$1329 ($eq).
+Removed top 4 bits (of 16) from port A of cell spex_core.$lt$../out/spex_core.v:1200$11 ($lt).
+Removed top 1 bits (of 9) from port A of cell spex_core.$add$../out/spex_core.v:1240$26 ($add).
+Removed top 7 bits (of 9) from port B of cell spex_core.$add$../out/spex_core.v:1240$26 ($add).
+Removed top 1 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:1416$98 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:1426$101 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:1436$104 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1446$107 ($add).
+Removed top 28 bits (of 29) from port B of cell spex_core.$add$../out/spex_core.v:1461$113 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1473$117 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1499$132 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1527$149 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1553$164 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1583$183 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1609$198 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1637$215 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1663$230 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1713$255 ($add).
+Removed top 3 bits (of 4) from port B of cell spex_core.$add$../out/spex_core.v:1716$256 ($add).
+Removed top 3 bits (of 4) from port B of cell spex_core.$sub$../out/spex_core.v:1717$257 ($sub).
+Removed top 1 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:1801$283 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:1810$286 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:1819$289 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1828$292 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:1846$298 ($add).
+Removed top 31 bits (of 32) from port B of cell spex_core.$add$../out/spex_core.v:1877$302 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:2273$424 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:2284$429 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:2295$434 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:2307$439 ($add).
+Removed top 15 bits (of 16) from port B of cell spex_core.$add$../out/spex_core.v:2370$468 ($add).
+Removed top 1 bits (of 2) from mux cell spex_core.$ternary$../out/spex_core.v:2478$502 ($mux).
+Removed top 3 bits (of 4) from port B of cell spex_core.$add$../out/spex_core.v:2535$519 ($add).
+Removed top 3 bits (of 4) from port B of cell spex_core.$sub$../out/spex_core.v:2536$520 ($sub).
+Removed top 1 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:2700$552 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:2709$555 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$eq$../out/spex_core.v:2718$558 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:2727$561 ($add).
+Removed top 2 bits (of 3) from port B of cell spex_core.$add$../out/spex_core.v:2746$567 ($add).
+Removed top 3 bits (of 4) from port B of cell spex_core.$add$../out/spex_core.v:2775$571 ($add).
+Removed top 3 bits (of 4) from port B of cell spex_core.$sub$../out/spex_core.v:2776$572 ($sub).
+Removed top 1 bits (of 2) from port B of cell spex_core.$eq$../out/spex_core.v:2780$576 ($eq).
+Removed top 7 bits (of 8) from port B of cell spex_core.$sub$../out/spex_core.v:2842$593 ($sub).
+Removed top 15 bits (of 16) from port B of cell spex_core.$add$../out/spex_core.v:2926$604 ($add).
+Removed top 15 bits (of 16) from port B of cell spex_core.$add$../out/spex_core.v:2941$612 ($add).
+Removed top 1 bits (of 8) from port B of cell spex_core.$auto$fsm_map.cc:77:implement_pattern_cache$1338 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$721_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$746_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$763_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$764_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$765_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$766_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell spex_core.$procmux$767_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell spex_core.$procmux$768_CMP0 ($eq).
+Removed top 3 bits (of 4) from port B of cell spex_core.$procmux$769_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$777_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$procmux$805_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$procmux$806_CMP0 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$procmux$807_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$861_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$procmux$872_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$procmux$873_CMP0 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$procmux$874_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$893_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$898_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$909_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$910_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$911_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$912_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell spex_core.$procmux$913_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell spex_core.$procmux$914_CMP0 ($eq).
+Removed top 3 bits (of 4) from port B of cell spex_core.$procmux$915_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$920_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$945_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$956_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$957_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$958_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$959_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell spex_core.$procmux$960_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell spex_core.$procmux$961_CMP0 ($eq).
+Removed top 3 bits (of 4) from port B of cell spex_core.$procmux$962_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$967_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$972_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$983_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$984_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$985_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$procmux$986_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell spex_core.$procmux$987_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell spex_core.$procmux$988_CMP0 ($eq).
+Removed top 3 bits (of 4) from port B of cell spex_core.$procmux$989_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$994_CMP0 ($eq).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$1004_CMP0 ($eq).
+Removed top 1 bits (of 8) from port B of cell spex_core.$auto$fsm_map.cc:77:implement_pattern_cache$1321 ($eq).
+Removed top 1 bits (of 7) from port B of cell spex_core.$auto$fsm_map.cc:77:implement_pattern_cache$1355 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$procmux$1044_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$procmux$1045_CMP0 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$procmux$1046_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$procmux$1099_CMP0 ($eq).
+Removed top 1 bits (of 3) from port B of cell spex_core.$procmux$1100_CMP0 ($eq).
+Removed top 2 bits (of 3) from port B of cell spex_core.$procmux$1101_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$auto$opt_dff.cc:195:make_patterns_logic$1619 ($ne).
+Removed top 1 bits (of 2) from port B of cell spex_core.$procmux$1215_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell spex_core.$auto$opt_dff.cc:195:make_patterns_logic$1617 ($ne).
+Removed top 1 bits (of 5) from port B of cell spex_core.$auto$opt_dff.cc:195:make_patterns_logic$1615 ($ne).
+Removed top 1 bits (of 2) from wire spex_core._348.
+
+2.11. Executing PEEPOPT pass (run peephole optimizers).
+
+2.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+2.13. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module spex_core:
+  creating $macc model for $add$../out/spex_core.v:1240$26 ($add).
+  creating $macc model for $add$../out/spex_core.v:1446$107 ($add).
+  creating $macc model for $add$../out/spex_core.v:1461$113 ($add).
+  creating $macc model for $add$../out/spex_core.v:1473$117 ($add).
+  creating $macc model for $add$../out/spex_core.v:1499$132 ($add).
+  creating $macc model for $add$../out/spex_core.v:1527$149 ($add).
+  creating $macc model for $add$../out/spex_core.v:1553$164 ($add).
+  creating $macc model for $add$../out/spex_core.v:1583$183 ($add).
+  creating $macc model for $add$../out/spex_core.v:1609$198 ($add).
+  creating $macc model for $add$../out/spex_core.v:1637$215 ($add).
+  creating $macc model for $add$../out/spex_core.v:1663$230 ($add).
+  creating $macc model for $add$../out/spex_core.v:1713$255 ($add).
+  creating $macc model for $add$../out/spex_core.v:1716$256 ($add).
+  creating $macc model for $add$../out/spex_core.v:1828$292 ($add).
+  creating $macc model for $add$../out/spex_core.v:1846$298 ($add).
+  creating $macc model for $add$../out/spex_core.v:1877$302 ($add).
+  creating $macc model for $add$../out/spex_core.v:2307$439 ($add).
+  creating $macc model for $add$../out/spex_core.v:2370$468 ($add).
+  creating $macc model for $add$../out/spex_core.v:2535$519 ($add).
+  creating $macc model for $add$../out/spex_core.v:2727$561 ($add).
+  creating $macc model for $add$../out/spex_core.v:2746$567 ($add).
+  creating $macc model for $add$../out/spex_core.v:2775$571 ($add).
+  creating $macc model for $add$../out/spex_core.v:2926$604 ($add).
+  creating $macc model for $add$../out/spex_core.v:2941$612 ($add).
+  creating $macc model for $sub$../out/spex_core.v:1457$112 ($sub).
+  creating $macc model for $sub$../out/spex_core.v:1717$257 ($sub).
+  creating $macc model for $sub$../out/spex_core.v:2536$520 ($sub).
+  creating $macc model for $sub$../out/spex_core.v:2776$572 ($sub).
+  creating $macc model for $sub$../out/spex_core.v:2842$593 ($sub).
+  creating $alu model for $macc $sub$../out/spex_core.v:2842$593.
+  creating $alu model for $macc $sub$../out/spex_core.v:2776$572.
+  creating $alu model for $macc $sub$../out/spex_core.v:2536$520.
+  creating $alu model for $macc $sub$../out/spex_core.v:1717$257.
+  creating $alu model for $macc $sub$../out/spex_core.v:1457$112.
+  creating $alu model for $macc $add$../out/spex_core.v:2941$612.
+  creating $alu model for $macc $add$../out/spex_core.v:2926$604.
+  creating $alu model for $macc $add$../out/spex_core.v:2775$571.
+  creating $alu model for $macc $add$../out/spex_core.v:2746$567.
+  creating $alu model for $macc $add$../out/spex_core.v:2727$561.
+  creating $alu model for $macc $add$../out/spex_core.v:2535$519.
+  creating $alu model for $macc $add$../out/spex_core.v:2370$468.
+  creating $alu model for $macc $add$../out/spex_core.v:2307$439.
+  creating $alu model for $macc $add$../out/spex_core.v:1877$302.
+  creating $alu model for $macc $add$../out/spex_core.v:1846$298.
+  creating $alu model for $macc $add$../out/spex_core.v:1828$292.
+  creating $alu model for $macc $add$../out/spex_core.v:1716$256.
+  creating $alu model for $macc $add$../out/spex_core.v:1713$255.
+  creating $alu model for $macc $add$../out/spex_core.v:1663$230.
+  creating $alu model for $macc $add$../out/spex_core.v:1637$215.
+  creating $alu model for $macc $add$../out/spex_core.v:1609$198.
+  creating $alu model for $macc $add$../out/spex_core.v:1583$183.
+  creating $alu model for $macc $add$../out/spex_core.v:1553$164.
+  creating $alu model for $macc $add$../out/spex_core.v:1527$149.
+  creating $alu model for $macc $add$../out/spex_core.v:1499$132.
+  creating $alu model for $macc $add$../out/spex_core.v:1473$117.
+  creating $alu model for $macc $add$../out/spex_core.v:1461$113.
+  creating $alu model for $macc $add$../out/spex_core.v:1446$107.
+  creating $alu model for $macc $add$../out/spex_core.v:1240$26.
+  creating $alu model for $lt$../out/spex_core.v:1152$1 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1155$4 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1200$11 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1209$14 ($lt): merged with $lt$../out/spex_core.v:1152$1.
+  creating $alu model for $lt$../out/spex_core.v:1213$17 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1283$43 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1525$147 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1579$179 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1581$181 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1635$213 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1689$245 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1691$247 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1693$249 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:1697$252 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:2144$380 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:2160$383 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:2242$410 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:2258$413 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:2441$482 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:2457$485 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:2923$602 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:2969$621 ($lt): new $alu
+  creating $alu model for $lt$../out/spex_core.v:3067$658 ($lt): new $alu
+  creating $alu model for $eq$../out/spex_core.v:2072$360 ($eq): merged with $lt$../out/spex_core.v:1283$43.
+  creating $alu model for $eq$../out/spex_core.v:2083$370 ($eq): merged with $lt$../out/spex_core.v:2144$380.
+  creating $alu model for $eq$../out/spex_core.v:2088$374 ($eq): merged with $lt$../out/spex_core.v:2160$383.
+  creating $alu model for $eq$../out/spex_core.v:2181$400 ($eq): merged with $lt$../out/spex_core.v:2242$410.
+  creating $alu model for $eq$../out/spex_core.v:2186$404 ($eq): merged with $lt$../out/spex_core.v:2258$413.
+  creating $alu model for $eq$../out/spex_core.v:2380$472 ($eq): merged with $lt$../out/spex_core.v:2441$482.
+  creating $alu model for $eq$../out/spex_core.v:2385$476 ($eq): merged with $lt$../out/spex_core.v:2457$485.
+  creating $alu model for $eq$../out/spex_core.v:2479$503 ($eq): merged with $lt$../out/spex_core.v:2923$602.
+  creating $alu model for $eq$../out/spex_core.v:2484$507 ($eq): merged with $lt$../out/spex_core.v:2969$621.
+  creating $alu cell for $lt$../out/spex_core.v:3067$658: $auto$alumacc.cc:485:replace_alu$1655
+  creating $alu cell for $lt$../out/spex_core.v:2969$621, $eq$../out/spex_core.v:2484$507: $auto$alumacc.cc:485:replace_alu$1660
+  creating $alu cell for $lt$../out/spex_core.v:2923$602, $eq$../out/spex_core.v:2479$503: $auto$alumacc.cc:485:replace_alu$1667
+  creating $alu cell for $lt$../out/spex_core.v:2457$485, $eq$../out/spex_core.v:2385$476: $auto$alumacc.cc:485:replace_alu$1678
+  creating $alu cell for $lt$../out/spex_core.v:2441$482, $eq$../out/spex_core.v:2380$472: $auto$alumacc.cc:485:replace_alu$1689
+  creating $alu cell for $lt$../out/spex_core.v:2258$413, $eq$../out/spex_core.v:2186$404: $auto$alumacc.cc:485:replace_alu$1696
+  creating $alu cell for $lt$../out/spex_core.v:2242$410, $eq$../out/spex_core.v:2181$400: $auto$alumacc.cc:485:replace_alu$1707
+  creating $alu cell for $lt$../out/spex_core.v:2160$383, $eq$../out/spex_core.v:2088$374: $auto$alumacc.cc:485:replace_alu$1714
+  creating $alu cell for $lt$../out/spex_core.v:2144$380, $eq$../out/spex_core.v:2083$370: $auto$alumacc.cc:485:replace_alu$1721
+  creating $alu cell for $lt$../out/spex_core.v:1697$252: $auto$alumacc.cc:485:replace_alu$1732
+  creating $alu cell for $lt$../out/spex_core.v:1693$249: $auto$alumacc.cc:485:replace_alu$1743
+  creating $alu cell for $lt$../out/spex_core.v:1691$247: $auto$alumacc.cc:485:replace_alu$1748
+  creating $alu cell for $lt$../out/spex_core.v:1689$245: $auto$alumacc.cc:485:replace_alu$1753
+  creating $alu cell for $lt$../out/spex_core.v:1635$213: $auto$alumacc.cc:485:replace_alu$1764
+  creating $alu cell for $lt$../out/spex_core.v:1581$181: $auto$alumacc.cc:485:replace_alu$1769
+  creating $alu cell for $lt$../out/spex_core.v:1579$179: $auto$alumacc.cc:485:replace_alu$1780
+  creating $alu cell for $lt$../out/spex_core.v:1525$147: $auto$alumacc.cc:485:replace_alu$1791
+  creating $alu cell for $lt$../out/spex_core.v:1283$43, $eq$../out/spex_core.v:2072$360: $auto$alumacc.cc:485:replace_alu$1796
+  creating $alu cell for $lt$../out/spex_core.v:1213$17: $auto$alumacc.cc:485:replace_alu$1803
+  creating $alu cell for $lt$../out/spex_core.v:1200$11: $auto$alumacc.cc:485:replace_alu$1808
+  creating $alu cell for $lt$../out/spex_core.v:1155$4: $auto$alumacc.cc:485:replace_alu$1813
+  creating $alu cell for $lt$../out/spex_core.v:1152$1, $lt$../out/spex_core.v:1209$14: $auto$alumacc.cc:485:replace_alu$1818
+  creating $alu cell for $add$../out/spex_core.v:1240$26: $auto$alumacc.cc:485:replace_alu$1829
+  creating $alu cell for $add$../out/spex_core.v:1446$107: $auto$alumacc.cc:485:replace_alu$1832
+  creating $alu cell for $add$../out/spex_core.v:1461$113: $auto$alumacc.cc:485:replace_alu$1835
+  creating $alu cell for $add$../out/spex_core.v:1473$117: $auto$alumacc.cc:485:replace_alu$1838
+  creating $alu cell for $add$../out/spex_core.v:1499$132: $auto$alumacc.cc:485:replace_alu$1841
+  creating $alu cell for $add$../out/spex_core.v:1527$149: $auto$alumacc.cc:485:replace_alu$1844
+  creating $alu cell for $add$../out/spex_core.v:1553$164: $auto$alumacc.cc:485:replace_alu$1847
+  creating $alu cell for $add$../out/spex_core.v:1583$183: $auto$alumacc.cc:485:replace_alu$1850
+  creating $alu cell for $add$../out/spex_core.v:1609$198: $auto$alumacc.cc:485:replace_alu$1853
+  creating $alu cell for $add$../out/spex_core.v:1637$215: $auto$alumacc.cc:485:replace_alu$1856
+  creating $alu cell for $add$../out/spex_core.v:1663$230: $auto$alumacc.cc:485:replace_alu$1859
+  creating $alu cell for $add$../out/spex_core.v:1713$255: $auto$alumacc.cc:485:replace_alu$1862
+  creating $alu cell for $add$../out/spex_core.v:1716$256: $auto$alumacc.cc:485:replace_alu$1865
+  creating $alu cell for $add$../out/spex_core.v:1828$292: $auto$alumacc.cc:485:replace_alu$1868
+  creating $alu cell for $add$../out/spex_core.v:1846$298: $auto$alumacc.cc:485:replace_alu$1871
+  creating $alu cell for $add$../out/spex_core.v:1877$302: $auto$alumacc.cc:485:replace_alu$1874
+  creating $alu cell for $add$../out/spex_core.v:2307$439: $auto$alumacc.cc:485:replace_alu$1877
+  creating $alu cell for $add$../out/spex_core.v:2370$468: $auto$alumacc.cc:485:replace_alu$1880
+  creating $alu cell for $add$../out/spex_core.v:2535$519: $auto$alumacc.cc:485:replace_alu$1883
+  creating $alu cell for $add$../out/spex_core.v:2727$561: $auto$alumacc.cc:485:replace_alu$1886
+  creating $alu cell for $add$../out/spex_core.v:2746$567: $auto$alumacc.cc:485:replace_alu$1889
+  creating $alu cell for $add$../out/spex_core.v:2775$571: $auto$alumacc.cc:485:replace_alu$1892
+  creating $alu cell for $add$../out/spex_core.v:2926$604: $auto$alumacc.cc:485:replace_alu$1895
+  creating $alu cell for $add$../out/spex_core.v:2941$612: $auto$alumacc.cc:485:replace_alu$1898
+  creating $alu cell for $sub$../out/spex_core.v:1457$112: $auto$alumacc.cc:485:replace_alu$1901
+  creating $alu cell for $sub$../out/spex_core.v:1717$257: $auto$alumacc.cc:485:replace_alu$1904
+  creating $alu cell for $sub$../out/spex_core.v:2536$520: $auto$alumacc.cc:485:replace_alu$1907
+  creating $alu cell for $sub$../out/spex_core.v:2776$572: $auto$alumacc.cc:485:replace_alu$1910
+  creating $alu cell for $sub$../out/spex_core.v:2842$593: $auto$alumacc.cc:485:replace_alu$1913
+  created 51 $alu and 0 $macc cells.
+
+2.14. Executing SHARE pass (SAT-based resource sharing).
+
+2.15. Executing OPT pass (performing simple optimizations).
+
+2.15.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~19 debug messages>
+
+2.15.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.15.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~74 debug messages>
+
+2.15.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+    New input vector for $reduce_and cell $auto$opt_dff.cc:220:make_patterns_logic$1627: { $auto$alumacc.cc:501:replace_alu$1797 \_139 [2] }
+  Optimizing cells in module \spex_core.
+Performed a total of 1 changes.
+
+2.15.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.15.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.15.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 19 unused cells and 55 unused wires.
+<suppressed ~39 debug messages>
+
+2.15.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.15.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.15.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~74 debug messages>
+
+2.15.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.15.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.15.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.15.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.15.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.15.16. Finished OPT passes. (There is nothing left to do.)
+
+2.16. Executing MEMORY pass.
+
+2.16.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+2.16.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+2.16.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+2.16.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+2.16.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+2.16.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.16.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+2.16.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+2.16.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.16.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+2.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.18. Executing OPT pass (performing simple optimizations).
+
+2.18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~28 debug messages>
+
+2.18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.18.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.18.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 12 unused cells and 14 unused wires.
+<suppressed ~13 debug messages>
+
+2.18.5. Finished fast OPT passes.
+
+2.19. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+2.20. Executing OPT pass (performing simple optimizations).
+
+2.20.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.20.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.20.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~72 debug messages>
+
+2.20.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.20.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.20.6. Executing OPT_SHARE pass.
+    Found cells that share an operand and can be merged by moving the $mux $ternary$../out/spex_core.v:1718$258 in front of them:
+        $auto$alumacc.cc:485:replace_alu$1865
+        $auto$alumacc.cc:485:replace_alu$1904
+
+    Found cells that share an operand and can be merged by moving the $mux $ternary$../out/spex_core.v:2537$521 in front of them:
+        $auto$alumacc.cc:485:replace_alu$1883
+        $auto$alumacc.cc:485:replace_alu$1907
+
+    Found cells that share an operand and can be merged by moving the $mux $ternary$../out/spex_core.v:2777$573 in front of them:
+        $auto$alumacc.cc:485:replace_alu$1892
+        $auto$alumacc.cc:485:replace_alu$1910
+
+2.20.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.20.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 18 unused wires.
+<suppressed ~7 debug messages>
+
+2.20.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~6 debug messages>
+
+2.20.10. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.20.11. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~72 debug messages>
+
+2.20.12. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+    Consolidated identical input bits for $mux cell $auto$opt_share.cc:244:merge_operators$1947:
+      Old ports: A=4'1111, B=4'0001, Y=$auto$rtlil.cc:2498:Mux$1948
+      New ports: A=1'1, B=1'0, Y=$auto$rtlil.cc:2498:Mux$1948 [1]
+      New connections: { $auto$rtlil.cc:2498:Mux$1948 [3:2] $auto$rtlil.cc:2498:Mux$1948 [0] } = { $auto$rtlil.cc:2498:Mux$1948 [1] $auto$rtlil.cc:2498:Mux$1948 [1] 1'1 }
+    Consolidated identical input bits for $mux cell $auto$opt_share.cc:244:merge_operators$1954:
+      Old ports: A=4'1111, B=4'0001, Y=$auto$rtlil.cc:2498:Mux$1955
+      New ports: A=1'1, B=1'0, Y=$auto$rtlil.cc:2498:Mux$1955 [1]
+      New connections: { $auto$rtlil.cc:2498:Mux$1955 [3:2] $auto$rtlil.cc:2498:Mux$1955 [0] } = { $auto$rtlil.cc:2498:Mux$1955 [1] $auto$rtlil.cc:2498:Mux$1955 [1] 1'1 }
+    Consolidated identical input bits for $mux cell $auto$opt_share.cc:244:merge_operators$1961:
+      Old ports: A=4'1111, B=4'0001, Y=$auto$rtlil.cc:2498:Mux$1962
+      New ports: A=1'1, B=1'0, Y=$auto$rtlil.cc:2498:Mux$1962 [1]
+      New connections: { $auto$rtlil.cc:2498:Mux$1962 [3:2] $auto$rtlil.cc:2498:Mux$1962 [0] } = { $auto$rtlil.cc:2498:Mux$1962 [1] $auto$rtlil.cc:2498:Mux$1962 [1] 1'1 }
+  Optimizing cells in module \spex_core.
+Performed a total of 3 changes.
+
+2.20.13. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.20.14. Executing OPT_SHARE pass.
+
+2.20.15. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.20.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 6 unused wires.
+<suppressed ~1 debug messages>
+
+2.20.17. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~3 debug messages>
+
+2.20.18. Rerunning OPT passes. (Maybe there is more to do..)
+
+2.20.19. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spex_core..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~69 debug messages>
+
+2.20.20. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spex_core.
+Performed a total of 0 changes.
+
+2.20.21. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+Removed a total of 0 cells.
+
+2.20.22. Executing OPT_SHARE pass.
+
+2.20.23. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.20.24. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+
+2.20.25. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+
+2.20.26. Finished OPT passes. (There is nothing left to do.)
+
+2.21. Executing TECHMAP pass (map to technology primitives).
+
+2.21.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+2.21.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $not.
+Using extmapper simplemap for cells of type $reduce_and.
+Using extmapper simplemap for cells of type $logic_not.
+Using extmapper simplemap for cells of type $eq.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $or.
+Using extmapper simplemap for cells of type $mux.
+Using template $paramod$ee3d784672cdb1cb32d9a801a3af776716f16b74\_90_alu for cells of type $alu.
+Using template $paramod$dee3d4f0fa4b4806e8ff2cfc018f7272686163a5\_90_alu for cells of type $alu.
+Using template $paramod$0d149ffe75563ef6fcc1a3dddc59d00af28651a7\_90_pmux for cells of type $pmux.
+Using template $paramod$6b90a16b6f3b57b9c9d958838204f952a01dc262\_90_alu for cells of type $alu.
+Using template $paramod$3ef7d3dd227da7627a99c5e5a6a4deb817573e39\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $ne.
+Using extmapper simplemap for cells of type $reduce_or.
+Using template $paramod$80fd49bc875a8a1ceaa5f1b164eef265e92f0909\_90_alu for cells of type $alu.
+Using template $paramod$6df0329addda9228fcc2546de2aaf14ad26c98e1\_90_alu for cells of type $alu.
+Using template $paramod$fc972a7a46956c1788f3cb5257b53c8f1df2d0cc\_90_alu for cells of type $alu.
+Using template $paramod$78e969f2586efcf3a5b0b0440bcca0db83d5cca2\_90_alu for cells of type $alu.
+Using template $paramod$740b056ede97228d3eae64ea2fdc81f0a33e0fe7\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $xor.
+Using template $paramod$6a42b6fefed750f8a1c58eab59479d960557103c\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $reduce_bool.
+Using template $paramod$2af30114e9bd4ccb04dad757b3f0a8f6bf0615b0\_90_alu for cells of type $alu.
+Using template $paramod$403a3c2fa431a154c52a6a5429d7a6260b5d144f\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $sdff.
+Using template $paramod$85df5dc01c7df96a7d8e5f1fdf76ce9ac452af63\_90_pmux for cells of type $pmux.
+Using template $paramod$aa21a8cfcdb2d038c61c16c25c37cdf209d597be\_90_pmux for cells of type $pmux.
+Using template $paramod$fc16b9f758000d363d24f130038bd99b46b4fa1b\_90_pmux for cells of type $pmux.
+Using template $paramod$97565c3687be688407d1272a293bd9d0ae6852dc\_90_pmux for cells of type $pmux.
+Using template $paramod$d7387fdb214042e5ef2d69a3f74948694b4bb65e\_90_pmux for cells of type $pmux.
+Using template $paramod$bf541dd3c0ba8228982b61e7bfbc350a2c253f4c\_90_pmux for cells of type $pmux.
+Using template $paramod$d629d85c8826a74239b9178d1930215a43b0ceb0\_90_pmux for cells of type $pmux.
+Using template $paramod$c15e84c77f007506123baf6c4be45847f0e33a3b\_90_pmux for cells of type $pmux.
+Using template $paramod$645fe0cc96ae5edb83bff90cc2c78f4a20ca3e3c\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $dff.
+Using template $paramod$2ba6eea9a2ffbc0a8d95f42aa687019d6f97ee2b\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $sdffe.
+Using extmapper simplemap for cells of type $pos.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000010000 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000001 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000011 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000011101 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000100 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001001 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001100 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000100000 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001000 for cells of type $lcu.
+No more expansions possible.
+<suppressed ~4464 debug messages>
+
+2.22. Executing OPT pass (performing simple optimizations).
+
+2.22.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~1908 debug messages>
+
+2.22.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~1449 debug messages>
+Removed a total of 483 cells.
+
+2.22.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 603 unused cells and 3525 unused wires.
+<suppressed ~622 debug messages>
+
+2.22.5. Finished fast OPT passes.
+
+2.23. Executing ABC pass (technology mapping using ABC).
+
+2.23.1. Extracting gate netlist of module `\spex_core' to `<abc-temp-dir>/input.blif'..
+Extracted 4993 gates and 6429 wires to a netlist network with 1434 inputs and 475 outputs.
+
+2.23.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+2.23.1.2. Re-integrating ABC results.
+ABC RESULTS:               MUX cells:      487
+ABC RESULTS:               AND cells:      303
+ABC RESULTS:               NOT cells:      197
+ABC RESULTS:              XNOR cells:      169
+ABC RESULTS:              NAND cells:      183
+ABC RESULTS:             ORNOT cells:      185
+ABC RESULTS:                OR cells:     1052
+ABC RESULTS:               NOR cells:       94
+ABC RESULTS:            ANDNOT cells:     1539
+ABC RESULTS:               XOR cells:      263
+ABC RESULTS:        internal signals:     4520
+ABC RESULTS:           input signals:     1434
+ABC RESULTS:          output signals:      475
+Removing temp directory.
+
+2.24. Executing OPT pass (performing simple optimizations).
+
+2.24.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spex_core.
+<suppressed ~78 debug messages>
+
+2.24.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spex_core'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+2.24.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+2.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 1 unused cells and 3679 unused wires.
+<suppressed ~395 debug messages>
+
+2.24.5. Finished fast OPT passes.
+
+2.25. Executing HIERARCHY pass (managing design hierarchy).
+
+2.25.1. Analyzing design hierarchy..
+Top module:  \spex_core
+
+2.25.2. Analyzing design hierarchy..
+Top module:  \spex_core
+Removed 0 unused modules.
+
+2.26. Printing statistics.
+
+=== spex_core ===
+
+   Number of wires:               4585
+   Number of wire bits:           9670
+   Number of public wires:         559
+   Number of public wire bits:    5644
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               5809
+     $_ANDNOT_                    1539
+     $_AND_                        303
+     $_DFF_P_                        3
+     $_MUX_                        487
+     $_NAND_                       183
+     $_NOR_                         92
+     $_NOT_                        196
+     $_ORNOT_                      185
+     $_OR_                        1052
+     $_SDFFE_PP0P_                1188
+     $_SDFFE_PP1P_                  29
+     $_SDFF_PP0_                   112
+     $_SDFF_PP1_                     8
+     $_XNOR_                       169
+     $_XOR_                        263
+
+2.27. Executing CHECK pass (checking for obvious problems).
+Checking module spex_core...
+Found and reported 0 problems.
+
+3. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+
+4. Executing DFFLIBMAP pass (mapping DFF cells to sequential cells from liberty file).
+  cell DFF (noninv, pins=3, area=49.00) is a direct match for cell type $_DFF_P_.
+  cell DFFR (noninv, pins=4, area=49.00) is a direct match for cell type $_DFF_PN0_.
+  final dff cell mappings:
+    unmapped dff cell: $_DFF_N_
+    \DFF _DFF_P_ (.CLK( C), .D( D), .Q( Q));
+    unmapped dff cell: $_DFF_NN0_
+    unmapped dff cell: $_DFF_NN1_
+    unmapped dff cell: $_DFF_NP0_
+    unmapped dff cell: $_DFF_NP1_
+    \DFFR _DFF_PN0_ (.CLK( C), .D( D), .Q( Q), .RN( R));
+    unmapped dff cell: $_DFF_PN1_
+    unmapped dff cell: $_DFF_PP0_
+    unmapped dff cell: $_DFF_PP1_
+    unmapped dff cell: $_DFFSR_NNN_
+    unmapped dff cell: $_DFFSR_NNP_
+    unmapped dff cell: $_DFFSR_NPN_
+    unmapped dff cell: $_DFFSR_NPP_
+    unmapped dff cell: $_DFFSR_PNN_
+    unmapped dff cell: $_DFFSR_PNP_
+    unmapped dff cell: $_DFFSR_PPN_
+    unmapped dff cell: $_DFFSR_PPP_
+
+4.1. Executing DFFLEGALIZE pass (convert FFs to types supported by the target).
+Mapping DFF cells in module `\spex_core':
+  mapped 1340 $_DFF_P_ cells to \DFF cells.
+
+5. Executing ABC pass (technology mapping using ABC).
+
+5.1. Extracting gate netlist of module `\spex_core' to `<abc-temp-dir>/input.blif'..
+Extracted 7023 gates and 8624 wires to a netlist network with 1599 inputs and 1471 outputs.
+
+5.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_lib -w /home/lenovo/spex/hardcaml/spex/synth/mini.lib 
+ABC: Parsing finished successfully.  Parsing time =     0.00 sec
+ABC: Warning: Templates are not defined.
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFFR".
+ABC: Scl_LibertyReadGenlib() skipped sequential cell "DFF".
+ABC: Library "mini" from "/home/lenovo/spex/hardcaml/spex/synth/mini.lib" has 11 cells (2 skipped: 2 seq; 0 tri-state; 0 no func; 0 dont_use).  Time =     0.00 sec
+ABC: Memory =    0.01 MB. Time =     0.00 sec
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &fraig -x 
+ABC: + &put 
+ABC: + scorr 
+ABC: Warning: The network is combinational (run "fraig" or "fraig_sweep").
+ABC: + dc2 
+ABC: + dretime 
+ABC: + strash 
+ABC: + &get -n 
+ABC: + &dch -f 
+ABC: + &nf 
+ABC: + &put 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+5.1.2. Re-integrating ABC results.
+ABC RESULTS:              MUX2 cells:       40
+ABC RESULTS:               INV cells:      284
+ABC RESULTS:              XOR2 cells:      102
+ABC RESULTS:             XNOR2 cells:      130
+ABC RESULTS:              AND2 cells:      581
+ABC RESULTS:              NOR2 cells:     1193
+ABC RESULTS:               OR2 cells:      155
+ABC RESULTS:             OAI21 cells:      550
+ABC RESULTS:             NAND2 cells:     2296
+ABC RESULTS:             AOI21 cells:     1980
+ABC RESULTS:        internal signals:     5554
+ABC RESULTS:           input signals:     1599
+ABC RESULTS:          output signals:     1471
+Removing temp directory.
+
+6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spex_core..
+Removed 0 unused cells and 8403 unused wires.
+<suppressed ~94 debug messages>
+
+7. Printing statistics.
+
+=== spex_core ===
+
+   Number of wires:               7646
+   Number of wire bits:          12455
+   Number of public wires:         466
+   Number of public wire bits:    5275
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               8651
+     AND2                          581
+     AOI21                        1980
+     DFF                          1340
+     INV                           284
+     MUX2                           40
+     NAND2                        2296
+     NOR2                         1193
+     OAI21                         550
+     OR2                           155
+     XNOR2                         130
+     XOR2                          102
+
+   Chip area for module '\spex_core': 126251.960000
+
+8. Executing LTP pass (find longest path).
+
+Longest topological path in spex_core (length=0):
+    0: \_994
+
+End of script. Logfile hash: 77375d424b, CPU: user 5.00s system 0.03s, MEM: 59.29 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 29% 2x abc (1 sec), 20% 37x opt_expr (1 sec), ...

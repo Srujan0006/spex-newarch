@@ -1,0 +1,5 @@
+(executable
+ (name vectors)
+ (libraries base stdio hardcaml spex spex_test)
+ (preprocess
+  (pps ppx_jane)))
