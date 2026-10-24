@@ -41,7 +41,9 @@ MUTANTS = [
     ("UNEXPECTED ignores the watch mask", "(changed_all &: hdr.watch <>:. 0)", "(changed_all <>:. 0)"),
     ("data flag inversion ignored", "let dat_ok = mux e.flag flags ^: e.flag_inv in", "let dat_ok = mux e.flag flags in"),
     ("ignore age in windows (entry-time changes judged at the EVAL clock)",
-     "(mux2 (c <: age) (zero clock_bits) (c -: age))", "(mux2 (c <: age) c c)"),
+     "let a17 = uresize age_next (clock_bits + 1) in", "let a17 = zero (clock_bits + 1) in"),
+    ("no floor at 0 for a clock reset after the change", "|: (e.lo ==:. 0)) &: (c17 <=: hi_adj)",
+     "|: gnd) &: (c17 <=: hi_adj)"),
     ("send_bit drives the inverted bit", "(sresize tx_sr.value.:(0) 8 &: tmask)", "(sresize ~:(tx_sr.value.:(0)) 8 &: tmask)"),
 ]
 

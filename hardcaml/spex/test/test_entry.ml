@@ -62,6 +62,34 @@ let%expect_test "a change during entry is judged at the clock it was seen" =
     |}]
 ;;
 
+let%expect_test "a change seen before the entry action reset the clock counts as clock 0" =
+  (* "w" resets clock 0 on entry (last FETCH beat), so EVAL starts at clock 0. A change
+     seen in beat 2, before the reset, is judged at max(0 - 3, 0) = 0: inside [0, 3]. *)
+  let spec =
+    let open Spec in
+    { name = "entry_reset"
+    ; locs =
+        [ loc "w" ~entry:(nop |> reset 0) [ edge ~goto:"ok" (always |> rises 1 |> window 0 3) nop ]
+        ; loc "ok" ~accepting:true []
+        ]
+    }
+  in
+  let t = H.create () in
+  H.load t spec;
+  let raised = ref false in
+  t.device
+  <- (fun ~out:_ ~oe:_ ->
+       (match t.model.phase with
+        | Model.Fetch 0 when t.model.cur_loc = 0 -> raised := true
+        | _ -> ());
+       if !raised then 0xFF else 0xFF land lnot 2);
+  H.cycles t 5;
+  H.start t ();
+  H.cycles t 20;
+  printf "violations %d, now at loc %d\n" (List.length (H.drain_vlog t)) (H.get t.o.status.cur_loc);
+  [%expect {| violations 0, now at loc 1 |}]
+;;
+
 let%expect_test "compiler warns about narrow change windows in entered locations" =
   let show (s : Spec.t) =
     match Spec.warnings s with

@@ -219,33 +219,71 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       | _ -> assert false)
   in
   (* A pin change is judged against the clocks as they were when it was seen: an edge
-     waiting on a change compares clock - age (the earliest matching latched change),
-     floored at 0; a saturated clock stays saturated. *)
-  let clk_seen (e : Signal.t Edge.t) =
-    let c = clk_of e.clk in
-    let age =
-      List.mapi ages ~f:(fun p a ->
-        mux2 (changed.value.:(p) &: e.chg_mask.:(p)) a.value (zero 3))
-      |> max3
-      |> fun a -> uresize a clock_bits
-    in
-    mux2 (c ==:. 0xFFFF) c (mux2 (c <: age) (zero clock_bits) (c -: age))
+     waiting on a change is judged with v = max(clock - age, 0), age = the earliest
+     matching latched change; a saturated clock stays saturated (ENGINE.md).
+
+     Ages are only nonzero in the first EVAL cycle after FETCH, so the subtract is kept
+     out of the EVAL loop: every cycle computes, from the record, ages and change
+     latches as they will be next cycle, each edge's age and lo + age, hi + age into
+     registers. EVAL then compares the raw clock with them:
+       lo <= v <= hi  <=>  (clock >= lo + age | lo = 0) & clock <= hi + age
+       v = x          <=>  clock = x + age | (x = 0 & clock < age) *)
+  let record_next =
+    List.mapi rec_b ~f:(fun k b ->
+      mux2 (in_fetch &: (beat.value ==:. k + 1)) i.ram.rec_rdata b.value)
+    |> concat_lsb
   in
-  let seen = List.map edges ~f:clk_seen in
-  let fire_of (e : Signal.t Edge.t) c =
+  let edges_next =
+    List.init num_edges ~f:(fun k ->
+      let lo = header_bits + (edge_bits * k) in
+      Edge.Of_signal.unpack (select record_next (lo + edge_bits - 1) lo))
+  in
+  (* in FETCH a latched change ages by one and a new one starts at 1; EVAL clears them *)
+  let aged_next =
+    List.mapi ages ~f:(fun p a ->
+      let age_next =
+        mux2
+          (chg_now.:(p) &: ~:(changed.value.:(p)))
+          (of_int ~width:3 1)
+          (mux2 (a.value ==:. 7) a.value (a.value +:. 1))
+      in
+      mux2 (in_fetch &: changed_all.:(p)) age_next (zero 3))
+  in
+  let adj =
+    List.map edges_next ~f:(fun (e : Signal.t Edge.t) ->
+      let age_next =
+        List.mapi aged_next ~f:(fun p a -> mux2 e.chg_mask.:(p) a (zero 3)) |> max3
+      in
+      let a17 = uresize age_next (clock_bits + 1) in
+      ( reg spec age_next
+      , reg spec (uresize e.lo (clock_bits + 1) +: a17)
+      , reg spec (uresize e.hi (clock_bits + 1) +: a17) ))
+  in
+  let fire_of (e : Signal.t Edge.t) (age, lo_adj, hi_adj) =
+    let c = clk_of e.clk in
+    let c17 = uresize c (clock_bits + 1) in
+    let sat = c ==:. 0xFFFF in
+    let c_lt_age = c <: uresize age clock_bits in
+    let v_eq x x_adj = mux2 sat (x ==:. 0xFFFF) (c17 ==: x_adj |: (x ==:. 0 &: c_lt_age)) in
     let pin_ok = (pins_s ^: e.pin_val) &: e.pin_mask ==:. 0 in
     let chg_ok = e.chg_mask ==:. 0 |: (changed_all &: e.chg_mask <>:. 0) in
-    let win_ok = c >=: e.lo &: (c <=: e.hi) in
+    let win_ok =
+      mux2 sat (e.hi ==:. 0xFFFF) ((c17 >=: lo_adj |: (e.lo ==:. 0)) &: (c17 <=: hi_adj))
+    in
     let dat_ok = mux e.flag flags ^: e.flag_inv in
     let str_ok =
       ~:is_stress
       |: mux
            e.stress
-           [ vdd; c ==: e.lo; c ==: e.hi; select lfsr.value 3 0 ==:. 0 |: (c ==: e.hi) ]
+           [ vdd
+           ; v_eq e.lo lo_adj
+           ; v_eq e.hi hi_adj
+           ; select lfsr.value 3 0 ==:. 0 |: v_eq e.hi hi_adj
+           ]
     in
     e.valid &: pin_ok &: chg_ok &: win_ok &: dat_ok &: str_ok
   in
-  let fires = List.map2_exn edges seen ~f:(fun e c -> in_eval &: fire_of e c) in
+  let fires = List.map2_exn edges adj ~f:(fun e a -> in_eval &: fire_of e a) in
   let any_fire = reduce ~f:( |: ) fires in
   let winner =
     match fires with
@@ -327,11 +365,29 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   (* ---- coverage: read in S1, merge and write in S2; 1 SRAM access per cycle ---- *)
   let cov_fire = any_fire &: h.cover_en in
   let cov_addr_now = concat_msb [ cur_loc.value; winner ] in
-  let c_w = mux winner seen in
-  let off_now = mux2 (c_w >:. 4095) (ones 12) (select c_w 11 0) in
+  (* the fired edge's clock and age; the subtract happens in S1 -> S2, off the EVAL path *)
+  let c_w = clk_of we.clk in
+  let a_w = mux winner (List.map adj ~f:(fun (a, _, _) -> a)) in
+  let clip w v = mux2 (v >:. (1 lsl w) - 1) (ones w) (select v (w - 1) 0) in
+  (* a fire in the cycle after another one is never a first EVAL cycle, so its age is
+     0 and the raw clock is its offset *)
+  let off_now = clip 12 c_w in
   let s1_v = rv 1 in
   let s1_addr = rv 8 in
-  let s1_off = rv 12 in
+  let s1_raw = rv 13 in
+  let s1_sat = rv 1 in
+  let s1_age = rv 3 in
+  let s1_off =
+    mux2
+      s1_sat.value
+      (ones 12)
+      (clip
+         12
+         (mux2
+            (s1_raw.value <: uresize s1_age.value 13)
+            (zero 13)
+            (s1_raw.value -: uresize s1_age.value 13)))
+  in
   let s2_v = rv 1 in
   let s2_addr = rv 8 in
   let s2_two = rv 1 in
@@ -388,11 +444,13 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; (* coverage pipeline *)
       s1_v <-- (cov_fire &: ~:(s1_v.value))
     ; s1_addr <-- cov_addr_now
-    ; s1_off <-- off_now
+    ; s1_raw <-- clip 13 c_w
+    ; s1_sat <-- (c_w ==:. 0xFFFF)
+    ; s1_age <-- a_w
     ; s2_v <-- s1_v.value
     ; s2_addr <-- s1_addr.value
     ; s2_two <-- merge_now
-    ; s2_off1 <-- s1_off.value
+    ; s2_off1 <-- s1_off
     ; s2_off2 <-- off_now
     ; (* engine phases *)
       switch
