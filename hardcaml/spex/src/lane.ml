@@ -146,7 +146,12 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let crc_bad_next = crc_bad.value |: (rbit <>: crc_bit) in
   let cnt_after = mux2 rx_take (cnt.value +:. 1) cnt.value in
   let left_after = mux2 rx_crc (crc_left.value -:. 1) crc_left.value in
-  let rx_finish = rx_step &: rx_data &: (cnt_after ==: c.frame_bits) &: (left_after ==:. 0) in
+  let run_after = run_next rbit in
+  let stuff_after = stuff_on &: (run_after ==: c.stuff_len) in
+  let rx_finish =
+    rx_step &: ~:rx_stuff_bad &: (cnt_after ==: c.frame_bits) &: (left_after ==:. 0)
+    &: ~:stuff_after
+  in
   (* END pushes the partial byte (bitpos after this cycle's step) *)
   let bitpos_after =
     mux2 (rx_take |: (tx_step &: has_slot &: ~:stuff_due &: data_avail)) (bitpos.value +:. 1) bitpos.value
@@ -229,8 +234,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                     ; crc_left <-- crc_left.value -:. 1
                     ; when_ (crc_left.value ==:. 1) [ crc_ok <-- ~:crc_bad_next ]
                     ]
-                ; when_ rx_finish [ mode <--. m_done ]
                 ]
+            ; when_ rx_finish [ mode <--. m_done ]
             ]
         ]
     ; (* commands, after this cycle's step *)

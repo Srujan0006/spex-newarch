@@ -207,3 +207,88 @@ let i2c_controller_write ~scl ~sda ~q =
       ]
   }
 ;;
+
+(** CAN 2.0A transmitter on bit lane 0. The lane sends SOF..data from the TX FIFO
+    ([frame_bits] = 19 + 8 DLC, packed MSB first by the host), stuffs, appends CRC-15
+    and checks every bit it sends (readback: lost arbitration or bit error stop it). The
+    engine waits for an idle bus, then handles CRC delimiter, ACK slot and end of frame.
+    Host setup: lane 0 TX, NRZ, [div] = [n], stuffing 1/5, CRC-15 (0x4599 << 17,
+    width 15), readback, [data_pin] = [pin]; pin [pin] open-drain with source "lane 0
+    AND engine", so the engine can pull the bus low too.
+
+    Locations: [idle] (bus idle 11 bits and a frame in the TX FIFO), [arm] (CRC armed
+    during the frame), [frame], [ack] (ACK slot sampled in its middle), [eof] (ACK
+    delimiter, 7 EOF bits, 3 intermission), [noack], [lost] (arbitration lost or bit
+    error; the host reads the lane status). *)
+let can_tx ~pin ~n =
+  { name = "can_tx"
+  ; locs =
+      [ loc
+          "idle"
+          ~entry:(nop |> set pin true)
+          ~accepting:true
+          [ edge ~goto:"idle" (always |> falls pin) (nop |> reset 0)
+          ; edge
+              ~goto:"arm"
+              (always |> after ((11 * n) - 1) |> not_flag Flag.tx_empty)
+              (nop |> lane (Lane_cmd.go 0))
+          ]
+      ; loc "arm" [ edge ~goto:"frame" always (nop |> lane (Lane_cmd.crc 0)) ]
+      ; loc
+          "frame"
+          [ edge ~goto:"lost" (always |> flag (Flag.lane_error 0)) nop
+          ; edge ~goto:"ack" (always |> flag (Flag.lane_done 0)) (nop |> reset 0)
+          ]
+      ; (* the lane is done at the start of the CRC delimiter; the ACK slot is the bit
+           after it, sampled in its middle *)
+        loc
+          "ack"
+          [ edge ~goto:"eof" (always |> pin_lo pin |> at (n + (n / 2))) (nop |> reset 0)
+          ; edge ~goto:"noack" (always |> at (n + (n / 2))) (nop |> reset 0)
+          ]
+      ; loc "eof" [ edge ~goto:"idle" (always |> at ((n / 2) + (11 * n) - 1)) (nop |> reset 0) ]
+      ; loc "noack" []
+      ; loc "lost" []
+      ]
+  }
+;;
+
+(** CAN 2.0A receiver on bit lane 1, which ACKs good frames. The lane is armed on an idle
+    bus, hard-syncs on SOF, destuffs, collects SOF..data into the RX FIFO (MSB first;
+    [frame_bits] = 19 + 8 DLC, written by the host, which knows the DLC) and checks
+    CRC-15. After a good CRC the engine drives the ACK slot dominant (pin source
+    "engine", open-drain). Host setup as [can_tx] with lane 1, RX, no readback. *)
+let can_rx ~pin ~n =
+  { name = "can_rx"
+  ; locs =
+      [ loc
+          "idle"
+          ~entry:(nop |> set pin true)
+          ~accepting:true
+          [ edge ~goto:"arm" always (nop |> lane (Lane_cmd.go 1)) ]
+      ; loc "arm" [ edge ~goto:"frame" always (nop |> lane (Lane_cmd.crc 1)) ]
+      ; loc
+          "frame"
+          [ edge ~goto:"idle" (always |> flag (Flag.lane_error 1)) nop
+          ; edge ~goto:"check" (always |> flag (Flag.lane_done 1)) (nop |> reset 0)
+          ]
+      ; loc
+          "check"
+          [ edge ~goto:"wait_ack" (always |> flag (Flag.lane_crc_ok 1)) nop
+          ; edge ~goto:"crc_error" always nop
+          ]
+      ; (* the lane is done when it samples the last CRC (or stuff) bit, 2 cycles after
+           its middle on the pad (synchroniser); clock 0 is 2 cycles later. The ACK slot
+           starts n / 2 + n after that middle (after the CRC delimiter): drive it from
+           clock n + n / 2 - 5 (needs n >= 16 to leave room for two FETCHes). *)
+        loc
+          "wait_ack"
+          [ edge ~goto:"acking" (always |> at (n + (n / 2) - 5)) (nop |> set pin false |> reset 0) ]
+      ; loc "acking" [ edge ~goto:"eof" (always |> at (n - 1)) (nop |> set pin true |> reset 0) ]
+      ; loc
+          "eof"
+          [ edge ~goto:"idle" (always |> at ((8 * n) - 1)) (nop |> lane (Lane_cmd.end_ 1)) ]
+      ; loc "crc_error" []
+      ]
+  }
+;;

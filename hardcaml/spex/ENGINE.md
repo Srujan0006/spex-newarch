@@ -213,7 +213,10 @@ Manchester) or `raw == prev` (NRZI, then `prev = raw`). Then:
    `{bit, byte[7:1]}`, else `{byte[6:0], bit}`), `cnt += 1`, and when `bitpos` wraps the
    byte is pushed to the RX FIFO; else if `crc_left > 0`: `crc_bad |= bit ≠ crc[31] xor
    crc_inv`, `crc <<= 1`, `crc_left −= 1`, and on the last one `crc_ok = NOT crc_bad`;
-3. after a data bit, if `cnt == frame_bits` and `crc_left == 0`: `mode = Done`.
+3. after a data bit or a good stuff bit, if `cnt == frame_bits`, `crc_left == 0` and no
+   stuff bit is due (`run ≠ stuff_len` after this bit, or stuffing off): `mode = Done`.
+   So a stuff bit that follows the last CRC bit (CAN) is read and checked first, as TX
+   sends it before going Done.
 Armed: the first change on the data pin starts Run with that cycle as the bit start
 (`ph = 1` next). With `clk_pin_en`, GO goes straight to Run.
 

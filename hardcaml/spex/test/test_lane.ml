@@ -156,7 +156,7 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
   printf
     "pushes %d, pops %d, configurations reaching Done %d, cycles with error %d, with crc_ok %d\n"
     !pushes !pops !dones !errors !crc_oks;
-  [%expect {| pushes 1733, pops 3697, configurations reaching Done 41, cycles with error 24947, with crc_ok 0 |}]
+  [%expect {| pushes 1733, pops 3697, configurations reaching Done 40, cycles with error 24952, with crc_ok 0 |}]
 ;;
 
 (* ---- TX -> RX loopback ---- *)

@@ -203,6 +203,15 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
   then (
     let b = if c.code = Code.nrzi then Bool.to_int (d = t.prev) else d in
     if c.code = Code.nrzi then t.prev <- d;
+    let finish () =
+      (* Done once the frame and its CRC are in and no stuff bit is due *)
+      if t.cnt = c.frame_bits
+         && t.crc_left = 0
+         && not (c.stuff <> 0 && t.run = c.stuff_len)
+      then (
+        t.mode <- Done;
+        became_done := true)
+    in
     if stuff_due
     then
       if b <> stuff_bit
@@ -210,7 +219,9 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
         t.error <- true;
         t.kind <- 1;
         t.mode <- Idle)
-      else count b
+      else (
+        count b;
+        finish ())
     else (
       count b;
       t.sr <- ((t.sr lsl 1) lor b) land 0xFFFF;
@@ -231,10 +242,7 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
         t.crc <- (t.crc lsl 1) land 0xFFFF_FFFF;
         t.crc_left <- t.crc_left - 1;
         if t.crc_left = 0 then t.crc_ok <- not t.crc_bad);
-      if t.cnt = c.frame_bits && t.crc_left = 0
-      then (
-        t.mode <- Done;
-        became_done := true)));
+      finish ()));
   (* commands, after this cycle's step *)
   if k.end_
   then (
