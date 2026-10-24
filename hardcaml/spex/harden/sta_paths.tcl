@@ -1,0 +1,59 @@
+# Per-path post-route timing of the new_arch 6x4 harden (adapted from experiments/rtl_spike/sta_paths.tcl).
+# the harden, once per corner:  CORNER=slow|typ|fast openroad -exit -no_splash experiments/rtl_spike/sta_paths.tcl
+#   (A) the edge/location macros' clock-to-output through the table reads into the per-slot registers
+#   (B) the per-slot registers through guards, priority and next location into the macros' address / enable pins
+#   (action) the fired slot through the action table into the pin-write registers (uio_out / uio_oe)
+set pdk $::env(PDK_ROOT)/ihp-sg13cmos5l/libs.ref
+array set std  {slow slow_1p08V_125C typ typ_1p20V_25C fast fast_1p32V_m40C}
+array set sram {slow slow_1p08V_125C typ typ_1p20V_25C fast fast_1p32V_m55C}
+set c $::env(CORNER)
+read_liberty $pdk/sg13cmos5l_stdcell/lib/sg13cmos5l_stdcell_$std($c).lib
+read_liberty $pdk/sg13cmos5l_sram/lib/RM_IHPSG13_1P_256x64_c2_bm_bist_$sram($c).lib
+read_liberty $pdk/sg13cmos5l_sram/lib/RM_IHPSG13_1P_256x32_c2_bm_bist_$sram($c).lib
+# the newest database at or after detailed routing (final/ if the flow finished; otherwise the last step's), and the
+# newest extracted parasitics: timing is reported even when routing left violations (owner, 2026-10-23)
+proc step_no {d} { if {[regexp {/([0-9]+)-[^/]+/} $d -> n]} { return [scan $n %d] } else { return 9999 } }
+proc by_step {files} { return [lsort -command {apply {{a b} {expr {[step_no $a] - [step_no $b]}}}} $files] }
+set odbs [glob -nocomplain runs/wokwi/final/odb/*.odb]
+if {![llength $odbs]} {
+    set odbs [by_step [glob -nocomplain runs/wokwi/*/*.odb]]
+    set odbs [list [lindex $odbs end]]
+}
+puts "database: [lindex $odbs 0]"
+read_db [lindex $odbs 0]
+set spef [glob -nocomplain runs/wokwi/final/spef/nom*/*.spef]
+if {![llength $spef]} { set spef [by_step [glob -nocomplain runs/wokwi/*-openroad-rcx/nom*/*.spef runs/wokwi/*-openroad-rcx/*.nom*.spef]] }
+if {[llength $spef]} { puts "parasitics: [lindex $spef end]"; read_spef [lindex $spef end] } else { puts "WARNING: no extracted parasitics, wire load only" }
+set sdc [glob -nocomplain runs/wokwi/final/sdc/*.sdc]
+if {![llength $sdc]} { set sdc [by_step [glob -nocomplain runs/wokwi/*/*.sdc]] }
+read_sdc [lindex $sdc end]
+set_propagated_clock [all_clocks]
+
+set macros [get_cells {u_rec0 u_rec1 u_cov}]
+set fields {slew cap fanout}
+puts "\n==================== corner $c: (fetch) record and coverage macros clock-to-output -> beat registers / coverage merge"
+report_checks -from $macros -path_delay max -fields $fields -digits 3
+puts "\n==================== corner $c: (address) EVAL guards -> priority -> next location -> macro address and enables"
+report_checks -to $macros -path_delay max -fields $fields -digits 3
+puts "\n==================== corner $c: (pins) -> pin output registers (pout / poe)"
+set drivers {}
+if {[catch {
+    foreach port [get_ports {uio_out[*] uio_oe[*]}] {
+        set net [get_nets -quiet [get_full_name $port]]
+        if {$net eq ""} { continue }
+        foreach pin [get_pins -quiet -of_objects $net -filter "direction == output"] {
+            lappend drivers [get_cells -of_objects $pin]
+        }
+    }
+} err]} { puts "action path: could not find the pin-write registers: $err" }
+if {[llength $drivers]} {
+    if {[catch {report_checks -to $drivers -path_delay max -fields $fields -digits 3} err]} { puts "action path: $err" }
+} else {
+    puts "no pin-write registers found on uio_out / uio_oe"
+}
+puts "\n==================== corner $c: overall worst setup path (any group)"
+report_checks -path_delay max -fields $fields -digits 3
+puts "\n==================== corner $c: summary"
+report_wns
+report_tns
+report_check_types -max_slew -max_capacitance -max_fanout -violators

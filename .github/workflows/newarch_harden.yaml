@@ -1,0 +1,60 @@
+# new_arch (Hardcaml SPEX v0.1) at 6x4: decision option C, 2026-10-24. Hardens hardcaml/spex/harden with the SPEX v1
+# spike's layout-A recipe and reports the routing violation count and per-path timing at every corner.
+name: newarch_harden
+on:
+  workflow_dispatch:
+  push:
+    branches: [new-arch]
+    paths:
+      - "hardcaml/spex/harden/**"
+      - ".github/workflows/newarch_harden.yaml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gds:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Use the new_arch harden as the project
+        run: |
+          rm -rf src
+          cp -r hardcaml/spex/harden/src src
+          cp hardcaml/spex/harden/info.yaml info.yaml
+          cp hardcaml/spex/harden/librelane_plugin_spex_pdn.py hardcaml/spex/harden/odb_stripes.py .
+
+      - name: Build GDS
+        uses: ./.github/actions/harden   # tt-gds-action@3412659 steps without the PNG render
+        timeout-minutes: 150
+        with:
+          librelane-version: 3.1.0.dev3
+
+      - name: Per-path timing at each corner
+        if: always()
+        run: |
+          ls runs/wokwi/*detailedrouting*/*.odb > /dev/null 2>&1 || { echo "detailed routing did not finish: no database to time"; exit 0; }
+          drc=$(ls runs/wokwi/*detailedrouting*/*.drc 2>/dev/null | tail -1)
+          echo "ROUTING VIOLATIONS: $( [ -n "$drc" ] && grep -c 'violation type' "$drc" || echo unknown)"
+          grep -h "Effective utilization" runs/wokwi/*floorplan*/*.log 2>/dev/null | tail -1 || true
+          for c in slow typ fast; do
+            docker run --rm -v "$PWD:$PWD" -v "/home/runner/pdk:/home/runner/pdk" -w "$PWD" \
+              -e PDK_ROOT=/home/runner/pdk -e CORNER=$c ghcr.io/librelane/librelane:3.1.0.dev3 \
+              openroad -exit -no_splash hardcaml/spex/harden/sta_paths.tcl 2>&1 | tee "sta_paths_$c.rpt" || true
+          done
+          mkdir -p runs/sta_paths && mv sta_paths_*.rpt runs/sta_paths/ || true
+
+      - name: Upload the LibreLane run directory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newarch-runs
+          path: runs/
+          retention-days: 14
+          if-no-files-found: warn
