@@ -85,18 +85,32 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   (* ---- bit timing ---- *)
   let edge_rx = is_rx &: dedge &: ~:(c.clk_pin_en) in
   let manch = c.code ==:. Code.manchester in
-  let mid = srl c.div_int 1 in
-  let samp_pt = mux2 (is_rx &: manch) (mid +: srl c.div_int 2) mid in
+  (* values derived from the configuration, registered: the host changes the CSRs only
+     while the lane is Idle (ENGINE.md), so the adders stay off the bit-timing path *)
+  let mid = reg spec (srl c.div_int 1) in
+  let quarter = reg spec (srl c.div_int 2) in
+  let samp_pt = reg spec (mux2 (is_rx &: manch) (srl c.div_int 1 +: srl c.div_int 2) (srl c.div_int 1)) in
+  let last0 = reg spec (uresize c.div_int 17 -:. 1) in
+  let last1 = reg spec (uresize c.div_int 17) in
   (* NRZ/NRZI: an edge is a bit start; Manchester: an edge in the middle half of the
      bit is the mid-bit transition; Armed: the first edge is a bit start *)
-  let mid_edge = edge_rx &: manch &: (ph.value >=: srl c.div_int 2) &: (ph.value <: samp_pt) in
+  let mid_edge = edge_rx &: manch &: (ph.value >=: quarter) &: (ph.value <: samp_pt) in
   let resync = edge_rx &: (in_armed |: ~:manch) in
   let timing_on = in_run |: in_done |: (in_armed &: edge_rx) in
   let e = mux2 resync (zero 16) (mux2 (mid_edge &: ~:in_armed) mid ph.value) in
-  let len = uresize c.div_int 17 +: uresize extra.value 17 in
-  let last_cycle = ~:(c.clk_pin_en) &: (uresize e 17 ==: len -:. 1) in
-  let start = mux2 c.clk_pin_en cedge (e ==:. 0) in
-  let sample = mux2 c.clk_pin_en cedge (e ==: samp_pt) in
+  (* e is 0 (resync), mid (Manchester mid-bit edge) or ph: compare all three with each
+     target in parallel and select, instead of comparing the selected e *)
+  let at_mid = mid_edge &: ~:in_armed in
+  let e_is x0 xmid xph = mux2 resync x0 (mux2 at_mid xmid xph) in
+  let lm = mux2 extra.value last1 last0 in
+  let last_cycle =
+    ~:(c.clk_pin_en)
+    &: e_is (lm ==:. 0) (uresize mid 17 ==: lm) (uresize ph.value 17 ==: lm)
+  in
+  let start = mux2 c.clk_pin_en cedge (e_is vdd (mid ==:. 0) (ph.value ==:. 0)) in
+  let sample =
+    mux2 c.clk_pin_en cedge (e_is (samp_pt ==:. 0) (mid ==: samp_pt) (ph.value ==: samp_pt))
+  in
   (* ---- stuffing and CRC helpers ---- *)
   let stuff_on = c.stuff <>:. 0 in
   let stuff_due = stuff_on &: (run.value ==: c.stuff_len) in
@@ -144,14 +158,11 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let push = rx_take &: (bitpos.value ==:. 7) in
   let rx_crc = rx_step &: rx_data &: ~:data_avail &: crc_avail in
   let crc_bad_next = crc_bad.value |: (rbit <>: crc_bit) in
-  let cnt_after = mux2 rx_take (cnt.value +:. 1) cnt.value in
-  let left_after = mux2 rx_crc (crc_left.value -:. 1) crc_left.value in
-  let run_after = run_next rbit in
-  let stuff_after = stuff_on &: (run_after ==: c.stuff_len) in
-  let rx_finish =
-    rx_step &: ~:rx_stuff_bad &: (cnt_after ==: c.frame_bits) &: (left_after ==:. 0)
-    &: ~:stuff_after
-  in
+  (* the same comparisons, formed from the registers for each outcome and then selected *)
+  let cnt_done = mux2 rx_take (cnt.value +:. 1 ==: c.frame_bits) (cnt.value ==: c.frame_bits) in
+  let left_done = mux2 rx_crc (crc_left.value ==:. 1) (crc_left.value ==:. 0) in
+  let stuff_after = stuff_on &: mux2 rbit (run_next vdd ==: c.stuff_len) (run_next gnd ==: c.stuff_len) in
+  let rx_finish = rx_step &: ~:rx_stuff_bad &: cnt_done &: left_done &: ~:stuff_after in
   (* END pushes the partial byte (bitpos after this cycle's step) *)
   let bitpos_after =
     mux2 (rx_take |: (tx_step &: has_slot &: ~:stuff_due &: data_avail)) (bitpos.value +:. 1) bitpos.value

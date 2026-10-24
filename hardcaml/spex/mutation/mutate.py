@@ -79,7 +79,7 @@ LANE_MUTANTS = [
      "(concat_msb [ rbit; select byte.value 6 0 ])"),
     ("END drops the partial byte", "&: (bitpos_after <>:. 0) &: ~:push in", "&: (bitpos_after <>:. 0) &: ~:push &: gnd in"),
     ("NRZI decode inverted", "(d ==: prev.value)", "(d <>: prev.value)"),
-    ("RX Done before a trailing stuff bit", "    &: ~:stuff_after", "    &: ~:(stuff_after &: gnd)"),
+    ("RX Done before a trailing stuff bit", "&: left_done &: ~:stuff_after in", "&: left_done &: ~:(stuff_after &: gnd) in"),
 ]
 
 # host SPI port (test/test_spi_host.ml drives it through its pins only)

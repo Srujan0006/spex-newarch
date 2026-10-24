@@ -151,6 +151,10 @@ lane treats a frame as one continuous bit stream: the host packs the fields into
 and the lane sends `frame_bits` data bits from the TX FIFO, or receives that many into
 the RX FIFO. It does not parse fields (an RX frame's length is `frame_bits`).
 
+**The host writes a lane's CSRs only while that lane is Idle** (the RTL keeps registered
+copies of values derived from them, such as the sample point, so a write takes effect one
+cycle later; with the lane Idle this is invisible).
+
 **Configuration (CSRs, per lane):** `dir` (0 TX, 1 RX); bit timing `div` (16-bit integer
 ≥ 4, 8-bit fraction) or `clk_pin_en` with `clk_pin` and `clk_edge` (0 rising, 1 falling);
 line `code` (0 NRZ, 1 NRZI, 2 Manchester); `stuff` (0 off, 1 after `stuff_len` equal bits
