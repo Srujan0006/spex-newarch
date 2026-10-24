@@ -1,8 +1,8 @@
 # Per-path post-route timing of the new_arch 6x4 harden (adapted from experiments/rtl_spike/sta_paths.tcl).
-# the harden, once per corner:  CORNER=slow|typ|fast openroad -exit -no_splash experiments/rtl_spike/sta_paths.tcl
-#   (A) the edge/location macros' clock-to-output through the table reads into the per-slot registers
-#   (B) the per-slot registers through guards, priority and next location into the macros' address / enable pins
-#   (action) the fired slot through the action table into the pin-write registers (uio_out / uio_oe)
+# the harden, once per corner:  CORNER=slow|typ|fast openroad -exit -no_splash hardcaml/spex/harden/sta_paths.tcl
+#   (fetch) the record macros' clock-to-output into the beat registers; (address) EVAL into the record macros' address
+#   and enables; (coverage) both directions at u_cov; (pins) into the registers driving the output pins; overall worst
+#   setup and hold; slew / capacitance / fanout violators
 set pdk $::env(PDK_ROOT)/ihp-sg13cmos5l/libs.ref
 array set std  {slow slow_1p08V_125C typ typ_1p20V_25C fast fast_1p32V_m40C}
 array set sram {slow slow_1p08V_125C typ typ_1p20V_25C fast fast_1p32V_m55C}
@@ -29,31 +29,39 @@ if {![llength $sdc]} { set sdc [by_step [glob -nocomplain runs/wokwi/*/*.sdc]] }
 read_sdc [lindex $sdc end]
 set_propagated_clock [all_clocks]
 
-set macros [get_cells {u_rec0 u_rec1 u_cov}]
+set rec [get_cells {u_rec0 u_rec1}]
+set cov [get_cells u_cov]
 set fields {slew cap fanout}
-puts "\n==================== corner $c: (fetch) record and coverage macros clock-to-output -> beat registers / coverage merge"
-report_checks -from $macros -path_delay max -fields $fields -digits 3
-puts "\n==================== corner $c: (address) EVAL guards -> priority -> next location -> macro address and enables"
-report_checks -to $macros -path_delay max -fields $fields -digits 3
-puts "\n==================== corner $c: (pins) -> pin output registers (pout / poe)"
-set drivers {}
-if {[catch {
-    foreach port [get_ports {uio_out[*] uio_oe[*]}] {
-        set net [get_nets -quiet [get_full_name $port]]
-        if {$net eq ""} { continue }
-        foreach pin [get_pins -quiet -of_objects $net -filter "direction == output"] {
-            lappend drivers [get_cells -of_objects $pin]
-        }
-    }
-} err]} { puts "action path: could not find the pin-write registers: $err" }
-if {[llength $drivers]} {
-    if {[catch {report_checks -to $drivers -path_delay max -fields $fields -digits 3} err]} { puts "action path: $err" }
-} else {
-    puts "no pin-write registers found on uio_out / uio_oe"
-}
+# each group on its own: a -from/-to over all three macros reports one worst path (run 40074901833: u_cov to u_cov
+# for both), which hides the record-store paths
+puts "\n==================== corner $c: (fetch) record macros clock-to-output -> beat registers"
+report_checks -from $rec -path_delay max -fields $fields -digits 3
+puts "\n==================== corner $c: (address) EVAL guards -> priority -> next location -> record macro address / enables"
+report_checks -to $rec -path_delay max -fields $fields -digits 3
+puts "\n==================== corner $c: (coverage) u_cov read -> merge -> u_cov write"
+report_checks -from $cov -path_delay max -fields $fields -digits 3
+puts "\n==================== corner $c: (coverage) -> u_cov address / enables / data"
+report_checks -to $cov -path_delay max -fields $fields -digits 3
+puts "\n==================== corner $c: (pins) -> registers driving uo_out / uio_out / uio_oe"
+# the outputs go through output buffers, so the pin registers are the sequential start points of the ports' fan-in
+set regs [all_fanin -to [get_ports {uo_out[*] uio_out[*] uio_oe[*]}] -startpoints_only -only_cells]
+puts "pin registers: [llength $regs]"
+if {[llength $regs]} { report_checks -to $regs -path_delay max -fields $fields -digits 3 }
 puts "\n==================== corner $c: overall worst setup path (any group)"
 report_checks -path_delay max -fields $fields -digits 3
+puts "\n==================== corner $c: overall worst hold path (any group)"
+report_checks -path_delay min -fields $fields -digits 3
 puts "\n==================== corner $c: summary"
-report_wns
-report_tns
-report_check_types -max_slew -max_capacitance -max_fanout -violators
+report_worst_slack -max -digits 3
+report_worst_slack -min -digits 3
+report_tns -digits 3
+report_check_types -max_slew -max_capacitance -violators
+# max fanout: the clock tree's leaf buffers drive 15-16 flops against the SDC's signal limit of 8; count the rest
+report_check_types -max_fanout -violators > fanout_$c.rpt
+set f [open fanout_$c.rpt]
+set fo 0
+foreach line [split [read $f] "\n"] {
+    if {[regexp {VIOLATED} $line] && ![regexp {^clkbuf_} [string trim $line]]} { incr fo }
+}
+close $f
+puts "max fanout violators outside the clock tree: $fo"
