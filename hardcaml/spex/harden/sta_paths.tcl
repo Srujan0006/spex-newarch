@@ -43,10 +43,24 @@ report_checks -from $cov -path_delay max -fields $fields -digits 3
 puts "\n==================== corner $c: (coverage) -> u_cov address / enables / data"
 report_checks -to $cov -path_delay max -fields $fields -digits 3
 puts "\n==================== corner $c: (pins) -> registers driving uo_out / uio_out / uio_oe"
-# the outputs go through output buffers, so the pin registers are the sequential start points of the ports' fan-in
-set regs [all_fanin -to [get_ports {uo_out[*] uio_out[*] uio_oe[*]}] -startpoints_only -only_cells]
+# the outputs go through output buffers, so walk back from each port through single-input cells to the flop that
+# drives it (OpenROAD has no all_fanin)
+set regs {}
+foreach port [get_ports {uo_out[*] uio_out[*] uio_oe[*]}] {
+    set net [get_nets -quiet [get_full_name $port]]
+    for {set hop 0} {$hop < 6 && $net ne ""} {incr hop} {
+        set drv [get_pins -quiet -of_objects $net -filter "direction == output"]
+        if {$drv eq ""} { break }
+        set cell [get_cells -of_objects [lindex $drv 0]]
+        if {[regexp {df|dl|RM_IHPSG13} [get_property $cell ref_name]]} { lappend regs [get_full_name $cell]; break }
+        set ins [get_pins -quiet -of_objects $cell -filter "direction == input"]
+        if {[llength $ins] != 1} { break }
+        set net [get_nets -quiet -of_objects [lindex $ins 0]]
+    }
+}
+set regs [lsort -unique $regs]
 puts "pin registers: [llength $regs]"
-if {[llength $regs]} { report_checks -to $regs -path_delay max -fields $fields -digits 3 }
+if {[llength $regs]} { report_checks -to [get_cells $regs] -path_delay max -fields $fields -digits 3 }
 puts "\n==================== corner $c: overall worst setup path (any group)"
 report_checks -path_delay max -fields $fields -digits 3
 puts "\n==================== corner $c: overall worst hold path (any group)"
