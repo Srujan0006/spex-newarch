@@ -17,8 +17,8 @@ MUTANTS = [
     ("edge priority: edge 1 beats edge 0",
      "mux2 f0 (of_int ~width:2 0) (mux2 f1 (of_int ~width:2 1)",
      "mux2 f1 (of_int ~width:2 1) (mux2 f0 (of_int ~width:2 0)"),
-    ("window lower bound exclusive", "c >=: e.lo &: (c <=: e.hi)", "c >: e.lo &: (c <=: e.hi)"),
-    ("window upper bound exclusive", "c >=: e.lo &: (c <=: e.hi)", "c >=: e.lo &: (c <: e.hi)"),
+    ("window lower bound exclusive", "(c17 >=: lo_adj |:", "(c17 >: lo_adj |:"),
+    ("window upper bound exclusive", "(c17 <=: hi_adj)", "(c17 <: hi_adj)"),
     ("pin changes during entry are lost", "; changed <-- changed_all", "; changed <-- chg_now"),
     ("Check role drives the pins", "(act_en &: drive)\n        [ pout", "(act_en &: (drive |: vdd))\n        [ pout"),
     ("TIMEOUT logged every cycle, not once per visit",
@@ -31,7 +31,7 @@ MUTANTS = [
     ("counter load8 loads 7", "of_int ~width:8 7; of_int ~width:8 8 ]", "of_int ~width:8 7; of_int ~width:8 7 ]"),
     ("coverage count wraps instead of saturating", "mux2 sum.:(8) (ones 8) (select sum 7 0)", "select sum 7 0"),
     ("open-drain pin drives high", "pins_oe = poe.value &: ~:(h.open_drain &: pout.value)", "pins_oe = poe.value"),
-    ("Stress at_hi fires at lo", "[ vdd; c ==: e.lo; c ==: e.hi;", "[ vdd; c ==: e.lo; c ==: e.lo;"),
+    ("Stress at_hi fires at lo", "; v_eq e.hi hi_adj\n", "; v_eq e.lo lo_adj\n"),
     ("clocks wrap instead of saturating", "when_ (c.value <>:. 0xFFFF) [ c <-- c.value +:. 1 ]", "c <-- c.value +:. 1"),
     ("one-flop synchroniser", "let pins_s = reg spec sync1 in", "let pins_s = sync1 in"),
     ("change age starts at 0", "[ a <--. 1 ]", "[ a <--. 0 ]"),
@@ -87,6 +87,7 @@ def main():
             original = originals[src]
             if original.count(old) != 1:
                 rows.append((name, "SKIPPED (pattern not found once)"))
+                print(f"SKIPPED   {name}", flush=True)
                 continue
             src.write_text(original.replace(old, new))
             if run("dune build 2>&1").returncode != 0:

@@ -22,6 +22,7 @@
 | UNEXPECTED ignores the watch mask | KILLED |
 | data flag inversion ignored | KILLED |
 | ignore age in windows (entry-time changes judged at the EVAL clock) | KILLED |
+| no floor at 0 for a clock reset after the change | KILLED |
 | send_bit drives the inverted bit | KILLED |
 | SPI samples MOSI on the falling edge | KILLED |
 | SPI address does not auto-increment | KILLED |
@@ -36,4 +37,4 @@
 | vlog byte 5 does not wrap the address | KILLED |
 | TX FIFO byte pushed without its data | KILLED |
 
-34/35 killed
+35/36 killed
