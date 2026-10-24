@@ -27,6 +27,7 @@ let random_spec rs =
     ; out_val = int 256
     ; out_oe = int 256
     ; tx_pin = (if int 3 = 0 then Some (int 8) else None)
+    ; lane_cmd = 0
     ; reset = List.filter [ 0; 1; 2 ] ~f:(fun _ -> int 2 = 0)
     ; tx_op = int 4
     ; rx_op = int 4
@@ -60,6 +61,7 @@ let random_spec rs =
     ; policy = int 4
     ; accepting = int 2 = 0
     ; irq = int 4 = 0
+    ; prescale = 0
     ; edges = List.init (int 5) ~f:(fun _ -> edge ())
     }
   in

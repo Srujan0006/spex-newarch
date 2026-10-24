@@ -26,6 +26,7 @@ type action =
   ; out_val : int
   ; out_oe : int
   ; tx_pin : int option
+  ; lane_cmd : int (** [Lane_cmd]; shares the edge's [tx_pin] field with [send_bit] *)
   ; reset : int list
   ; tx_op : int
   ; rx_op : int
@@ -50,6 +51,7 @@ type loc =
   ; policy : int
   ; accepting : bool
   ; irq : bool
+  ; prescale : int (** [Prescale]: clocks count every 1, 8, 64 or 512 cycles here *)
   ; edges : edge list
   }
 [@@deriving sexp_of]
@@ -91,6 +93,7 @@ let nop =
   ; out_val = 0
   ; out_oe = 0
   ; tx_pin = None
+  ; lane_cmd = Lane_cmd.none
   ; reset = []
   ; tx_op = Tx_op.none
   ; rx_op = Rx_op.none
@@ -114,6 +117,7 @@ let release p a =
 ;;
 
 let send_bit p a = { a with tx_pin = Some p }
+let lane c a = { a with lane_cmd = c }
 let reset c a = { a with reset = c :: a.reset }
 let tx op a = { a with tx_op = op }
 let rx ?(pin = 0) op a = { a with rx_op = op; rx_pin = pin }
@@ -121,9 +125,9 @@ let cnt op a = { a with cnt_op = op }
 let edge ?(stress = Stress.asap) ~goto guard action = { guard; action; stress; goto }
 
 let loc ?(entry = nop) ?inv ?(watch = 0) ?(policy = Policy.halt) ?(accepting = false)
-  ?(irq = false) name edges
+  ?(irq = false) ?(prescale = Prescale.div1) name edges
   =
-  { name; entry; inv; watch; policy; accepting; irq; edges }
+  { name; entry; inv; watch; policy; accepting; irq; prescale; edges }
 ;;
 
 (* ---- compiler ---- *)
@@ -156,8 +160,10 @@ let auto_invariant (l : loc) =
 ;;
 
 let header_of (l : loc) : int Header.t =
-  if Option.is_some l.entry.tx_pin || l.entry.rx_op <> Rx_op.none
-  then raise_s [%message "entry actions cannot send a bit or touch rx" (l.name : string)];
+  if Option.is_some l.entry.tx_pin || l.entry.rx_op <> Rx_op.none || l.entry.lane_cmd <> 0
+  then
+    raise_s
+      [%message "entry actions cannot send a bit, touch rx or command a lane" (l.name : string)];
   let inv_en, inv_clk, inv_hi =
     match l.inv, auto_invariant l with
     | Some (c, hi), _ | None, Some (c, hi) -> 1, c, hi
@@ -176,7 +182,7 @@ let header_of (l : loc) : int Header.t =
   ; policy = l.policy
   ; accepting = Bool.to_int l.accepting
   ; irq_on_entry = Bool.to_int l.irq
-  ; spare = 0
+  ; prescale = l.prescale
   }
 ;;
 
@@ -195,7 +201,13 @@ let edge_of t (e : edge) : int Edge.t =
   ; out_val = a.out_val
   ; out_oe = a.out_oe
   ; tx_pin_en = Bool.to_int (Option.is_some a.tx_pin)
-  ; tx_pin = Option.value a.tx_pin ~default:0
+  ; tx_pin =
+      (match a.tx_pin with
+       | Some p ->
+         if a.lane_cmd <> Lane_cmd.none
+         then raise_s [%message "an edge cannot send_bit and command a lane" (e.goto : string)];
+         p
+       | None -> a.lane_cmd)
   ; clk_reset = resets a.reset
   ; tx_op = a.tx_op
   ; rx_op = a.rx_op
