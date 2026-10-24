@@ -21,6 +21,7 @@
 | irq_ack ignored | KILLED |
 | UNEXPECTED ignores the watch mask | KILLED |
 | data flag inversion ignored | KILLED |
+| ignore age in windows (entry-time changes judged at the EVAL clock) | KILLED |
 | send_bit drives the inverted bit | KILLED |
 
-22/22 killed
+23/23 killed

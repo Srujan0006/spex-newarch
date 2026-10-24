@@ -148,7 +148,7 @@ let pulse t r v =
 ;;
 
 let load t (spec : Spec.t) =
-  let records = Spec.compile spec in
+  let records = Spec.compile ~warn:ignore spec in
   let h = t.i.host in
   Array.iteri records ~f:(fun loc record ->
     List.iteri (Spec.beats_of record) ~f:(fun b word ->

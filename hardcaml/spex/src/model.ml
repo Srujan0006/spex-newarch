@@ -250,8 +250,22 @@ let step t (i : inputs) =
     | _ -> false
   in
   let stress = t.role = Role.stress in
-  let fires (e : int Edge.t) =
+  (* ENGINE.md: a pin change is judged against the clocks as they were when it was
+     seen. The earliest latched change on the edge's change pins sets the age. *)
+  let clock_seen (e : int Edge.t) =
     let c = clock_sel t e.clk in
+    if c = 0xFFFF
+    then c
+    else (
+      let age =
+        List.init 8 ~f:(fun p ->
+          if bit t.changed p && bit e.chg_mask p then t.ages.(p) else 0)
+        |> List.fold ~init:0 ~f:max
+      in
+      max 0 (c - age))
+  in
+  let fires (e : int Edge.t) =
+    let c = clock_seen e in
     e.valid = 1
     && (t.pins_s lxor e.pin_val) land e.pin_mask = 0
     && (e.chg_mask = 0 || changed_all land e.chg_mask <> 0)
@@ -352,7 +366,7 @@ let step t (i : inputs) =
   (* coverage *)
   let cov_fire = any_fire && i.cover_en in
   let cov_addr_now = (t.cur_loc lsl 2) lor w in
-  let off_now = min 4095 (clock_sel t we.clk) in
+  let off_now = min 4095 (clock_seen we) in
   let merge_now, drop_now =
     match t.s1 with
     | Some (a, _) when cov_fire -> a = cov_addr_now, a <> cov_addr_now

@@ -26,7 +26,9 @@ test harness stops with the cycle number and both output sets.
 
 ## Each cycle
 
-Let `chg_now = pins_s xor pins_q` and `changed_all = changed | chg_now`.
+Let `chg_now = pins_s xor pins_q` and `changed_all = changed | chg_now`. Each latched
+change keeps its age: 1 in the cycle after it was seen, +1 per cycle (saturating at 7);
+in the first EVAL cycle the age is the number of cycles since it was seen.
 
 **FETCH beat b** (b = 0..4). For b < 4 the location store is read at
 `{cur_loc, b}`. The word read in beat b arrives in beat b + 1 and is stored as record
@@ -40,10 +42,26 @@ takes 5 cycles in which no edge can fire.
 fire_k = valid
        & ((pins_s xor pin_val) & pin_mask) == 0          pin levels
        & (chg_mask == 0 | (changed_all & chg_mask) != 0)  pin change
-       & lo <= clock[clk] <= hi                            timing window
+       & lo <= v_k <= hi                                   timing window
        & flag[flag_sel] xor flag_inv                       data flag
        & stress_ok                                         Stress role only
 ```
+
+**A pin change is judged against the clocks as they were when it was seen.** A change
+seen during FETCH waits up to 5 cycles for the first EVAL cycle; its edge must not be
+judged against the clock of that later cycle. So `v_k`, the clock value edge k is judged
+with, is:
+
+- `clock[clk]` if the edge has `chg_mask == 0`, or if the clock is saturated (0xFFFF);
+- otherwise `max(clock[clk] − a, 0)`, where `a` is the largest age among the latched
+  changes on the edge's `chg_mask` pins (the earliest change, the one that would have
+  fired the edge first), and 0 if only `chg_now` pins match. The floor at 0 covers a clock
+  the entry action reset after the change was seen: the change counts as seen at the
+  reset.
+
+The same `v_k` is used by the Stress tests (`v_k == lo`, `v_k == hi`) and is the value
+coverage records for a taken edge. The age is at most 5 in practice (3 bits, saturating
+at 7), so this is a 3-bit subtract per edge.
 
 The lowest k with `fire_k` wins. If an edge wins, its action runs. If its target is
 the current location it is an internal transition: no fetch, no entry action, and
@@ -99,7 +117,7 @@ fires on it changes `pout` the cycle after. Pad to pad: 3 cycles plus the output
 ## Coverage
 
 With `cover_en`, every taken edge updates `{cur_loc, edge}` in a 1-port SRAM:
-count + 1 (saturating at 255), and min/max of the edge's clock value (saturated to
+count + 1 (saturating at 255), and min/max of the edge's `v_k` (saturated to
 12 bits). The update is a read in stage S1 and a merged write in S2. If an edge fires
 while S1 is busy: the same address is merged, a different address is dropped and
 `cov_overrun` is set.

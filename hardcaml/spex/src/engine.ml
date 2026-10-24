@@ -210,8 +210,29 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   in
   let changed_all = changed.value |: chg_now in
   let is_stress = role.value ==:. Role.stress in
-  let fire_of (e : Signal.t Edge.t) =
+  (* each pin keeps the age of its latched change (cycles since it was seen) *)
+  let ages = List.init 8 ~f:(fun _ -> rv 3) in
+  let max3 l =
+    tree l ~arity:2 ~f:(function
+      | [ a ] -> a
+      | [ a; b ] -> mux2 (a >: b) a b
+      | _ -> assert false)
+  in
+  (* A pin change is judged against the clocks as they were when it was seen: an edge
+     waiting on a change compares clock - age (the earliest matching latched change),
+     floored at 0; a saturated clock stays saturated. *)
+  let clk_seen (e : Signal.t Edge.t) =
     let c = clk_of e.clk in
+    let age =
+      List.mapi ages ~f:(fun p a ->
+        mux2 (changed.value.:(p) &: e.chg_mask.:(p)) a.value (zero 3))
+      |> max3
+      |> fun a -> uresize a clock_bits
+    in
+    mux2 (c ==:. 0xFFFF) c (mux2 (c <: age) (zero clock_bits) (c -: age))
+  in
+  let seen = List.map edges ~f:clk_seen in
+  let fire_of (e : Signal.t Edge.t) c =
     let pin_ok = (pins_s ^: e.pin_val) &: e.pin_mask ==:. 0 in
     let chg_ok = e.chg_mask ==:. 0 |: (changed_all &: e.chg_mask <>:. 0) in
     let win_ok = c >=: e.lo &: (c <=: e.hi) in
@@ -224,7 +245,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     in
     e.valid &: pin_ok &: chg_ok &: win_ok &: dat_ok &: str_ok
   in
-  let fires = List.map edges ~f:(fun e -> in_eval &: fire_of e) in
+  let fires = List.map2_exn edges seen ~f:(fun e c -> in_eval &: fire_of e c) in
   let any_fire = reduce ~f:( |: ) fires in
   let winner =
     match fires with
@@ -244,15 +265,11 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let viol_kind_now = concat_msb [ timeout_now; unexp_now ] in
   vlog_push <== viol_now;
   (* A change latched during entry is logged with the cycle it was seen, not the
-     cycle EVAL got to it: each pin keeps the age of its latched change. *)
-  let ages = List.init 8 ~f:(fun _ -> rv 3) in
+     cycle EVAL got to it. *)
   let watched_age =
     List.mapi ages ~f:(fun p a ->
       mux2 (changed.value.:(p) &: hdr.watch.:(p)) a.value (zero 3))
-    |> tree ~arity:2 ~f:(function
-      | [ a ] -> a
-      | [ a; b ] -> mux2 (a >: b) a b
-      | _ -> assert false)
+    |> max3
   in
   (* timestamp - age without a 32-bit subtract: a 3-bit subtract on the low bits,
      and a register that always holds timestamp[31:3] - 1 for the borrow case *)
@@ -310,7 +327,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   (* ---- coverage: read in S1, merge and write in S2; 1 SRAM access per cycle ---- *)
   let cov_fire = any_fire &: h.cover_en in
   let cov_addr_now = concat_msb [ cur_loc.value; winner ] in
-  let c_w = clk_of we.clk in
+  let c_w = mux winner seen in
   let off_now = mux2 (c_w >:. 4095) (ones 12) (select c_w 11 0) in
   let s1_v = rv 1 in
   let s1_addr = rv 8 in

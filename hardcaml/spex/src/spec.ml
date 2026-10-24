@@ -217,9 +217,50 @@ end
 module Pack_header = Pack (Header)
 module Pack_edge = Pack (Edge)
 
-(** Compile to one 512-bit record per location. *)
-let compile (t : t) : Bits.t array =
+(** Entry-time warning. A location entered from another location spends 5 cycles in
+    FETCH. A pin change seen then is judged at the clock it was seen (ENGINE.md), but
+    its edge can only fire in the first EVAL cycle, up to 5 cycles later. For a window
+    narrower than 6 cycles that delay is as long as the window: the edge's action lands
+    outside the window it was judged in. *)
+let entry_window_cycles = 6
+
+let warnings (t : t) =
+  let entered =
+    0
+    :: List.concat_mapi t.locs ~f:(fun k l ->
+      List.filter_map l.edges ~f:(fun e ->
+        let target = index_of t e.goto in
+        if target <> k then Some target else None))
+  in
+  List.concat_mapi t.locs ~f:(fun k l ->
+    if not (List.mem entered k ~equal:Int.equal)
+    then []
+    else
+      List.filter_mapi l.edges ~f:(fun j e ->
+        let g = e.guard in
+        let width = g.hi - g.lo + 1 in
+        if g.changed <> 0 && g.hi < max_clock && width < entry_window_cycles
+        then
+          Some
+            (Printf.sprintf
+               "%s: location %s edge %d waits on a pin change with a %d-cycle window \
+                [%d, %d] on clock %d; a change during the 5-cycle entry fires up to 5 \
+                cycles late"
+               t.name
+               l.name
+               j
+               width
+               g.lo
+               g.hi
+               g.clk)
+        else None))
+;;
+
+(** Compile to one 512-bit record per location. Entry-time warnings go to [warn]
+    (stderr by default). *)
+let compile ?(warn = fun s -> Stdio.eprintf "warning: %s\n%!" s) (t : t) : Bits.t array =
   if List.length t.locs > num_locs then raise_s [%message "too many locations" t.name];
+  List.iter (warnings t) ~f:warn;
   List.map t.locs ~f:(fun l ->
     if List.length l.edges > num_edges
     then raise_s [%message "too many edges" (l.name : string)];
