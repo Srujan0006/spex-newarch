@@ -49,7 +49,11 @@ for f, text in hits:
     if m:   # magic feedback: "scale <n> <d> [<nm per lambda>]"; a box unit is n/d lambda
         nm = float(m.group(3)) if m.group(3) else 10.0
         scale = int(m.group(1)) / int(m.group(2)) * nm / 1000.0
-    if scale is None:
+    if scale is None:   # no scale line: list every box in raw Magic units
+        raw = re.findall(r"^box\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)", text, re.M)
+        print(f"{os.path.basename(f)}: no scale line; {len(raw)} raw boxes (llx lly urx ury):")
+        for r in raw:
+            print("RAWBOX", *r)
         continue
     print(f"{os.path.basename(f)}: 1 box unit = {scale} um")
     for b in re.finditer(r"^box\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)", text, re.M):

@@ -8,6 +8,7 @@ on:
     branches: [new-arch]
     paths:
       - "hardcaml/spex/harden/**"
+      - "!hardcaml/spex/harden/magic_overlaps.py"
       - ".github/workflows/newarch_harden.yaml"
 
 concurrency:
