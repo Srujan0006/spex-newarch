@@ -1,5 +1,9 @@
 name: test
-on: [push, workflow_dispatch]
+# runs only when the TT harness (src/, test/, info.yaml) changes
+on:
+  push:
+    paths: ["src/**", "test/**", "info.yaml", ".github/workflows/test.yaml"]
+  workflow_dispatch:
 jobs:
   test:
     runs-on: ubuntu-24.04

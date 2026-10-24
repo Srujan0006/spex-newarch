@@ -1,7 +1,9 @@
 name: docs
 
+# runs only when the TT datasheet inputs change
 on:
   push:
+    paths: ["docs/info.md", "info.yaml", ".github/workflows/docs.yaml"]
   workflow_dispatch:
 
 jobs:
