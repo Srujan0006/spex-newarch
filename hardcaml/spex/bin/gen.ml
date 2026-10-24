@@ -1,12 +1,14 @@
 (* Write the generated Verilog.
    <dir>/spex_core.v     engine core, SRAM ports external (synthesis, chip top)
-   <dir>/spex_sim_top.v  core + behavioural single-port RAMs (Verilog simulation) *)
+   <dir>/spex_sim_top.v  core + behavioural single-port RAMs (Verilog simulation)
+   <dir>/spex_chip.v     host SPI port + core, SRAM ports external (the Tiny Tapeout top) *)
 
 open! Base
 open! Hardcaml
 open Spex
 module Core_circuit = Circuit.With_interface (Engine.I) (Engine.O)
 module Top_circuit = Circuit.With_interface (Engine.Top.I) (Engine.Top.O)
+module Chip_circuit = Circuit.With_interface (Chip.I) (Chip.O)
 
 let () =
   let argv = Sys.get_argv () in
@@ -21,5 +23,9 @@ let () =
     ~output_mode:(To_file (dir ^ "/spex_sim_top.v"))
     Verilog
     (Top_circuit.create_exn ~name:"spex_sim_top" (Engine.Top.create (scope ())));
-  Stdio.printf "wrote %s/spex_core.v and %s/spex_sim_top.v\n" dir dir
+  Rtl.output
+    ~output_mode:(To_file (dir ^ "/spex_chip.v"))
+    Verilog
+    (Chip_circuit.create_exn ~name:"spex_chip" (Chip.create (scope ())));
+  Stdio.printf "wrote %s/spex_core.v, %s/spex_sim_top.v and %s/spex_chip.v\n" dir dir dir
 ;;

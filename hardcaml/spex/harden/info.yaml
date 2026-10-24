@@ -3,7 +3,7 @@ project:
   title:        "SPEX new_arch harden (6x4)"      # Project title
   author:       "Srujan0006"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  "Critical loop of a SPEX engine (edge macros, guards, priority, next location), for timing"      # One line description of what your project does
+  description:  "SPEX protocol engine (Hardcaml new_arch v0.1) with its host SPI port"      # One line description of what your project does
   language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
   clock_hz:     48000000       # Clock frequency in Hz (or 0 if not applicable)
 
@@ -18,15 +18,15 @@ project:
   # Don't forget to also update `PROJECT_SOURCES` in test/Makefile.
   source_files:
     - "project.v"
-    - "spex_core.v"
+    - "spex_chip.v"
 
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 # This section is for the datasheet/website. Use descriptive names (e.g., RX, TX, MOSI, SCL, SEG_A, etc.).
 pinout:
   # Inputs
-  ui[0]: ""
-  ui[1]: ""
-  ui[2]: ""
+  ui[0]: "CS_n"
+  ui[1]: "SCK"
+  ui[2]: "MOSI"
   ui[3]: ""
   ui[4]: ""
   ui[5]: ""
@@ -34,24 +34,24 @@ pinout:
   ui[7]: ""
 
   # Outputs
-  uo[0]: ""
-  uo[1]: ""
-  uo[2]: ""
-  uo[3]: ""
-  uo[4]: ""
-  uo[5]: ""
-  uo[6]: ""
-  uo[7]: ""
+  uo[0]: "MISO"
+  uo[1]: "IRQ"
+  uo[2]: "VIOL pulse"
+  uo[3]: "ENTRY"
+  uo[4]: "debug 0"
+  uo[5]: "debug 1"
+  uo[6]: "debug 2"
+  uo[7]: "debug 3"
 
   # Bidirectional pins
-  uio[0]: ""
-  uio[1]: ""
-  uio[2]: ""
-  uio[3]: ""
-  uio[4]: ""
-  uio[5]: ""
-  uio[6]: ""
-  uio[7]: ""
+  uio[0]: "protocol pin 0"
+  uio[1]: "protocol pin 1"
+  uio[2]: "protocol pin 2"
+  uio[3]: "protocol pin 3"
+  uio[4]: "protocol pin 4"
+  uio[5]: "protocol pin 5"
+  uio[6]: "protocol pin 6"
+  uio[7]: "protocol pin 7"
 
 # Do not change!
 yaml_version: 6

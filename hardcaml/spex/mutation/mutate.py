@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Mutation test for the SPEX RTL.
 
-Each mutant changes one line of src/engine.ml (the RTL only; the reference model is
-left alone), rebuilds and runs the whole test suite. A mutant is KILLED when any test
+Each mutant changes one line of the RTL (src/engine.ml, or src/host_spi.ml for the host
+port; the reference model is left alone), rebuilds and runs the whole test suite. A mutant is KILLED when any test
 fails (a lockstep mismatch or a changed expect output). A SURVIVED mutant is a hole
 in the tests, or a change with no visible effect (an equivalent mutant).
 
@@ -11,6 +11,7 @@ usage: python3 mutation/mutate.py        (from the repo root, with opam env load
 import subprocess, sys, pathlib
 
 SRC = pathlib.Path("src/engine.ml")
+SPI = pathlib.Path("src/host_spi.ml")
 
 MUTANTS = [
     ("edge priority: edge 1 beats edge 0",
@@ -44,21 +45,48 @@ MUTANTS = [
     ("send_bit drives the inverted bit", "(sresize tx_sr.value.:(0) 8 &: tmask)", "(sresize ~:(tx_sr.value.:(0)) 8 &: tmask)"),
 ]
 
+# host SPI port (test/test_spi_host.ml drives it through its pins only)
+SPI_MUTANTS = [
+    ("SPI samples MOSI on the falling edge", "let rise = active &: sck &: ~:sck_q in",
+     "let rise = active &: ~:sck &: sck_q in"),
+    ("SPI address does not auto-increment", "; when_ in_data [ addr <-- next_addr ]", "; when_ gnd [ addr <-- next_addr ]"),
+    ("location store bytes assembled big-endian", "rec_w <-- concat_msb [ byte; select rec_w.value 127 8 ]",
+     "rec_w <-- concat_msb [ select rec_w.value 119 0; byte ]"),
+    ("location store beat written on byte 14", "(select a 3 0 ==:. 15)", "(select a 3 0 ==:. 14)"),
+    ("STATUS not sent during the command byte", "out_sr <-- status_byte st ]", "out_sr <--. 0 ]"),
+    ("RX FIFO popped when its byte is loaded, not when sent",
+     "when_ (rd_data &: sp Space.rx) [ rx_pop_p <--. 1 ]",
+     "when_ (fall &: (bitn.value ==:. 0) &: in_data &: is_read &: sp Space.rx) [ rx_pop_p <--. 1 ]"),
+    # equivalent while timestamps are below 2^24: byte 5 is timestamp[31:24], 0 in both entries, so the early
+    # pop is invisible; a test would need 16.8 M simulated cycles
+    ("violation log popped after byte 4 (equivalent below 2^24 cycles)", "(select a 2 0 ==:. 5)) [ vlog_pop_p", "(select a 2 0 ==:. 4)) [ vlog_pop_p"),
+    ("coverage write goes to the incremented address", "cov_addr = mux2 cov_we_p.value cov_waddr.value (select a 9 2)",
+     "cov_addr = select a 9 2"),
+    ("CS_n high does not reset the bit counter", "[ bitn <--. 0; byte_idx <--. 0;", "[ byte_idx <--. 0;"),
+    ("CTRL start and stop bits swapped", "[ start_p <-- byte.:(0); stop_p <-- byte.:(1);",
+     "[ start_p <-- byte.:(1); stop_p <-- byte.:(0);"),
+    ("vlog byte 5 does not wrap the address", "(concat_msb [ select a 15 3; zero 3 ])", "(a +:. 1)"),
+    ("TX FIFO byte pushed without its data", "[ tx_push_p <--. 1; tx_data <-- byte ]", "[ tx_push_p <--. 1 ]"),
+]
+
 
 def run(cmd):
     return subprocess.run(cmd, shell=True, capture_output=True, text=True)
 
 
 def main():
-    original = SRC.read_text()
+    originals = {SRC: SRC.read_text(), SPI: SPI.read_text()}
     killed = 0
     rows = []
     try:
-        for name, old, new in MUTANTS:
+        for src, (name, old, new) in [(SRC, m) for m in MUTANTS] + [(SPI, m) for m in SPI_MUTANTS]:
+            for f, text in originals.items():
+                f.write_text(text)
+            original = originals[src]
             if original.count(old) != 1:
                 rows.append((name, "SKIPPED (pattern not found once)"))
                 continue
-            SRC.write_text(original.replace(old, new))
+            src.write_text(original.replace(old, new))
             if run("dune build 2>&1").returncode != 0:
                 rows.append((name, "SKIPPED (does not compile)"))
                 continue
@@ -70,7 +98,8 @@ def main():
                 rows.append((name, "SURVIVED"))
             print(f"{rows[-1][1]:9} {name}", flush=True)
     finally:
-        SRC.write_text(original)
+        for f, text in originals.items():
+            f.write_text(text)
         run("dune build 2>&1")
     tried = sum(1 for _, r in rows if r in ("KILLED", "SURVIVED"))
     print(f"\n{killed}/{tried} mutants killed")

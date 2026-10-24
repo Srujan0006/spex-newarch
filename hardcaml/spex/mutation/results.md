@@ -23,5 +23,17 @@
 | data flag inversion ignored | KILLED |
 | ignore age in windows (entry-time changes judged at the EVAL clock) | KILLED |
 | send_bit drives the inverted bit | KILLED |
+| SPI samples MOSI on the falling edge | KILLED |
+| SPI address does not auto-increment | KILLED |
+| location store bytes assembled big-endian | KILLED |
+| location store beat written on byte 14 | KILLED |
+| STATUS not sent during the command byte | KILLED |
+| RX FIFO popped when its byte is loaded, not when sent | KILLED |
+| violation log popped after byte 4 | SURVIVED |
+| coverage write goes to the incremented address | KILLED |
+| CS_n high does not reset the bit counter | KILLED |
+| CTRL start and stop bits swapped | KILLED |
+| vlog byte 5 does not wrap the address | SURVIVED |
+| TX FIFO byte pushed without its data | KILLED |
 
-23/23 killed
+33/35 killed
