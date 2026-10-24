@@ -14,3 +14,4 @@
 | 2026-10-24 | A5 synthesis (srujan's WSL) | 126,252 µm², 1,340 DFF, depth 37 (Yosys 0.33, mini.lib): matches |
 | 2026-10-24 | A6 mutation (srujan's WSL) | 22/22 killed, 2 min 14 s |
 | 2026-10-24 | IHP liberty synthesis | **119,951 µm², 1,340 DFF** on sg13cmos5l_stdcell_typ_1p20V_25C.lib (yowasp-yosys 0.70, `synth -flatten; dfflibmap; abc; stat`, the SPEX v1 probes' script): `synth/ihp/ihp_typ.ys` |
+| 2026-10-24 | 6x4 harden (private repo, run 40077932994) | **Routes: 0 violations, 0 max-cap, 0 max-slew, hold met. Worst setup slack at 20.8 ns: +6.952 slow / +12.013 typ / +14.161 fast ns = 72.2 / 113.8 / 150.6 MHz.** Utilisation 0.436. LVS, Magic and precheck not run |
