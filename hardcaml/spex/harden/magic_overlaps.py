@@ -42,10 +42,16 @@ for f, text in hits:
 
 boxes = []
 for f, text in hits:
-    scale = 1.0
-    m = re.search(r"^scale\s+(\d+)\s+(\d+)\s+([\d.]+)", text, re.M)
-    if m:   # magic feedback: "scale <n> <d> <um per unit>"
-        scale = float(m.group(3)) * int(m.group(1)) / int(m.group(2)) / 1000.0
+    if f.endswith("feedback.txt"):
+        print("\nfeedback.txt header:", *text.splitlines()[:4], sep="\n    ")
+    scale = None
+    m = re.search(r"^scale\s+(\d+)\s+(\d+)(?:\s+([\d.]+))?", text, re.M)
+    if m:   # magic feedback: "scale <n> <d> [<nm per lambda>]"; a box unit is n/d lambda
+        nm = float(m.group(3)) if m.group(3) else 10.0
+        scale = int(m.group(1)) / int(m.group(2)) * nm / 1000.0
+    if scale is None:
+        continue
+    print(f"{os.path.basename(f)}: 1 box unit = {scale} um")
     for b in re.finditer(r"^box\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)", text, re.M):
         llx, lly, urx, ury = (int(v) * scale for v in b.groups())
         boxes.append((f, (llx + urx) / 2, (lly + ury) / 2))
