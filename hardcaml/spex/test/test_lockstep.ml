@@ -154,14 +154,15 @@ let%expect_test "lanes and the engine push into the RX FIFO together: RTL and mo
      RX FIFO priority and the wait buffers (ENGINE.md, Bit lanes). *)
   let open Spec in
   let open Layout in
-  let spec =
+  (* lane [rx] receives what lane [tx] sends; odd seeds swap them, so each lane pushes *)
+  let spec ~rxl ~txl =
     { name = "lane_push"
     ; locs =
-        [ loc "s0" ~entry:(nop |> set 0 true) [ edge ~goto:"s1" always (nop |> lane (Lane_cmd.go 1)) ]
-        ; loc "s1" [ edge ~goto:"b" always (nop |> lane (Lane_cmd.go 0)) ]
+        [ loc "s0" ~entry:(nop |> set 0 true) [ edge ~goto:"s1" always (nop |> lane (Lane_cmd.go rxl)) ]
+        ; loc "s1" [ edge ~goto:"b" always (nop |> lane (Lane_cmd.go txl)) ]
         ; loc
             "b"
-            [ edge ~goto:"s0" (always |> flag (Flag.lane_done 0)) (nop |> lane (Lane_cmd.end_ 1))
+            [ edge ~goto:"s0" (always |> flag (Flag.lane_done txl)) (nop |> lane (Lane_cmd.end_ rxl))
             ; edge ~goto:"b" (always |> after 3) (nop |> rx Rx_op.push |> reset 0)
             ]
         ]
@@ -173,7 +174,8 @@ let%expect_test "lanes and the engine push into the RX FIFO together: RTL and mo
   for seed = 1 to 40 do
     let rs = Random.State.make [| seed |] in
     let t = H.create () in
-    H.load t spec;
+    let rxl, txl = if seed % 2 = 0 then 1, 0 else 0, 1 in
+    H.load t (spec ~rxl ~txl);
     let h = t.i.host in
     let base = Test_lane.random_cfg rs in
     let c =
@@ -185,9 +187,9 @@ let%expect_test "lanes and the engine push into the RX FIFO together: RTL and mo
       ; readback = 0
       }
     in
-    Layout.Lane_cfg.iter2 h.lane0 { c with dir = 0 } ~f:H.set;
-    Layout.Lane_cfg.iter2 h.lane1 { c with dir = 1 } ~f:H.set;
-    H.set h.pin_src Layout.Pin_src.lane0;
+    Layout.Lane_cfg.iter2 h.lane0 { c with dir = (if rxl = 0 then 1 else 0) } ~f:H.set;
+    Layout.Lane_cfg.iter2 h.lane1 { c with dir = (if rxl = 1 then 1 else 0) } ~f:H.set;
+    H.set h.pin_src (if txl = 0 then Layout.Pin_src.lane0 else Layout.Pin_src.lane1);
     t.device <- (fun ~out ~oe -> out land oe lor lnot oe land 0xFF);
     H.start t ();
     H.push_tx t (List.init 8 ~f:(fun _ -> Random.State.int rs 256));

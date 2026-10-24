@@ -24,6 +24,24 @@
 | ignore age in windows (entry-time changes judged at the EVAL clock) | KILLED |
 | no floor at 0 for a clock reset after the change | KILLED |
 | send_bit drives the inverted bit | KILLED |
+| RX FIFO: lane 0 data replaced when the engine waits | SURVIVED |
+| wait buffer forgets a push that lost | KILLED |
+| pin source 'lane 0 AND engine' ignores the engine | KILLED |
+| prescaler /8 counts every cycle | KILLED |
+| send_bit edges also command the lanes | KILLED |
+| lane flags read as 0 | KILLED |
+| stuff bit one bit early | KILLED |
+| stuff bit not complemented | KILLED |
+| CRC feedback ignores the bit | SKIPPED (does not compile) |
+| CRC inversion ignored | KILLED |
+| readback never compares | KILLED |
+| lost arbitration and bit error swapped | KILLED |
+| RX never resynchronises | KILLED |
+| fractional carry dropped | KILLED |
+| RX MSB-first shift takes the wrong end | KILLED |
+| END drops the partial byte | KILLED |
+| NRZI decode inverted | KILLED |
+| RX Done before a trailing stuff bit | SKIPPED (does not compile) |
 | SPI samples MOSI on the falling edge | KILLED |
 | SPI address does not auto-increment | KILLED |
 | location store bytes assembled big-endian | KILLED |
@@ -37,4 +55,4 @@
 | vlog byte 5 does not wrap the address | KILLED |
 | TX FIFO byte pushed without its data | KILLED |
 
-35/36 killed
+50/52 killed

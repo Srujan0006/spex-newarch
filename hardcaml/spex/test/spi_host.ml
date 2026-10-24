@@ -110,3 +110,24 @@ let start t ?(loc = 0) ?(recover = 0) ?(role = Layout.Role.drive) ?(cover = fals
 
 let stop t = write t ~space:Space.csr ~addr:csr_ctrl [ 2 ]
 let push_tx t bytes = write t ~space:Space.tx ~addr:0 bytes
+
+(** Lane configuration bytes, as the host writes them to space 6 (Host_spi). *)
+let lane_bytes (c : int Layout.Lane_cfg.t) =
+  let le v n = List.init n ~f:(fun k -> (v lsr (8 * k)) land 0xFF) in
+  le c.div_int 2
+  @ [ c.div_frac
+    ; c.dir lor (c.clk_pin_en lsl 1) lor (c.clk_edge lsl 2) lor (c.code lsl 3) lor (c.lsb_first lsl 5)
+      lor (c.readback lsl 6) lor (c.crc_inv lsl 7)
+    ; c.clk_pin lor (c.data_pin lsl 3)
+    ; c.stuff lor (c.stuff_len lsl 2)
+    ; c.crc_width
+    ; 0
+    ]
+  @ le c.poly 4 @ le c.init 4 @ le c.sync 2 @ le c.sync_mask 2 @ le c.frame_bits 2
+;;
+
+let set_lane t l cfg = write t ~space:Space.lanes ~addr:(32 * l) (lane_bytes cfg)
+
+let set_pin_src t v = write t ~space:Space.csr ~addr:0x10 [ v land 0xFF; (v lsr 8) land 0xFF; (v lsr 16) land 0xFF ]
+
+let lane_status t l = List.hd_exn (read t ~space:Space.csr ~addr:(0x0C + l) 1)

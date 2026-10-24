@@ -12,6 +12,7 @@ import subprocess, sys, pathlib
 
 SRC = pathlib.Path("src/engine.ml")
 SPI = pathlib.Path("src/host_spi.ml")
+LANE = pathlib.Path("src/lane.ml")
 
 MUTANTS = [
     ("edge priority: edge 1 beats edge 0",
@@ -30,9 +31,10 @@ MUTANTS = [
      "concat_msb [ rx_bit; select rx_sr.value 6 0 ]"),
     ("counter load8 loads 7", "of_int ~width:8 7; of_int ~width:8 8 ]", "of_int ~width:8 7; of_int ~width:8 7 ]"),
     ("coverage count wraps instead of saturating", "mux2 sum.:(8) (ones 8) (select sum 7 0)", "select sum 7 0"),
-    ("open-drain pin drives high", "pins_oe = poe.value &: ~:(h.open_drain &: pout.value)", "pins_oe = poe.value"),
+    ("open-drain pin drives high", "pins_oe = poe.value &: ~:(h.open_drain &: pin_val)", "pins_oe = poe.value"),
     ("Stress at_hi fires at lo", "; v_eq e.hi hi_adj\n", "; v_eq e.lo lo_adj\n"),
-    ("clocks wrap instead of saturating", "when_ (c.value <>:. 0xFFFF) [ c <-- c.value +:. 1 ]", "c <-- c.value +:. 1"),
+    ("clocks wrap instead of saturating", "when_ (tick &: (c.value <>:. 0xFFFF)) [ c <-- c.value +:. 1 ]",
+     "when_ tick [ c <-- c.value +:. 1 ]"),
     ("one-flop synchroniser", "let pins_s = reg spec sync1 in", "let pins_s = sync1 in"),
     ("change age starts at 0", "[ a <--. 1 ]", "[ a <--. 0 ]"),
     ("FIFO full one entry early", "let full = used ==:. depth in", "let full = used ==:. depth - 1 in"),
@@ -45,6 +47,39 @@ MUTANTS = [
     ("no floor at 0 for a clock reset after the change", "|: (e.lo ==:. 0)) &: (c17 <=: hi_adj)",
      "|: gnd) &: (c17 <=: hi_adj)"),
     ("send_bit drives the inverted bit", "(sresize tx_sr.value.:(0) 8 &: tmask)", "(sresize ~:(tx_sr.value.:(0)) 8 &: tmask)"),
+]
+
+# bit lanes in the engine (test_lockstep.ml lane push collisions, test_can.ml)
+MUTANTS += [
+    ("RX FIFO: lane 0 data replaced when the engine waits",
+     "rx_push_d <== mux2 l0_push l0_data (mux2 acc1 (dat b1) (dat b2));",
+     "rx_push_d <== mux2 (l0_push &: ~:(req b2)) l0_data (mux2 acc1 (dat b1) (dat b2));"),
+    ("wait buffer forgets a push that lost", "[ when_ (~:(bv.value) &: n) [ bv <--. 1; bd <-- nd ] ]", "[ ]"),
+    ("pin source 'lane 0 AND engine' ignores the engine", "[ e; l0; ~:l0; l0 &: e;", "[ e; l0; ~:l0; l0;"),
+    ("prescaler /8 counts every cycle", "; select pre.value 2 0 ==:. 7", "; vdd"),
+    ("send_bit edges also command the lanes",
+     "lane_cmd <== mux2 (any_fire &: ~:(we.tx_pin_en)) we.tx_pin (zero 3);",
+     "lane_cmd <== mux2 any_fire we.tx_pin (zero 3);"),
+    ("lane flags read as 0", "    @ lane_flags", "    @ List.map lane_flags ~f:(fun _ -> gnd)"),
+]
+
+# bit lane (test_lane.ml lockstep and loopback, test_can.ml)
+LANE_MUTANTS = [
+    ("stuff bit one bit early", "let stuff_due = stuff_on &: (run.value ==: c.stuff_len) in",
+     "let stuff_due = stuff_on &: (run.value ==: c.stuff_len -:. 1) in"),
+    ("stuff bit not complemented", "mux2 (c.stuff ==:. 1) ~:(last.value) gnd", "mux2 (c.stuff ==:. 1) last.value gnd"),
+    ("CRC feedback ignores the bit", "let fb = b ^: crc.value.:(31) in", "let fb = (b &: gnd) ^: crc.value.:(31) in"),
+    ("CRC inversion ignored", "let crc_bit = crc.value.:(31) ^: c.crc_inv in", "let crc_bit = crc.value.:(31) in"),
+    ("readback never compares", "&: sample &: (d <>: out.value)", "&: sample &: gnd &: (d <>: out.value)"),
+    ("lost arbitration and bit error swapped", "mux2 out.value (of_int ~width:3 4) (of_int ~width:3 2)",
+     "mux2 out.value (of_int ~width:3 2) (of_int ~width:3 4)"),
+    ("RX never resynchronises", "let resync = edge_rx &: (in_armed |: ~:manch) in", "let resync = edge_rx &: in_armed in"),
+    ("fractional carry dropped", "[ acc <-- select s 7 0; extra <-- s.:(8) ]", "[ acc <-- select s 7 0 ]"),
+    ("RX MSB-first shift takes the wrong end", "(concat_msb [ select byte.value 6 0; rbit ])",
+     "(concat_msb [ rbit; select byte.value 6 0 ])"),
+    ("END drops the partial byte", "&: (bitpos_after <>:. 0) &: ~:push in", "&: (bitpos_after <>:. 0) &: ~:push &: gnd in"),
+    ("NRZI decode inverted", "(d ==: prev.value)", "(d <>: prev.value)"),
+    ("RX Done before a trailing stuff bit", "    &: ~:stuff_after", "    &: ~:(stuff_after &: gnd)"),
 ]
 
 # host SPI port (test/test_spi_host.ml drives it through its pins only)
@@ -77,11 +112,13 @@ def run(cmd):
 
 
 def main():
-    originals = {SRC: SRC.read_text(), SPI: SPI.read_text()}
+    originals = {SRC: SRC.read_text(), SPI: SPI.read_text(), LANE: LANE.read_text()}
     killed = 0
     rows = []
     try:
-        for src, (name, old, new) in [(SRC, m) for m in MUTANTS] + [(SPI, m) for m in SPI_MUTANTS]:
+        for src, (name, old, new) in (
+            [(SRC, m) for m in MUTANTS] + [(LANE, m) for m in LANE_MUTANTS] + [(SPI, m) for m in SPI_MUTANTS]
+        ):
             for f, text in originals.items():
                 f.write_text(text)
             original = originals[src]

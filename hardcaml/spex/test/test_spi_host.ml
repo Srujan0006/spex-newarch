@@ -164,3 +164,28 @@ let%expect_test "a frame aborted mid-byte does not shift the next one" =
     and after a new write: 3c
     |}]
 ;;
+
+let%expect_test "CAN TX configured and fed through SPI only" =
+  let n = Test_can.n in
+  let t = S.create () in
+  let node = Can_node.create ~n () in
+  t.device
+  <- (fun ~out ~oe ->
+       let chip = if oe land 1 = 1 then out land 1 else 1 in
+       let bus = chip land node.drive in
+       Can_node.step node ~bus;
+       0xFE lor bus);
+  let f : Can_node.frame = { id = 0x5A5; data = [ 0xCA; 0xFE ] } in
+  let bits = Test_can.frame_bits f in
+  S.set_lane t 0 (Test_can.can_cfg ~dir:0 ~frame_bits:(List.length bits));
+  S.set_pin_src t Layout.Pin_src.lane0_and_engine;
+  S.write t ~space:S.Space.csr ~addr:S.csr_open_drain [ 1 ];
+  S.load t (Protocols.can_tx ~pin:0 ~n);
+  S.push_tx t (Test_can.pack bits);
+  S.start t ();
+  S.ticks t (120 * n);
+  printf "node received %s, stuff errors %d; lane 0 status %02x; STATUS %02x\n"
+    (Sexp.to_string [%sexp (List.rev node.received : Can_node.frame list)])
+    node.stuff_errors (S.lane_status t 0) (S.status t);
+  [%expect {| node received (((id 1445)(data(202 254)))), stuff errors 0; lane 0 status 80; STATUS 90 |}]
+;;
