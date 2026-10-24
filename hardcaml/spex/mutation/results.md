@@ -29,11 +29,11 @@
 | location store beat written on byte 14 | KILLED |
 | STATUS not sent during the command byte | KILLED |
 | RX FIFO popped when its byte is loaded, not when sent | KILLED |
-| violation log popped after byte 4 | SURVIVED |
+| violation log popped after byte 4 (equivalent below 2^24 cycles) | SURVIVED |
 | coverage write goes to the incremented address | KILLED |
 | CS_n high does not reset the bit counter | KILLED |
 | CTRL start and stop bits swapped | KILLED |
-| vlog byte 5 does not wrap the address | SURVIVED |
+| vlog byte 5 does not wrap the address | KILLED |
 | TX FIFO byte pushed without its data | KILLED |
 
-33/35 killed
+34/35 killed
