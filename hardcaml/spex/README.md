@@ -19,6 +19,8 @@ dune build && dune test                    # all expect tests, all in lockstep w
 dune exec bin/gen.exe -- out               # generated Verilog
 ./_build/default/test/vectors/vectors.exe $PWD/out && (cd out && iverilog -g2012 -o simv tb.v spex_sim_top.v && vvp -n simv)
 python3 mutation/mutate.py                 # mutation test of the RTL
+formal/prove.sh                            # formal proofs (Yosys + ABC PDR) on out/spex_core.v
+python3 formal/vacuity.py                  # each property must fail on a mutant
 ```
 
 `out/` holds the generated Verilog (`spex_core.v`, `spex_sim_top.v`) from this run.

@@ -21,3 +21,22 @@
 | 2026-10-24 | 6x4 re-harden with SPI (run 40084954695) | Routes, LVS clean, precheck passed, but +1.278 ns slow (51 MHz): the clock - age subtract in the guards (depth 37 -> 61) |
 | 2026-10-24 | Registered age adjustment (run 40089963463) | lo + age, hi + age registered the cycle before; depth 43. **Routes, LVS clean, precheck 9/9, +6.402 / +11.635 / +13.582 ns = 69.5 / 109.1 / 138.5 MHz**, stdcell 245,557 um^2 |
 | 2026-10-24 | Magic overlaps | 222 obsm4/metal4 overlaps, all wholly inside the macro outlines (88 / 88 / 46): benign |
+| 2026-10-24 | Credit sprint (cloud, from the shared-folder copy, not `new-arch`) | Toolchain rebuilt from git sources (OCaml 5.2.1, Hardcaml v0.17.0) |
+| 2026-10-24 | Step 9 SPI target | Modes 0 to 3 pass at 1 MHz SCK (40 MHz engine); top speed 2.22 MHz (CPHA 0) / 2.50 MHz (CPHA 1); above the limit MISO is corrupted **without** a violation (acceptance not met, see CHANGES.md) |
+| 2026-10-24 | Step 8 I2C target | Write, read until NACK, address mismatch, STOP mid-byte (clean recovery): pass at 100 and 400 kHz |
+| 2026-10-24 | Timestamp past 2^24 | Preload test across 2^24 and the 2^32 wrap, 8 glitches at every low-bit phase, lockstep holds |
+| 2026-10-24 | A2 tests | `dune test` silent, exit 0, all in lockstep |
+| 2026-10-24 | Step 8 I2C controller read | `Protocols.i2c_controller_read`: reads N bytes (one TX FIFO byte per byte to read), ACK all but the last, NACK + STOP; passes at 100 and 400 kHz against a software target |
+| 2026-10-24 | A4 Verilog replay | PASS on 100,857 cycles (Icarus 12, now with SPI target modes 0-3, I2C target and I2C controller read) |
+| 2026-10-24 | A6 mutation | **24/24 killed** (22 + 2 new: 24-bit timestamp counter, 21-bit borrow register), 2 min 25 s |
+| 2026-10-24 | Step 12 formal (part) | Yosys 0.33 + ABC PDR, unbounded, all inputs and SRAM data free: Check role never drives, TX FIFO flags, one TIMEOUT per visit, timestamp counts: **all proved**. Non-vacuity: P2, P4, P6 fail on a matching mutant (`formal/vacuity.md`); P5 not shown. Properties 1 and 3 not written |
+| 2026-10-24 | Step 14 write-up | First draft: `docs/submission-draft.md` |
+| 2026-10-24 | Step 12 formal (round 2) | Properties 1 (lowest true edge wins) and 3 (no pin change lost) added: **all 6 properties proved unbounded** (ABC PDR). Non-vacuity: P1, P2, P3, P4, P6 each fail on a matching mutant. Found: `start` while running restarts and drops latched changes (document in ENGINE.md) |
+| 2026-10-24 | Re-run after naming formal signals | `dune test` silent; Verilog replay PASS on 100,857 cycles; mutation 24/24 killed |
+| 2026-10-24 | 1-Wire controller (new protocol) | Reset, presence, write 0x33, read 0x28 against a software device; no device gives TIMEOUT in `rst_wait` and a retry. Verilog replay PASS on 120,900 cycles; mutation 24/24 |
+| 2026-10-24 | Bit lanes (step 11) | ENGINE.md lane semantics; `lane.ml` (RTL) and `lane_model.ml` (model) separately; lane lockstep 400 configs x 3000 cycles; TX -> RX loopback for NRZ, CAN stuffing, NRZI + USB stuffing, Manchester with CRC ok. One lane 19,504 µm² + CSRs |
+| 2026-10-24 | Lanes in the engine | commands, flags 8..15, pin source select, prescaler, RX FIFO priority with wait buffers; random lockstep draws them; a directed test makes lane and engine pushes collide |
+| 2026-10-24 | CAN 2.0A | `can_tx` / `can_rx` against an independent software CAN node: frames decode both ways, arbitration lost (0x122) and won (0x124), wrong CRC not ACKed; CAN TX configured through SPI only |
+| 2026-10-24 | 6x4 harden, two lanes (run 40108049347) | Signs off (0 DRC, LVS clean, precheck 9/9, hold met) at +3.299 ns slow = 57.1 MHz, utilisation 0.639: depth 43 -> 65 (lane bit-timing adders on the path) |
+| 2026-10-24 | Lane timing fix (run 40117848780) | Derived lane constants registered, parallel compares: depth 45. **0 DRC, LVS clean, precheck 9/9, hold met, +4.016 / +10.171 / +12.757 ns = 59.6 / 94.1 / 124.3 MHz**, stdcell 347,539 µm², utilisation 0.646 |
+| 2026-10-25 | Sprint merged onto `new-arch` | sprint.patch applied (CHANGES, PROGRESS, mutate.py by hand); all tests pass in lockstep with the new-arch model; **all 6 formal properties proved unbounded on the core with both lanes** (lane settings free; P2 asserts pins_oe always, pins_out while the pin source is the engine); P1-P4, P6 non-vacuous; the log-pop mutant is now killed (timestamp preload across 2^24 in the SPI test); **mutation 56/56** |

@@ -54,3 +54,66 @@ the record to 576 bits (still 4.5 beats, so a 5th beat).
 - I2C read transactions, I2C/SPI target specs.
 - Formal proofs (SymbiYosys) and TChecker model checks of the specs.
 - The real CMOS5L harden (Gate 2: 6x4 routes at ≥ 40 MHz slow corner).
+
+## Credit sprint, 2026-10-24 (cloud, from the shared-folder copy)
+
+This work started from the copy in the project's shared folder, which is older than
+commit 50b0353 on `new-arch` (no entry-time fix, no real SPI host port). Merge it onto
+`new-arch` by hand; the files are listed in `PROGRESS.md`.
+
+- **SPI target, modes 0 to 3** (`Protocols.spi_target`, `test/test_spi_target.ml`).
+  All four modes pass at 1 MHz SCK from a 40 MHz engine, with continuous SCK between
+  bytes. **Measured top speed: half period 9 cycles = 2.22 MHz for modes 0 and 2
+  (CPHA 0), 8 cycles = 2.50 MHz for modes 1 and 3 (CPHA 1).** The draft guessed 2 to
+  3 MHz. The limit is the byte boundary: the spec passes through a second location
+  (5-cycle entry) to load the next TX byte and push the received one.
+  **Above the limit the failure is not flagged:** at one cycle faster the target still
+  receives every MOSI byte correctly, but the first MISO bit of the next byte comes out
+  late and the controller reads `da` for `5a`. The "next" location watches SCK, but the
+  early edge lands during the following FETCH, where it is latched and taken late
+  instead of being UNEXPECTED. Fix options: a per-location "edge seen during FETCH is a
+  violation" bit (header has 2 spare bits), or a TX prefetch so no second location is
+  needed. GUIDE step 9's "violation, not silent corruption" acceptance is **not met yet**.
+- **I2C target** (`Protocols.i2c_target`, `test/test_i2c_target.ml`): write, read
+  (until NACK), address mismatch (NACK, ignored), STOP in the middle of a data byte
+  (clean recovery: the partial byte is dropped, the next transaction works). Passes at
+  100 kHz and 400 kHz. No clock stretching by the target.
+- **I2C controller read** (`Protocols.i2c_controller_read`, `test/test_i2c_read.ml`): the
+  first TX FIFO byte is the address byte with R = 1, each further TX FIFO byte asks for
+  one more byte; ACKs all but the last, NACKs the last, STOP. Reuses the write spec's
+  START, address and ACK locations. Passes at 100 and 400 kHz.
+- **Timestamps past 2^24**: `Harness.preload_timestamp` sets the timestamp register and
+  the borrow register (`ts_reg`, `ts_hi_m1`, now named in the RTL) and the model
+  together; `test/test_timestamp.ml` logs 8 glitches at every phase of the low 3 bits
+  across 2^24 and across the 2^32 wrap. Two new mutants (24-bit timestamp counter,
+  21-bit borrow register) are added to `mutation/mutate.py`.
+- **Formal** (`formal/`): properties on the generated `spex_core.v` with the SRAM read
+  data, pins and every host input free (so every possible spec and bus). Proved
+  **unbounded** with ABC PDR through Yosys (`formal/prove.sh`): Check role never changes
+  `pins_out`/`pins_oe`; TX FIFO never full and empty at once; at most one TIMEOUT per
+  location visit; the timestamp counts every cycle. `formal/vacuity.py` checks that each
+  property fails on a mutant.
+- **Formal, round 2:** GUIDE properties 1 and 3 added, using internal signals named
+  `f_*` in `engine.ml` (no logic change) and made ports with Yosys `expose`.
+  P1: whenever a guard is true in EVAL, the winner is the lowest-index true edge, and
+  `taken`/`taken_edge` report it the next cycle. P3: a pin change seen during FETCH is
+  still in `changed_all` on the first EVAL cycle, and in EVAL a change on a watched pin
+  either fires an edge or is UNEXPECTED. **All six properties are proved unbounded.**
+  Non-vacuity (`formal/vacuity.md`): P1 fails on the edge-priority mutant, P3 on the
+  lost-changes mutant, P2, P4 and P6 on theirs; P5 (TX FIFO flags) has no mutant yet.
+  Found while writing P3: **a `start` pulse while the engine is running restarts it
+  and drops the changes latched so far.** That is reasonable, but ENGINE.md doesn't say
+  it; now noted in ENGINE.md.
+- **SPI target overspeed, why it can't be flagged on this copy:** an early SCK edge
+  that lands during FETCH is latched and fires late, and a clock window is judged
+  at the fire time, so no guard can tell it came early. On `new-arch`, with the
+  entry-time fix (windows judged at the change's age), the fix is a clock-1 reset in
+  the "next"/"first" actions plus `window ~clk:1 2 max` on the leading-edge guard in
+  "xfer" and `~watch:(bit sck)` on "xfer": an early edge then fails its window, no
+  edge takes it, and it is UNEXPECTED.
+- **1-Wire controller** (`Protocols.onewire_controller`, `test/test_onewire.ml`): a
+  protocol with no clock line, where every bit is a timing window. Reset pulse,
+  presence check (no device = TIMEOUT, then the spec retries), write slots LSB first,
+  one read byte. Against a software device: writes 0x33 (Read ROM) and reads 0x28 (the
+  DS18B20 family code). Written in about 10 minutes as an example of a protocol the
+  architecture was not designed around.

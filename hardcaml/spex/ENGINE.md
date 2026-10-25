@@ -137,7 +137,7 @@ while S1 is busy: the same address is merged, a different address is dropped and
 
 ## Host side (core ports)
 
-`start` (role, `start_loc`), `stop`; location-store and coverage writes are ignored
+`start` (role, `start_loc`), `stop` (a `start` while running restarts the engine at `start_loc` and drops the pin changes latched so far; found by formal property P3); location-store and coverage writes are ignored
 while running; TX push, RX pop, log pop. `irq` = RX not empty, or log not empty, or
 halted on violation, or an entry with `irq_on_entry` since the last `irq_ack`. FIFO
 heads are only defined when the FIFO is not empty.

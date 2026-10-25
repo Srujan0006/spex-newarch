@@ -40,6 +40,12 @@ let () =
   ignore (Test_uart.run_tx ~n:16 [ 0x48; 0x69; 0x00; 0xFF ]);
   Test_spi_i2c.run_i2c ~addr_on_bus:0x50 ~stretch:40 [ 0x12; 0x34 ];
   Test_spi_i2c.run_i2c ~addr_on_bus:0x51 ~stretch:0 [];
+  Test_i2c_read.run ~q:25 ~n:2 [ 0xC3; 0x5A ];
+  Test_onewire.run ~present:true;
+  Test_i2c_target.run ~q:25 ~addr:0x50 (Test_i2c_target.write 0x50 [ 0xDE; 0xAD ]);
+  for mode = 0 to 3 do
+    ignore (Test_spi_target.run ~mode ~hp:20)
+  done;
   ignore (Test_roles.bit_widths ~role:Layout.Role.stress ~stress:Layout.Stress.random : string);
   for seed = 1 to 40 do
     ignore (Test_lockstep.run_one ~seed ~cycles:2000 : H.t)

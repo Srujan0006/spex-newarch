@@ -21,8 +21,9 @@ type t =
 let set r v = r := Bits.of_int ~width:(Bits.width !r) v
 let get r = Bits.to_int !r
 
-let create ?(half = 3) () =
-  let sim = Sim.create (Chip.Sim_top.create (Scope.create ~flatten_design:true ())) in
+let create ?(half = 3) ?(internal = false) () =
+  let config = if internal then Cyclesim.Config.trace_all else Cyclesim.Config.default in
+  let sim = Sim.create ~config (Chip.Sim_top.create (Scope.create ~flatten_design:true ())) in
   let i = Cyclesim.inputs sim in
   let o = Cyclesim.outputs sim in
   set i.cs_n 1;
@@ -131,3 +132,15 @@ let set_lane t l cfg = write t ~space:Space.lanes ~addr:(32 * l) (lane_bytes cfg
 let set_pin_src t v = write t ~space:Space.csr ~addr:0x10 [ v land 0xFF; (v lsr 8) land 0xFF; (v lsr 16) land 0xFF ]
 
 let lane_status t l = List.hd_exn (read t ~space:Space.csr ~addr:(0x0C + l) 1)
+
+(** Set the engine's free-running timestamp (as [Harness.preload_timestamp], without a
+    model). Needs [create ~internal:true]. *)
+let preload_timestamp t ts =
+  let reg name =
+    match Cyclesim.lookup_reg_by_name t.sim name with
+    | Some r -> r
+    | None -> failwith ("no register " ^ name)
+  in
+  Cyclesim.Reg.of_int (reg "ts_reg") ts;
+  Cyclesim.Reg.of_int (reg "ts_hi_m1") (((ts lsr 3) - 1) land 0x1FFF_FFFF)
+;;

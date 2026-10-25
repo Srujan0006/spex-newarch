@@ -24,6 +24,8 @@
 | ignore age in windows (entry-time changes judged at the EVAL clock) | KILLED |
 | no floor at 0 for a clock reset after the change | KILLED |
 | send_bit drives the inverted bit | KILLED |
+| timestamp counter is only 24 bits | KILLED |
+| logged timestamp borrow register is only 21 bits | KILLED |
 | RX FIFO: lane 0 data replaced when the engine waits | KILLED |
 | wait buffer forgets a push that lost | KILLED |
 | pin source 'lane 0 AND engine' ignores the engine | KILLED |
@@ -48,11 +50,11 @@
 | location store beat written on byte 14 | KILLED |
 | STATUS not sent during the command byte | KILLED |
 | RX FIFO popped when its byte is loaded, not when sent | KILLED |
-| violation log popped after byte 4 (equivalent below 2^24 cycles) | SURVIVED |
+| violation log popped after byte 4 | KILLED |
 | coverage write goes to the incremented address | KILLED |
 | CS_n high does not reset the bit counter | KILLED |
 | CTRL start and stop bits swapped | KILLED |
 | vlog byte 5 does not wrap the address | KILLED |
 | TX FIFO byte pushed without its data | KILLED |
 
-53/54 killed
+56/56 killed

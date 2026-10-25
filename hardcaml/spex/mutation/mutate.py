@@ -47,6 +47,10 @@ MUTANTS = [
     ("no floor at 0 for a clock reset after the change", "|: (e.lo ==:. 0)) &: (c17 <=: hi_adj)",
      "|: gnd) &: (c17 <=: hi_adj)"),
     ("send_bit drives the inverted bit", "(sresize tx_sr.value.:(0) 8 &: tmask)", "(sresize ~:(tx_sr.value.:(0)) 8 &: tmask)"),
+    ("timestamp counter is only 24 bits", 'reg_fb spec ~width:32 ~f:(fun t -> t +:. 1) -- "ts_reg"',
+     'reg_fb spec ~width:32 ~f:(fun t -> uresize (select t 23 0 +:. 1) 32) -- "ts_reg"'),
+    ("logged timestamp borrow register is only 21 bits", '(x +:. 1) x)\n    -- "ts_hi_m1"',
+     '(uresize (select x 20 0 +:. 1) 29) x)\n    -- "ts_hi_m1"'),
 ]
 
 # bit lanes in the engine (test_lockstep.ml lane push collisions, test_can.ml)
@@ -94,9 +98,8 @@ SPI_MUTANTS = [
     ("RX FIFO popped when its byte is loaded, not when sent",
      "when_ (rd_data &: sp Space.rx) [ rx_pop_p <--. 1 ]",
      "when_ (fall &: (bitn.value ==:. 0) &: in_data &: is_read &: sp Space.rx) [ rx_pop_p <--. 1 ]"),
-    # equivalent while timestamps are below 2^24: byte 5 is timestamp[31:24], 0 in both entries, so the early
-    # pop is invisible; a test would need 16.8 M simulated cycles
-    ("violation log popped after byte 4 (equivalent below 2^24 cycles)", "(select a 2 0 ==:. 5)) [ vlog_pop_p", "(select a 2 0 ==:. 4)) [ vlog_pop_p"),
+    # byte 5 is timestamp[31:24]: test_spi_host.ml preloads the timestamp so the two log entries straddle 2^24
+    ("violation log popped after byte 4", "(select a 2 0 ==:. 5)) [ vlog_pop_p", "(select a 2 0 ==:. 4)) [ vlog_pop_p"),
     ("coverage write goes to the incremented address", "cov_addr = mux2 cov_we_p.value cov_waddr.value (select a 9 2)",
      "cov_addr = select a 9 2"),
     ("CS_n high does not reset the bit counter", "[ bitn <--. 0; byte_idx <--. 0;", "[ byte_idx <--. 0;"),

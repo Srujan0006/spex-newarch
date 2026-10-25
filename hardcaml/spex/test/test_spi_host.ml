@@ -101,7 +101,10 @@ let%expect_test "RX FIFO read over SPI: UART receiver in Drive role" =
 
 let%expect_test "violation log over SPI: UART Check role, low stop bit" =
   let n = 32 in
-  let t = S.create () in
+  (* the timestamp crosses 2^24 between the two violations, so byte 5 of the two log
+     entries differs (it catches a log popped after byte 4) *)
+  let t = S.create ~internal:true () in
+  S.preload_timestamp t ((1 lsl 24) - 10_900);
   S.load t (Protocols.uart_rx ~pin:0 ~n);
   S.start t ~role:Layout.Role.check ~recover:0 ();
   let bad = Test_uart.frame ~n 0x41 |> List.mapi ~f:(fun k (l, d) -> if k = 9 then 0, d else l, d) in
@@ -123,8 +126,8 @@ let%expect_test "violation log over SPI: UART Check role, low stop bit" =
   printf "RX FIFO: %s\n" (hex (S.read t ~space:S.Space.rx ~addr:0 2));
   [%expect {|
     STATUS: ac
-    log entry: ts 10515 loc 2 TIMEOUT pins fe
-    log entry: ts 11283 loc 2 TIMEOUT pins fe
+    log entry: ts 16776831 loc 2 TIMEOUT pins fe
+    log entry: ts 16777599 loc 2 TIMEOUT pins fe
     STATUS after reading them: a8
     RX FIFO: 42 00
     |}]

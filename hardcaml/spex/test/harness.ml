@@ -31,13 +31,14 @@ let getb r = Bits.to_bool !r
 (** Pins pulled up, nothing else driving. *)
 let pullups ~out ~oe = out land oe lor (lnot oe land 0xFF)
 
-let rec create ?(waves = false) () =
-  let t = create_raw ~waves in
+let rec create ?(waves = false) ?(internal = false) () =
+  let t = create_raw ~waves ~internal in
   !on_create t;
   t
 
-and create_raw ~waves =
-  let sim = Sim.create (Engine.Top.create (Scope.create ~flatten_design:true ())) in
+and create_raw ~waves ~internal =
+  let config = if internal then Cyclesim.Config.trace_all else Cyclesim.Config.default in
+  let sim = Sim.create ~config (Engine.Top.create (Scope.create ~flatten_design:true ())) in
   let waves, sim =
     if waves
     then (
@@ -238,3 +239,16 @@ let clear_coverage t =
 ;;
 
 let pin_level ~out ~oe p = (pullups ~out ~oe lsr p) land 1
+
+(** Set the free-running timestamp (RTL and model together), so tests can reach
+    timestamps that would take hours of simulation. Needs [create ~internal:true]. *)
+let preload_timestamp t ts =
+  let reg name =
+    match Cyclesim.lookup_reg_by_name t.sim name with
+    | Some r -> r
+    | None -> failwith ("no register " ^ name)
+  in
+  Cyclesim.Reg.of_int (reg "ts_reg") ts;
+  Cyclesim.Reg.of_int (reg "ts_hi_m1") (((ts lsr 3) - 1) land 0x1FFF_FFFF);
+  t.model.timestamp <- ts
+;;

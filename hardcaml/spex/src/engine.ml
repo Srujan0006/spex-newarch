@@ -175,7 +175,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let rx_ovf = rv 1 in
   let vlog_ovf = rv 1 in
   let cov_ovr = rv 1 in
-  let timestamp = reg_fb spec ~width:32 ~f:(fun t -> t +:. 1) in
+  let timestamp = reg_fb spec ~width:32 ~f:(fun t -> t +:. 1) -- "ts_reg" in
   let in_idle = phase.value ==:. phase_idle in
   let in_fetch = phase.value ==:. phase_fetch in
   let in_eval = phase.value ==:. phase_eval in
@@ -328,6 +328,14 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       mux2 f0 (of_int ~width:2 0) (mux2 f1 (of_int ~width:2 1) (mux2 f2 (of_int ~width:2 2) (of_int ~width:2 3)))
     | _ -> assert false
   in
+  (* names for the formal properties (formal/spex_props.sv) *)
+  List.iteri fires ~f:(fun k f -> ignore (f -- Printf.sprintf "f_fire%d" k : Signal.t));
+  ignore (winner -- "f_winner" : Signal.t);
+  ignore (changed_all -- "f_changed_all" : Signal.t);
+  ignore (chg_now -- "f_chg_now" : Signal.t);
+  ignore (in_eval -- "f_in_eval" : Signal.t);
+  ignore (in_fetch -- "f_in_fetch" : Signal.t);
+  ignore (hdr.watch -- "f_watch" : Signal.t);
   let we = Edge.Of_signal.mux winner edges in
   let self_loop = we.target ==: cur_loc.value in
   (* ---- violations ---- *)
@@ -336,6 +344,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     in_eval &: ~:any_fire &: hdr.inv_en &: (ic >: hdr.inv_hi) &: ~:(to_logged.value)
   in
   let unexp_now = in_eval &: ~:any_fire &: (changed_all &: hdr.watch <>:. 0) in
+  ignore (unexp_now -- "f_unexp_now" : Signal.t);
   let viol_now = timeout_now |: unexp_now in
   let viol_kind_now = concat_msb [ timeout_now; unexp_now ] in
   vlog_push <== viol_now;
@@ -353,6 +362,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       (Reg_spec.override spec ~clear_to:(ones 29))
       ~width:29
       ~f:(fun x -> mux2 (select timestamp 2 0 ==:. 7) (x +:. 1) x)
+    -- "ts_hi_m1"
   in
   let age = mux2 unexp_now watched_age (zero 3) in
   let ts_lo = select timestamp 2 0 in
