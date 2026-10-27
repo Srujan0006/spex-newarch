@@ -38,6 +38,9 @@ module Host_in = struct
     ; lane0 : 'a Lane_cfg.t [@rtlprefix "lane0_"] (** bit lane CSRs (ENGINE.md, Bit lanes) *)
     ; lane1 : 'a Lane_cfg.t [@rtlprefix "lane1_"]
     ; pin_src : 'a [@bits 24] (** 3 bits per pin, [Pin_src] *)
+    ; cov_re : 'a (** the host reads coverage this cycle (refused while running) *)
+    ; lane_we : 'a [@bits 2] (** the host writes lane l's CSRs this cycle *)
+    ; err_clear : 'a (** clears host_err *)
     }
   [@@deriving hardcaml]
 end
@@ -65,6 +68,9 @@ module Status = struct
     ; rx_overflow : 'a
     ; vlog_overflow : 'a
     ; cov_overrun : 'a
+    ; host_err : 'a (** sticky: a host access was refused (ENGINE.md, Host access rules) *)
+    ; host_err_cause : 'a [@bits 3] (** first cause: 1 store write, 2 coverage, 3 lane CSR *)
+    ; lane_active : 'a [@bits 2] (** lane l is Armed or Run *)
     ; lane_status : 'a [@bits 16]
         (** per lane, lane 1 in the high byte: {done, crc_ok, sync_hit, error, 0, kind 3} *)
     }
@@ -212,7 +218,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ; go = cmd_is (Lane_cmd.go l)
         ; end_ = cmd_is (Lane_cmd.end_ l)
         ; crc_cmd = cmd_is (Lane_cmd.crc l)
-        ; reset = cmd_is Lane_cmd.reset
+        ; reset = cmd_is Lane_cmd.reset |: h.stop
         ; pins_s
         ; pins_q
         ; tx_head = tx_q
@@ -372,6 +378,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
      (to_logged stays clear), an UNEXPECTED that loses is covered by it *)
   let viol_now = timeout_now |: unexp_now |: amb_now in
   let viol_kind_now = mux2 amb_now (zero 2) (concat_msb [ timeout_now; unexp_now ]) in
+  ignore (viol_now -- "f_viol_now" : Signal.t);
+  ignore (hdr.policy -- "f_policy" : Signal.t);
   vlog_push <== viol_now;
   (* A change latched during entry is logged with the cycle it was seen, not the
      cycle EVAL got to it. *)
@@ -532,6 +540,28 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ]
   in
   let host_cov_we = h.cov_we &: in_idle &: ~:(s2_v.value) &: ~:(s1_v.value) in
+  ignore (host_cov_we -- "f_host_cov_we" : Signal.t);
+  (* host access rules: refused accesses set host_err; the first cause is kept *)
+  let recover_lat = rv 6 in
+  let host_err = rv 1 in
+  let host_err_cause = rv 3 in
+  let lane_active l = match List.nth lanes l with Some o -> o.Lane.O.active | None -> gnd in
+  let err_cause =
+    priority_select_with_default
+      [ { With_valid.valid = h.rec_we &: ~:in_idle; value = of_int ~width:3 1 }
+      ; { With_valid.valid =
+            (h.cov_we |: h.cov_re) &: ~:in_idle
+            |: (h.cov_we &: in_idle &: (s1_v.value |: s2_v.value))
+        ; value = of_int ~width:3 2
+        }
+      ; { With_valid.valid =
+            h.lane_we.:(0) &: lane_active 0 |: (h.lane_we.:(1) &: lane_active 1)
+        ; value = of_int ~width:3 3
+        }
+      ]
+      ~default:(zero 3)
+  in
+  let err_now = err_cause <>:. 0 in
   (* ---- sequential logic ---- *)
   (* prescaler: a free-running 9-bit counter, 0 at start; with /N the clocks count in
      cycles where its low log2 N bits are all 1 *)
@@ -624,7 +654,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                         [ c2 Policy.halt, [ phase <--. phase_idle; halted_viol <--. 1 ]
                         ; c2 Policy.continue, []
                         ; ( c2 Policy.recover
-                          , [ cur_loc <-- h.recover_loc
+                          , [ cur_loc <-- recover_lat.value
                             ; phase <--. phase_fetch
                             ; beat <--. 0
                             ] )
@@ -636,11 +666,16 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ; c2 3, [ phase <--. phase_idle ]
         ]
     ; when_ h.stop [ phase <--. phase_idle; poe <--. 0 ]
+    ; if_
+        h.err_clear
+        [ host_err <--. 0; host_err_cause <--. 0 ]
+        [ when_ (err_now &: ~:(host_err.value)) [ host_err <--. 1; host_err_cause <-- err_cause ] ]
     ; when_
         h.start
         [ phase <--. phase_fetch
         ; beat <--. 0
         ; cur_loc <-- h.start_loc
+        ; recover_lat <-- h.recover_loc
         ; role <-- h.role
         ; pout <--. 0
         ; poe <--. 0
@@ -685,12 +720,15 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; rx_empty
     ; vlog_data = vlog_q
     ; vlog_empty
-    ; cov_rdata = i.ram.cov_rdata
+    ; cov_rdata = mux2 in_idle i.ram.cov_rdata (zero 32)
     ; irq = ~:rx_empty |: ~:vlog_empty |: halted_viol.value |: irq_flag.value
     ; halted_viol = halted_viol.value
     ; rx_overflow = rx_ovf.value
     ; vlog_overflow = vlog_ovf.value
     ; cov_overrun = cov_ovr.value
+    ; host_err = host_err.value
+    ; host_err_cause = host_err_cause.value
+    ; lane_active = concat_lsb (List.init 2 ~f:(fun l -> match List.nth lanes l with Some o -> o.Lane.O.active | None -> gnd))
     ; lane_status =
         concat_msb
           (List.rev

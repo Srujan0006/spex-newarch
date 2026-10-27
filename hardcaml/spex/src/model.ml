@@ -31,6 +31,9 @@ type inputs =
   ; lane0 : int Lane_cfg.t
   ; lane1 : int Lane_cfg.t
   ; pin_src : int
+  ; cov_re : bool
+  ; lane_we : int
+  ; err_clear : bool
   }
 
 let zero_lane_cfg = Lane_cfg.map Lane_cfg.port_widths ~f:(fun _ -> 0)
@@ -59,6 +62,9 @@ let idle_inputs =
   ; lane0 = zero_lane_cfg
   ; lane1 = zero_lane_cfg
   ; pin_src = 0
+  ; cov_re = false
+  ; lane_we = 0
+  ; err_clear = false
   }
 ;;
 
@@ -87,6 +93,9 @@ type outputs =
   ; rx_overflow : bool
   ; vlog_overflow : bool
   ; cov_overrun : bool
+  ; host_err : bool
+  ; host_err_cause : int
+  ; lane_active : int
   ; lane_status : int
   }
 [@@deriving sexp_of, equal]
@@ -138,6 +147,9 @@ type t =
   ; lanes : Lane_model.t array
   ; rx_wait : int option array (* lane 1, engine: one-entry wait buffers *)
   ; mutable pre : int
+  ; mutable recover_lat : int
+  ; mutable host_err : bool
+  ; mutable host_err_cause : int
   ; (* coverage pipeline *)
     mutable s1 : (int * int) option (* addr, offset *)
   ; mutable s2 : (int * int * int * int) option (* addr, n, min, max *)
@@ -198,6 +210,9 @@ let create () =
     ; lanes = Array.init num_lanes ~f:(fun _ -> Lane_model.create ())
     ; rx_wait = Array.create ~len:2 None
     ; pre = 0
+    ; recover_lat = 0
+    ; host_err = false
+    ; host_err_cause = 0
     ; s1 = None
     ; s2 = None
     }
@@ -268,7 +283,7 @@ let outputs t (i : inputs) =
   ; rx_empty = Queue.is_empty t.rx_fifo
   ; vlog_data = Option.value (Queue.peek t.vlog_fifo) ~default:0
   ; vlog_empty = Queue.is_empty t.vlog_fifo
-  ; cov_rdata = t.cov_rdata
+  ; cov_rdata = (if in_idle t then t.cov_rdata else 0) (* refused while running *)
   ; irq =
       (not (Queue.is_empty t.rx_fifo))
       || (not (Queue.is_empty t.vlog_fifo))
@@ -278,6 +293,11 @@ let outputs t (i : inputs) =
   ; rx_overflow = t.rx_ovf
   ; vlog_overflow = t.vlog_ovf
   ; cov_overrun = t.cov_ovr
+  ; host_err = t.host_err
+  ; host_err_cause = t.host_err_cause
+  ; lane_active =
+      List.init num_lanes ~f:(fun l -> if Lane_model.active t.lanes.(l) then 1 lsl l else 0)
+      |> List.fold ~init:0 ~f:( lor )
   ; lane_status = lane_status t
   }
 ;;
@@ -452,6 +472,27 @@ let step t (i : inputs) =
     Array.mapi t.clocks ~f:(fun k c ->
       if act_en && bit a_rst k then 0 else if c = 0xFFFF || not tick then c else c + 1)
   in
+  (* ENGINE.md, Host access rules: a refused access sets host_err, first cause kept *)
+  let running = not (in_idle t) in
+  let lane_active l = l < num_lanes && Lane_model.active t.lanes.(l) in
+  let err_cause =
+    if i.rec_we && running
+    then 1
+    else if ((i.cov_we || i.cov_re) && running)
+            || (i.cov_we && (Option.is_some t.s1 || Option.is_some t.s2))
+    then 2 (* also a write while the coverage pipeline drains after stop *)
+    else if (bit i.lane_we 0 && lane_active 0) || (bit i.lane_we 1 && lane_active 1)
+    then 3
+    else 0
+  in
+  if i.err_clear
+  then (
+    t.host_err <- false;
+    t.host_err_cause <- 0)
+  else if err_cause <> 0 && not t.host_err
+  then (
+    t.host_err <- true;
+    t.host_err_cause <- err_cause);
   (* bit lanes: the winning edge's tx_pin field is the command when tx_pin_en = 0 *)
   let cmd = if any_fire && we.tx_pin_en = 0 then we.tx_pin else 0 in
   let tx_head = Queue.peek t.tx_fifo in
@@ -461,7 +502,7 @@ let step t (i : inputs) =
         { go = cmd = Lane_cmd.go l
         ; end_ = cmd = Lane_cmd.end_ l
         ; crc = cmd = Lane_cmd.crc l
-        ; reset = cmd = Lane_cmd.reset
+        ; reset = cmd = Lane_cmd.reset || i.stop
         }
       in
       let cfg = if l = 0 then i.lane0 else i.lane1 in
@@ -628,7 +669,7 @@ let step t (i : inputs) =
          match h.policy with
          | 1 -> ()
          | 2 ->
-           t.cur_loc <- i.recover_loc;
+           t.cur_loc <- t.recover_lat;
            t.phase <- Fetch 0
          | _ ->
            t.phase <- Idle;
@@ -642,6 +683,7 @@ let step t (i : inputs) =
   then (
     t.phase <- Fetch 0;
     t.cur_loc <- i.start_loc;
+    t.recover_lat <- i.recover_loc;
     t.role <- i.role;
     t.pout <- 0;
     t.poe <- 0;

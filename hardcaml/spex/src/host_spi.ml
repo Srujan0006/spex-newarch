@@ -10,7 +10,7 @@
     the command byte, 0 during the address, then read data.
 
     Spaces (byte addresses):
-    - 0 CSRs. Write 0x00 CTRL {irq_ack, stop, start} pulses; read 0x00 STATUS.
+    - 0 CSRs. Write 0x00 CTRL {err_clear, irq_ack, stop, start} pulses; read 0x00 STATUS.
       0x01 CONFIG {dbg_sel 5:4, cover_en 2, role 1:0}, 0x02 START_LOC, 0x03 RECOVER_LOC,
       0x04 OPEN_DRAIN, 0x05 MATCH_ADDR (read/write). Read only: 0x06 FLAGS, 0x07 CUR_LOC,
       0x08..0x0B TIMESTAMP (reading 0x08 latches bits 31:8 for 0x09..0x0B).
@@ -33,7 +33,12 @@
     select, 3 bits per pin, pin 0 in bits 2:0 of 0x10 (little-endian 24 bits).
 
     STATUS = {running, halted_viol, irq, accepting, rx_avail, vlog_avail, tx_full,
-    in_entry}. FLAGS = {rx_overflow, vlog_overflow, cov_overrun, tx_empty, 4'b0}. *)
+    in_entry}. FLAGS = {rx_overflow, vlog_overflow, cov_overrun, tx_empty, host_err,
+    host_err_cause 3}.
+
+    Host access rules (ENGINE.md): a lane-CSR write while that lane is Armed or Run is
+    dropped here and reported to the core ([lane_we]), which sets host_err; a coverage
+    read while running returns 0 ([cov_re]). *)
 
 open! Base
 open! Hardcaml
@@ -152,6 +157,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let start_p = rv 1 in
   let stop_p = rv 1 in
   let ack_p = rv 1 in
+  let err_clear_p = rv 1 in
+  let lane_we_p = rv 2 in
   let rec_we_p = rv 1 in
   let rec_waddr = rv 8 in
   let rec_w = rv 128 in
@@ -185,7 +192,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ; uresize recover_loc.value 8
       ; open_drain.value
       ; match_addr.value
-      ; concat_msb [ st.rx_overflow; st.vlog_overflow; st.cov_overrun; st.tx_empty; zero 4 ]
+      ; concat_msb
+          [ st.rx_overflow; st.vlog_overflow; st.cov_overrun; st.tx_empty; st.host_err; st.host_err_cause ]
       ; uresize st.cur_loc 8
       ; select st.timestamp 7 0
       ; select ts_snap.value 7 0
@@ -223,6 +231,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     [ start_p <--. 0
     ; stop_p <--. 0
     ; ack_p <--. 0
+    ; err_clear_p <--. 0
+    ; lane_we_p <--. 0
     ; rec_we_p <--. 0
     ; cov_we_p <--. 0
     ; tx_push_p <--. 0
@@ -246,15 +256,23 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         (wr_data &: sp Space.lanes)
         [ proc
             (List.concat_mapi lane_regs ~f:(fun l regs ->
-               List.mapi regs ~f:(fun k r ->
-                 when_ ((a.:(5) ==:. l) &: (select a 4 0 ==:. k)) [ r <-- byte ])))
+               (* refused while the lane is Armed or Run (ENGINE.md, Host access rules) *)
+               when_ (a.:(5) ==:. l) [ lane_we_p <-- of_int ~width:2 (1 lsl l) ]
+               :: List.mapi regs ~f:(fun k r ->
+                    when_
+                      ((a.:(5) ==:. l) &: (select a 4 0 ==:. k) &: ~:(st.lane_active.:(l)))
+                      [ r <-- byte ])))
         ]
     ; when_
         (wr_data &: sp Space.csr &: ~:(a.:(4)))
         [ switch
             (select a 3 0)
             [ ( of_int ~width:4 0
-              , [ start_p <-- byte.:(0); stop_p <-- byte.:(1); ack_p <-- byte.:(2) ] )
+              , [ start_p <-- byte.:(0)
+                ; stop_p <-- byte.:(1)
+                ; ack_p <-- byte.:(2)
+                ; err_clear_p <-- byte.:(3)
+                ] )
             ; of_int ~width:4 1, [ config <-- select byte 5 0 ]
             ; of_int ~width:4 2, [ start_loc <-- select byte 5 0 ]
             ; of_int ~width:4 3, [ recover_loc <-- select byte 5 0 ]
@@ -318,6 +336,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; lane0 = lane_cfg_of (List.map (List.nth_exn lane_regs 0) ~f:(fun r -> r.value))
     ; lane1 = lane_cfg_of (List.map (List.nth_exn lane_regs 1) ~f:(fun r -> r.value))
     ; pin_src = concat_msb (List.rev_map pin_src ~f:(fun r -> r.value))
+    ; cov_re = fall &: (bitn.value ==:. 0) &: in_data &: is_read &: sp Space.coverage
+    ; lane_we = lane_we_p.value
+    ; err_clear = err_clear_p.value
     }
   in
   { host; miso = active &: out_sr.value.:(7); dbg_sel = select config.value 5 4 }

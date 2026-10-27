@@ -17,6 +17,9 @@ TARGETS = {
     "Check role drives the pins": "P2 (Check role never drives)",
     "TIMEOUT logged every cycle, not once per visit": "P4 (one TIMEOUT per visit)",
     "AMBIGUOUS: suppression dropped": "P7 (ambiguous input never selects an edge)",
+    "store write while running reaches the SRAM": "P8 (no host SRAM write while running)",
+    "coverage read while running returns SRAM data": "P8 (no host SRAM write while running)",
+    "recover jumps to the live recover_loc": "P9 (recover uses the latched recover_loc)",
     "AMBIGUOUS only when no edge fires": "P7 (ambiguous input never selects an edge)",
     "AMBIGUOUS: chg_mask left out of the relevant mask": "P7 (ambiguous input never selects an edge)",
 }

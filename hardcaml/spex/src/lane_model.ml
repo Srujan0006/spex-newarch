@@ -76,6 +76,13 @@ type step =
 
 let bit v k = (v lsr k) land 1
 
+(** Armed or Run: the host may not write this lane's CSRs. *)
+let active t =
+  match t.mode with
+  | Armed | Run -> true
+  | Idle | Done -> false
+;;
+
 let flags t =
   [ Bool.equal (equal_mode t.mode Done) true; t.crc_ok; t.sync_hit; t.error ]
 ;;

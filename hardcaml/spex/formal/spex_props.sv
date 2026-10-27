@@ -10,6 +10,7 @@ module spex_props (
     input [5:0] host_start_loc, input [5:0] host_recover_loc, input [1:0] host_role,
     input [7:0] host_match_addr, input host_rx_pop, input [7:0] host_tx_data,
     input host_tx_push, input [7:0] pins_in, input host_stop, input host_start,
+    input host_cov_re, input [1:0] host_lane_we, input host_err_clear,
     // bit lanes (new-arch): lane configurations and pin source select, all free
     input host_lane0_clk_edge, input [2:0] host_lane0_clk_pin, input host_lane0_clk_pin_en, input [1:0] host_lane0_code, input host_lane0_crc_inv, input [5:0] host_lane0_crc_width, input [2:0] host_lane0_data_pin, input host_lane0_dir, input [7:0] host_lane0_div_frac, input [15:0] host_lane0_div_int, input [15:0] host_lane0_frame_bits, input [31:0] host_lane0_init, input host_lane0_lsb_first, input [31:0] host_lane0_poly, input host_lane0_readback, input [1:0] host_lane0_stuff, input [2:0] host_lane0_stuff_len, input [15:0] host_lane0_sync, input [15:0] host_lane0_sync_mask, input host_lane1_clk_edge, input [2:0] host_lane1_clk_pin, input host_lane1_clk_pin_en, input [1:0] host_lane1_code, input host_lane1_crc_inv, input [5:0] host_lane1_crc_width, input [2:0] host_lane1_data_pin, input host_lane1_dir, input [7:0] host_lane1_div_frac, input [15:0] host_lane1_div_int, input [15:0] host_lane1_frame_bits, input [31:0] host_lane1_init, input host_lane1_lsb_first, input [31:0] host_lane1_poly, input host_lane1_readback, input [1:0] host_lane1_stuff, input [2:0] host_lane1_stuff_len, input [15:0] host_lane1_sync, input [15:0] host_lane1_sync_mask, input [23:0] host_pin_src
 );
@@ -25,6 +26,9 @@ module spex_props (
     wire [7:0] ram_rec_addr, ram_cov_addr; wire ram_rec_re, ram_rec_we, ram_cov_re, ram_cov_we;
     wire [127:0] ram_rec_wdata; wire [31:0] ram_cov_wdata;
     wire [15:0] st_lane_status;
+    wire st_host_err; wire [2:0] st_host_err_cause; wire [1:0] st_lane_active;
+    wire f_viol_now, f_host_cov_we; wire [1:0] f_policy;
+    wire f_recover_jump = f_in_eval && fires == 4'd0 && f_viol_now && f_policy == 2'd2;
 
     // internal signals, made ports of spex_core by `expose` in prove.sh
     wire f_fire0, f_fire1, f_fire2, f_fire3, f_in_eval, f_in_fetch, f_unexp_now;
@@ -84,6 +88,20 @@ module spex_props (
         else if (amb_eval) amb_seen <= 1'b1;
     end
     always @* if (!init && amb_eval) assert (!amb_seen);  // A7c: at most one per fetch
+
+    // P8: while running, the host port never reaches the store's or the coverage
+    // SRAM's write enable, and a coverage read returns 0.
+    always @* if (!init && st_running) begin
+        assert (!ram_rec_we);                       // A8a: the store is only written by the host
+        assert (!f_host_cov_we);                    // A8b
+        if (host_cov_re) assert (st_cov_rdata == 32'd0);  // A8c
+    end
+
+    // P9: a recover jump goes to the recover_loc latched at the last start.
+    reg [5:0] rec_lat = 6'd0;
+    always @(posedge clock) if (host_start) rec_lat <= host_recover_loc;
+    always @(posedge clock) if (!init && !$past(init) && $past(f_recover_jump) && !$past(host_start) && !$past(host_stop))
+        assert (st_cur_loc == $past(rec_lat));     // A9
 
 `ifdef CHECK_ROLE
     // P2: in Check role the engine never drives a pin. Every start is a Check start.

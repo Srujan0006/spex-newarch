@@ -173,9 +173,40 @@ count + 1 (saturating at 255), and min/max of the edge's `v_k` (saturated to
 while S1 is busy: the same address is merged, a different address is dropped and
 `cov_overrun` is set.
 
+## Host access rules
+
+| Access | Idle | Running |
+|---|---|---|
+| `start` | starts; latches role, `start_loc`, `recover_loc` | restarts at `start_loc`; latched changes dropped |
+| `stop` | no effect | stops at the end of the cycle; both lanes reset (as the lane reset command); FIFOs kept |
+| `recover_loc` write | takes effect at the next `start` | takes effect at the next `start` |
+| Location-store write | done | **ignored, sets `host_err`** (cause 1) |
+| Coverage write | done (ignored with `host_err` cause 2 while the coverage pipeline drains after `stop`) | ignored, sets `host_err` (cause 2) |
+| Coverage read (`cov_re`) | done | ignored (read data 0), sets `host_err` (cause 2) |
+| Lane configuration CSR write (`lane_we`) | done while the lane is Idle or Done | refused while that lane is Armed or Run, sets `host_err` (cause 3) |
+| TX push / RX pop / log pop | done | done (the FIFOs are dual-access) |
+| Any access during `clear` | ignored | ignored |
+
+`host_err` is sticky until the host writes `err_clear` (CTRL bit 3); `host_err_cause`
+keeps the first cause (1 store write while running, 2 coverage access while running or
+draining, 3 lane CSR write while the lane is active). The rule covers the lanes'
+configuration CSRs only; status, write-1-to-clear and IRQ-enable bits stay writable.
+
+`stop`: the engine's pins are released (`poe = 0`) and so are lane-sourced pins (their
+enable is `poe`), so a stopped chip drives nothing. Both lanes go Idle: a partial RX byte
+is dropped, a partial TX frame is cut off and its line released. The FIFOs keep their
+bytes.
+
+A lane CSR write in the same cycle as the engine's GO for that lane lands (the lane was
+not active yet), and the frame uses it: the lane reads `frame_bits` directly at its first
+bit start (the cycle after GO at the earliest), and the registered values derived from
+the bit timing CSRs are first used at the sample point, 2 or more cycles into the bit
+(`div_int >= 4`). A write is therefore either refused (Armed or Run) or fully in place
+before the frame starts.
+
 ## Host side (core ports)
 
-`start` (role, `start_loc`), `stop` (a `start` while running restarts the engine at `start_loc` and drops the pin changes latched so far; found by formal property P3); location-store and coverage writes are ignored
+`start` (role, `start_loc`, `recover_loc`), `stop` (see Host access rules; a `start` while running restarts the engine at `start_loc` and drops the pin changes latched so far; found by formal property P3); location-store and coverage writes are ignored
 while running; TX push, RX pop, log pop. `irq` = RX not empty, or log not empty, or
 halted on violation, or an entry with `irq_on_entry` since the last `irq_ack`. FIFO
 heads are only defined when the FIFO is not empty.

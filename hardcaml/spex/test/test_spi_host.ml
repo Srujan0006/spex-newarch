@@ -192,3 +192,68 @@ let%expect_test "CAN TX configured and fed through SPI only" =
     node.stuff_errors (S.lane_status t 0) (S.status t);
   [%expect {| node received (((id 1445)(data(202 254)))), stuff errors 0; lane 0 status 80; STATUS 90 |}]
 ;;
+
+let flags t = List.hd_exn (S.read t ~space:S.Space.csr ~addr:6 1)
+
+let%expect_test "lane CSR writes: refused while the lane is Armed or Run, land in Idle or Done" =
+  let t = S.create () in
+  let open Spec in
+  (* lane 1 RX is armed and stays armed (no traffic); lane 0 stays Idle *)
+  let spec =
+    { name = "arm"
+    ; locs =
+        [ loc "s" [ edge ~goto:"w" always (nop |> lane (Layout.Lane_cmd.go 1)) ]
+        ; loc "w" ~accepting:true []
+        ]
+    }
+  in
+  let cfg = Test_can.can_cfg ~dir:1 ~frame_bits:27 in
+  S.set_lane t 1 cfg;
+  S.load t spec;
+  S.start t ();
+  S.ticks t 40;
+  printf "lane 1 armed: FLAGS %02x\n" (flags t);
+  S.set_lane t 1 { cfg with frame_bits = 35 };
+  printf "write to lane 1 while armed: FLAGS %02x (host_err, cause 3)\n" (flags t);
+  S.write t ~space:S.Space.csr ~addr:S.csr_ctrl [ 8 ];
+  S.set_lane t 0 cfg;
+  printf "write to lane 0, idle: FLAGS %02x\n" (flags t);
+  [%expect {|
+    lane 1 armed: FLAGS 10
+    write to lane 1 while armed: FLAGS 1b (host_err, cause 3)
+    write to lane 0, idle: FLAGS 10
+    |}]
+;;
+
+let%expect_test "frame_bits written while lane 0 is Done is used by the next frame" =
+  let n = Test_can.n in
+  let t = S.create () in
+  let node = Can_node.create ~n () in
+  t.device
+  <- (fun ~out ~oe ->
+       let chip = if oe land 1 = 1 then out land 1 else 1 in
+       let bus = chip land node.drive in
+       Can_node.step node ~bus;
+       0xFE lor bus);
+  S.set_pin_src t Layout.Pin_src.lane0_and_engine;
+  S.write t ~space:S.Space.csr ~addr:S.csr_open_drain [ 1 ];
+  S.load t (Protocols.can_tx ~pin:0 ~n);
+  let send (f : Can_node.frame) =
+    let bits = Test_can.frame_bits f in
+    S.set_lane t 0 (Test_can.can_cfg ~dir:0 ~frame_bits:(List.length bits));
+    S.push_tx t (Test_can.pack bits)
+  in
+  send { id = 0x111; data = [ 0xAA ] };
+  S.start t ();
+  S.ticks t (110 * n);
+  printf "lane 0 status %02x (done)\n" (S.lane_status t 0);
+  send { id = 0x222; data = [ 0x01; 0x02; 0x03; 0x04 ] };
+  S.ticks t (140 * n);
+  printf "node received %s; FLAGS %02x\n"
+    (Sexp.to_string [%sexp (List.rev node.received : Can_node.frame list)])
+    (flags t);
+  [%expect {|
+    lane 0 status 80 (done)
+    node received (((id 273)(data(170)))((id 546)(data(1 2 3 4)))); FLAGS 10
+    |}]
+;;

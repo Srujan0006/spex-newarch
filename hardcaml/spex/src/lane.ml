@@ -36,6 +36,7 @@ module O = struct
     ; sync_hit : 'a
     ; error : 'a
     ; err_kind : 'a [@bits 3] (** {lost arbitration, bit error, stuff error} *)
+    ; active : 'a (** Armed or Run: the host may not write this lane's CSRs *)
     }
   [@@deriving hardcaml]
 end
@@ -300,5 +301,6 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   ; sync_hit = sync_hit.value
   ; error = error.value
   ; err_kind = kind.value
+  ; active = in_armed |: in_run
   }
 ;;

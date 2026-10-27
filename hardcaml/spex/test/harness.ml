@@ -79,6 +79,9 @@ let model_inputs (t : t) : Model.inputs =
   ; lane0 = Layout.Lane_cfg.map h.lane0 ~f:get
   ; lane1 = Layout.Lane_cfg.map h.lane1 ~f:get
   ; pin_src = get h.pin_src
+  ; cov_re = getb h.cov_re
+  ; lane_we = get h.lane_we
+  ; err_clear = getb h.err_clear
   }
 ;;
 
@@ -107,6 +110,9 @@ let rtl_outputs (t : t) : Model.outputs =
   ; rx_overflow = getb s.rx_overflow
   ; vlog_overflow = getb s.vlog_overflow
   ; cov_overrun = getb s.cov_overrun
+  ; host_err = getb s.host_err
+  ; host_err_cause = get s.host_err_cause
+  ; lane_active = get s.lane_active
   ; lane_status = get s.lane_status
   }
 ;;

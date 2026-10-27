@@ -104,6 +104,10 @@ let run_one ~seed ~cycles =
     H.set h.cov_addr (int 256);
     H.set h.cov_we (Bool.to_int (int 40 = 0));
     H.set h.cov_wdata (int 0x3FFFFFFF);
+    H.set h.cov_re (Bool.to_int (int 30 = 0));
+    H.set h.lane_we (if int 40 = 0 then 1 + int 3 else 0);
+    H.set h.err_clear (Bool.to_int (int 200 = 0));
+    if int 300 = 0 then H.set h.recover_loc (int nlocs);
     H.set h.rec_we (Bool.to_int (int 100 = 0));
     H.set h.rec_waddr (int 256);
     H.set h.stop (Bool.to_int (int 1500 = 0));
@@ -142,9 +146,9 @@ let%expect_test "random specs: RTL and model agree on every output, every cycle"
   printf "runs ending with: coverage overrun %d, halted on violation %d, rx overflow %d, log overflow %d\n"
     stats.(1) stats.(2) stats.(3) stats.(4);
   [%expect {|
-    runs where a lane left Idle 19, cycles with a push waiting 0, runs ending with a lane error 2
+    runs where a lane left Idle 20, cycles with a push waiting 0, runs ending with a lane error 1
     300 specs x 3000 cycles = 900000 cycles in lockstep, no mismatch
-    runs ending with: coverage overrun 1, halted on violation 92, rx overflow 1, log overflow 5
+    runs ending with: coverage overrun 0, halted on violation 91, rx overflow 3, log overflow 7
     |}]
 ;;
 
