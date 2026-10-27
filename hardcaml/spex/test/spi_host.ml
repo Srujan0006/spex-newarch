@@ -97,7 +97,13 @@ let csr_timestamp = 8
 let load t (spec : Spec.t) =
   Array.iteri (Spec.compile ~warn:ignore spec) ~f:(fun loc record ->
     let bytes = List.init 64 ~f:(fun k -> Bits.to_int (Bits.select record ((8 * k) + 7) (8 * k))) in
-    write t ~space:Space.records ~addr:(loc lsl 6) bytes)
+    write t ~space:Space.records ~addr:(loc lsl 6) bytes);
+  (* image check. Simulation shortcut: only the spec's locations are written, as the
+     simulated store starts at zero; a loader on silicon writes every word. *)
+  let crc = Model.store_crc32 (Spec.store_image spec) in
+  write t ~space:Space.csr ~addr:0x18 (List.init 4 ~f:(fun k -> (crc lsr (8 * k)) land 0xFF));
+  write t ~space:Space.csr ~addr:csr_ctrl [ 0x10 ];
+  ticks t 4200
 ;;
 
 let start t ?(loc = 0) ?(recover = 0) ?(role = Layout.Role.drive) ?(cover = false) () =

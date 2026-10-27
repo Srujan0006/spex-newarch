@@ -71,6 +71,8 @@ let random_spec rs =
 
 let lane_active = ref 0
 let wait_used = ref 0
+let sweeps_matched = ref 0
+let runs_start_refused = ref 0
 
 let run_one ~seed ~cycles =
   let rs = Random.State.make [| seed |] in
@@ -108,7 +110,19 @@ let run_one ~seed ~cycles =
     H.set h.lane_we (if int 40 = 0 then 1 + int 3 else 0);
     H.set h.err_clear (Bool.to_int (int 200 = 0));
     if int 300 = 0 then H.set h.recover_loc (int nlocs);
-    H.set h.rec_we (Bool.to_int (int 100 = 0));
+    (* image check: re-verify now and then (mostly with the right CRC) so restarts after
+       a store write are possible again; a crc_expect write now and then *)
+    (* verify mostly when the image is invalid (a sweep clears image_valid while it runs) *)
+    let verify = if t.model.image_valid then int 5000 = 0 else int 20 = 0 in
+    H.set h.verify (Bool.to_int verify);
+    if verify
+    then
+      H.set h.crc_expect (if int 8 = 0 then int 0x3FFFFFFF else Model.store_crc32 t.model.rec_mem);
+    H.set h.crc_expect_we (Bool.to_int (int 3000 = 0));
+    (* store writes: mostly while running (refused, host_err); rarely while idle, where
+       they land and invalidate the image (restarts are then refused until a verify) *)
+    let running = not (Model.in_idle t.model) in
+    H.set h.rec_we (Bool.to_int (if running then int 100 = 0 else int 2000 = 0));
     H.set h.rec_waddr (int 256);
     H.set h.stop (Bool.to_int (int 1500 = 0));
     if int 700 = 0
@@ -118,11 +132,14 @@ let run_one ~seed ~cycles =
       H.set h.role (int 3);
       H.set h.cover_en (int 2))
     else H.set h.start 0;
+    let was_valid = t.model.image_valid in
     H.cycle t;
+    if t.model.image_valid && not was_valid then Int.incr sweeps_matched;
     if Array.exists t.model.lanes ~f:(fun l -> not (Lane_model.equal_mode l.mode Idle)) then active := true;
     if Array.exists t.model.rx_wait ~f:Option.is_some then Int.incr wait_used
   done;
   if !active then Int.incr lane_active;
+  if t.model.host_err_cause = 4 then Int.incr runs_start_refused;
   t
 ;;
 
@@ -142,13 +159,16 @@ let%expect_test "random specs: RTL and model agree on every output, every cycle"
   done;
   printf "runs where a lane left Idle %d, cycles with a push waiting %d, runs ending with a lane error %d\n"
     !lane_active !wait_used stats.(5);
+  printf "image checks passed during the runs %d, runs whose first host error is a refused start %d\n"
+    !sweeps_matched !runs_start_refused;
   printf "%d specs x %d cycles = %d cycles in lockstep, no mismatch\n" specs cycles (specs * cycles);
   printf "runs ending with: coverage overrun %d, halted on violation %d, rx overflow %d, log overflow %d\n"
     stats.(1) stats.(2) stats.(3) stats.(4);
   [%expect {|
-    runs where a lane left Idle 20, cycles with a push waiting 0, runs ending with a lane error 1
+    runs where a lane left Idle 17, cycles with a push waiting 0, runs ending with a lane error 1
+    image checks passed during the runs 0, runs whose first host error is a refused start 1
     300 specs x 3000 cycles = 900000 cycles in lockstep, no mismatch
-    runs ending with: coverage overrun 0, halted on violation 91, rx overflow 3, log overflow 7
+    runs ending with: coverage overrun 0, halted on violation 123, rx overflow 3, log overflow 7
     |}]
 ;;
 

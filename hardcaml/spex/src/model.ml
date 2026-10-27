@@ -34,6 +34,9 @@ type inputs =
   ; cov_re : bool
   ; lane_we : int
   ; err_clear : bool
+  ; verify : bool
+  ; crc_expect : int
+  ; crc_expect_we : bool
   }
 
 let zero_lane_cfg = Lane_cfg.map Lane_cfg.port_widths ~f:(fun _ -> 0)
@@ -65,6 +68,9 @@ let idle_inputs =
   ; cov_re = false
   ; lane_we = 0
   ; err_clear = false
+  ; verify = false
+  ; crc_expect = 0
+  ; crc_expect_we = false
   }
 ;;
 
@@ -93,6 +99,8 @@ type outputs =
   ; rx_overflow : bool
   ; vlog_overflow : bool
   ; cov_overrun : bool
+  ; image_valid : bool
+  ; verify_busy : bool
   ; host_err : bool
   ; host_err_cause : int
   ; lane_active : int
@@ -149,6 +157,9 @@ type t =
   ; mutable pre : int
   ; mutable recover_lat : int
   ; mutable host_err : bool
+  ; mutable image_valid : bool
+  ; mutable sweeping : bool
+  ; mutable sw_cnt : int
   ; mutable host_err_cause : int
   ; (* coverage pipeline *)
     mutable s1 : (int * int) option (* addr, offset *)
@@ -212,6 +223,9 @@ let create () =
     ; pre = 0
     ; recover_lat = 0
     ; host_err = false
+    ; image_valid = false
+    ; sweeping = false
+    ; sw_cnt = 0
     ; host_err_cause = 0
     ; s1 = None
     ; s2 = None
@@ -283,7 +297,9 @@ let outputs t (i : inputs) =
   ; rx_empty = Queue.is_empty t.rx_fifo
   ; vlog_data = Option.value (Queue.peek t.vlog_fifo) ~default:0
   ; vlog_empty = Queue.is_empty t.vlog_fifo
-  ; cov_rdata = (if in_idle t then t.cov_rdata else 0) (* refused while running *)
+  ; cov_rdata =
+      (* refused while running or while the image check sweep runs *)
+      (if in_idle t && not t.sweeping then t.cov_rdata else 0)
   ; irq =
       (not (Queue.is_empty t.rx_fifo))
       || (not (Queue.is_empty t.vlog_fifo))
@@ -293,6 +309,8 @@ let outputs t (i : inputs) =
   ; rx_overflow = t.rx_ovf
   ; vlog_overflow = t.vlog_ovf
   ; cov_overrun = t.cov_ovr
+  ; image_valid = t.image_valid
+  ; verify_busy = t.sweeping
   ; host_err = t.host_err
   ; host_err_cause = t.host_err_cause
   ; lane_active =
@@ -300,6 +318,21 @@ let outputs t (i : inputs) =
       |> List.fold ~init:0 ~f:( lor )
   ; lane_status = lane_status t
   }
+;;
+
+(** CRC-32 (IEEE 802.3, as zlib's crc32) over the whole location store: words in address
+    order, each as 16 bytes little-endian. *)
+let store_crc32 (mem : Hardcaml.Bits.t array) =
+  let crc = ref 0xFFFF_FFFF in
+  Array.iter mem ~f:(fun w ->
+    for k = 0 to 15 do
+      let b = Hardcaml.Bits.to_int (Hardcaml.Bits.select w ((8 * k) + 7) (8 * k)) in
+      crc := !crc lxor b;
+      for _ = 1 to 8 do
+        crc := if !crc land 1 = 1 then (!crc lsr 1) lxor 0xEDB8_8320 else !crc lsr 1
+      done
+    done);
+  !crc lxor 0xFFFF_FFFF
 ;;
 
 let reverse8 v =
@@ -483,6 +516,10 @@ let step t (i : inputs) =
     then 2 (* also a write while the coverage pipeline drains after stop *)
     else if (bit i.lane_we 0 && lane_active 0) || (bit i.lane_we 1 && lane_active 1)
     then 3
+    else if i.start && not t.image_valid
+    then 4 (* start refused: the store has not passed the image check *)
+    else if t.sweeping && (i.rec_we || i.cov_we || i.cov_re)
+    then 5 (* busy: the image check sweep owns the store *)
     else 0
   in
   if i.err_clear
@@ -526,13 +563,38 @@ let step t (i : inputs) =
   in
   (* SRAM accesses this cycle (single port each) *)
   let fetch_rd = match t.phase with Fetch b when b < beats -> Some b | _ -> None in
-  let host_cov_we = i.cov_we && in_idle t && Option.is_none t.s2 && Option.is_none t.s1 in
+  let host_cov_we =
+    i.cov_we && in_idle t && Option.is_none t.s2 && Option.is_none t.s1 && not t.sweeping
+  in
   let n_rec_rdata =
     match fetch_rd with
     | Some b -> t.rec_mem.((t.cur_loc lsl 2) lor b)
     | None -> t.rec_rdata
   in
-  if Option.is_none fetch_rd && i.rec_we && in_idle t then t.rec_mem.(i.rec_waddr) <- i.rec_wdata;
+  let store_we = i.rec_we && in_idle t && not t.sweeping in
+  if Option.is_none fetch_rd && store_we then t.rec_mem.(i.rec_waddr) <- i.rec_wdata;
+  (* ENGINE.md, Image validation: a sweep over the whole store (256 words, 16 bytes
+     each, little-endian) computes CRC-32; only a match sets image_valid *)
+  let verify_go = i.verify && in_idle t && not t.sweeping in
+  let sweep_abort = t.sweeping && (i.start || i.rec_we || i.crc_expect_we) in
+  let start_ok = i.start && t.image_valid in
+  if store_we || i.crc_expect_we then t.image_valid <- false;
+  if verify_go
+  then (
+    t.sweeping <- true;
+    t.sw_cnt <- 0;
+    t.image_valid <- false)
+  else if t.sweeping
+  then (
+    if t.sw_cnt = 4096
+    then (
+      t.sweeping <- false;
+      t.image_valid <- store_crc32 t.rec_mem = i.crc_expect);
+    if sweep_abort
+    then (
+      t.sweeping <- false;
+      t.image_valid <- false);
+    t.sw_cnt <- t.sw_cnt + 1);
   let cov_read_addr =
     match t.s1 with
     | Some (a, _) -> a
@@ -679,7 +741,7 @@ let step t (i : inputs) =
     t.phase <- Idle;
     t.poe <- 0);
   t.pre <- (t.pre + 1) land 511;
-  if i.start
+  if start_ok
   then (
     t.phase <- Fetch 0;
     t.cur_loc <- i.start_loc;

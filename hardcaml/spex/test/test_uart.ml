@@ -65,7 +65,7 @@ let%expect_test "UART TX, 16 cycles per bit" =
     byte 0x55 framing ok
     every pin interval is a whole number of bits: true
     shortest interval 16 cycles
-    lockstep RTL = model for 852 cycles
+    lockstep RTL = model for 4951 cycles
     |}]
 ;;
 
@@ -78,7 +78,7 @@ let%expect_test "UART TX at 115200 baud from a 40 MHz clock" =
   [%expect {|
     SPEX
     all intervals multiple of 347: true
-    lockstep RTL = model for 14594 cycles
+    lockstep RTL = model for 18693 cycles
     |}]
 ;;
 
@@ -160,10 +160,10 @@ let%expect_test "UART Check role: exact violation timestamps" =
   printf "engine never drove the pins: oe = %d\n" (H.get t.o.pins_oe);
   [%expect {|
     decoded: 31 33
-    TIMEOUT    at cycle 710 in location 2
-    UNEXPECTED at cycle 825 in location 1
-    expected: TIMEOUT at 710 (stop-bit centre 707 + 2 sync + 1)
-    expected: UNEXPECTED at 825 (glitch edge 823 + 2 sync)
+    TIMEOUT    at cycle 4809 in location 2
+    UNEXPECTED at cycle 4924 in location 1
+    expected: TIMEOUT at 4809 (stop-bit centre 4806 + 2 sync + 1)
+    expected: UNEXPECTED at 4924 (glitch edge 4922 + 2 sync)
     engine never drove the pins: oe = 0
     |}]
 ;;

@@ -12,12 +12,14 @@ module W = Hardcaml_waveterm
 let%expect_test "waveform: UART TX, 8 cycles per bit" =
   let t = H.create ~waves:true () in
   H.load t (Protocols.uart_tx ~pin:0 ~n:8 ());
+  (* the display starts where the load (writes and image check) ends *)
+  let loaded = t.cycle in
   H.start t ();
   H.push_tx t [ 0xA5 ];
   H.cycles t 95;
   let waves = Option.value_exn t.waves in
   W.Waveform.print
-    ~start_cycle:12
+    ~start_cycle:loaded
     ~display_width:130
     ~display_height:16
     ~wave_width:(-1)

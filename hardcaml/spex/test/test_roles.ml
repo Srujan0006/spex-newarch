@@ -41,7 +41,7 @@ let%expect_test "Stress: one UART spec, bit window 32 +/- 4 cycles" =
     Drive          : 28x39
     Stress at_lo   : 28x39
     Stress at_hi   : 36x39
-    Stress random  : 28x4 29x2 31x3 32x2 33x1 34x2 35x1 36x24
+    Stress random  : 28x1 30x1 31x1 33x1 34x1 35x1 36x33
     |}]
 ;;
 

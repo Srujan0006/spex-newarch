@@ -82,6 +82,9 @@ let model_inputs (t : t) : Model.inputs =
   ; cov_re = getb h.cov_re
   ; lane_we = get h.lane_we
   ; err_clear = getb h.err_clear
+  ; verify = getb h.verify
+  ; crc_expect = get h.crc_expect
+  ; crc_expect_we = getb h.crc_expect_we
   }
 ;;
 
@@ -110,6 +113,8 @@ let rtl_outputs (t : t) : Model.outputs =
   ; rx_overflow = getb s.rx_overflow
   ; vlog_overflow = getb s.vlog_overflow
   ; cov_overrun = getb s.cov_overrun
+  ; image_valid = getb s.image_valid
+  ; verify_busy = getb s.verify_busy
   ; host_err = getb s.host_err
   ; host_err_cause = get s.host_err_cause
   ; lane_active = get s.lane_active
@@ -166,7 +171,18 @@ let load t (spec : Spec.t) =
       set h.rec_waddr ((loc lsl 2) lor b);
       h.rec_wdata := word;
       pulse t h.rec_we 1));
-  h.rec_wdata := Bits.zero 128
+  h.rec_wdata := Bits.zero 128;
+  (* image check: the simulated store starts at zero, so the spec's records plus zeros
+     are the whole store; a loader on silicon writes every word *)
+  set h.crc_expect (Model.store_crc32 (Spec.store_image spec));
+  pulse t h.crc_expect_we 1;
+  pulse t h.verify 1;
+  let n = ref 0 in
+  while getb t.o.status.verify_busy && !n < 5000 do
+    cycle t;
+    Int.incr n
+  done;
+  if not (getb t.o.status.image_valid) then failwith "load: image check failed"
 ;;
 
 let start t ?(loc = 0) ?(role = Layout.Role.drive) () =

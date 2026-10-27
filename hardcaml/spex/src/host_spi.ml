@@ -28,6 +28,11 @@
       clk_pin 3}, 5 {stuff_len 3, stuff 2}, 6 crc_width, 8-11 poly, 12-15 init, 16-17
       sync, 18-19 sync_mask, 20-21 frame_bits (all little-endian).
 
+    CSRs 0x13 (read) {image_valid, verify_busy, 6'b0}; 0x14 (read) format version; 0x15
+    (read) caps {lanes 4, edges per location 4}; 0x16 (read) record bits / 16; 0x17 (read)
+    locations; 0x18..0x1B crc_expect (little-endian; any write clears image_valid); CTRL
+    bit 4 = verify (ENGINE.md, Image validation).
+
     CSRs 0x0C / 0x0D (read): lane 0 / 1 status {done, crc_ok, sync_hit, error, 0,
     kind: lost arbitration, bit error, stuff error}. 0x10..0x12 (read/write): pin source
     select, 3 bits per pin, pin 0 in bits 2:0 of 0x10 (little-endian 24 bits).
@@ -76,6 +81,10 @@ module Space = struct
 end
 
 let lane_bytes = 22
+
+(** Record and CSR format of this chip; the host loader refuses an image built for
+    another version (CSR 0x14). *)
+let format_version = 1
 
 (** The lane configuration from its CSR bytes (layout in the module comment). *)
 let lane_cfg_of (b : Signal.t list) : Signal.t Layout.Lane_cfg.t =
@@ -152,6 +161,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let match_addr = rv 8 in
   let ts_snap = rv 24 in
   let pin_src = List.init 3 ~f:(fun _ -> rv 8) in
+  let crc_expect = List.init 4 ~f:(fun _ -> rv 8) in
+  let crc_we_p = rv 1 in
+  let verify_p = rv 1 in
   let lane_regs = List.init 2 ~f:(fun _ -> List.init lane_bytes ~f:(fun _ -> rv 8)) in
   (* host-side strobes and data, one cycle after the byte that causes them *)
   let start_p = rv 1 in
@@ -208,7 +220,17 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let csr_rd =
     mux2
       a.:(4)
-      (mux (select a 1 0) (List.map pin_src ~f:(fun r -> r.value) @ [ zero 8 ]))
+      (mux
+         (select a 3 0)
+         (List.map pin_src ~f:(fun r -> r.value)
+          @ [ concat_msb [ st.image_valid; st.verify_busy; zero 6 ]
+            ; of_int ~width:8 format_version
+            ; of_int ~width:8 ((Engine.num_lanes lsl 4) lor Layout.num_edges)
+            ; of_int ~width:8 (Layout.record_bits / 16)
+            ; of_int ~width:8 Layout.num_locs
+            ]
+          @ List.map crc_expect ~f:(fun r -> r.value)
+          @ [ zero 8 ]))
       csr_rd
   in
   let data_rd =
@@ -232,6 +254,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; stop_p <--. 0
     ; ack_p <--. 0
     ; err_clear_p <--. 0
+    ; crc_we_p <--. 0
+    ; verify_p <--. 0
     ; lane_we_p <--. 0
     ; rec_we_p <--. 0
     ; cov_we_p <--. 0
@@ -251,7 +275,11 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; (* writes *)
       when_
         (wr_data &: sp Space.csr &: a.:(4))
-        [ proc (List.mapi pin_src ~f:(fun k r -> when_ (select a 1 0 ==:. k) [ r <-- byte ])) ]
+        [ proc (List.mapi pin_src ~f:(fun k r -> when_ (select a 3 0 ==:. k) [ r <-- byte ]))
+        ; proc
+            (List.mapi crc_expect ~f:(fun k r ->
+               when_ (select a 3 0 ==:. 8 + k) [ r <-- byte; crc_we_p <--. 1 ]))
+        ]
     ; when_
         (wr_data &: sp Space.lanes)
         [ proc
@@ -272,6 +300,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                 ; stop_p <-- byte.:(1)
                 ; ack_p <-- byte.:(2)
                 ; err_clear_p <-- byte.:(3)
+                ; verify_p <-- byte.:(4)
                 ] )
             ; of_int ~width:4 1, [ config <-- select byte 5 0 ]
             ; of_int ~width:4 2, [ start_loc <-- select byte 5 0 ]
@@ -339,6 +368,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; cov_re = fall &: (bitn.value ==:. 0) &: in_data &: is_read &: sp Space.coverage
     ; lane_we = lane_we_p.value
     ; err_clear = err_clear_p.value
+    ; verify = verify_p.value
+    ; crc_expect = concat_msb (List.rev_map crc_expect ~f:(fun r -> r.value))
+    ; crc_expect_we = crc_we_p.value
     }
   in
   { host; miso = active &: out_sr.value.:(7); dbg_sel = select config.value 5 4 }

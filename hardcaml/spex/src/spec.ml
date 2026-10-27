@@ -287,6 +287,19 @@ let compile ?(warn = fun s -> Stdio.eprintf "warning: %s\n%!" s) (t : t) : Bits.
   |> Array.of_list
 ;;
 
+(** The whole location store as the loader writes it: the spec's records, then zero
+    records (no valid edges) up to [num_locs], 4 words each. The image check (CRC-32 over
+    the whole store) needs every word written. *)
+let store_image (t : t) =
+  let records = compile ~warn:ignore t in
+  Array.init (num_locs * beats) ~f:(fun a ->
+    let loc = a / beats
+    and b = a % beats in
+    if loc < Array.length records
+    then Bits.select records.(loc) (((b + 1) * beat_bits) - 1) (b * beat_bits)
+    else Bits.zero beat_bits)
+;;
+
 (** Split a record into the 128-bit words written to the location store at
     address {loc, beat}. *)
 let beats_of record =

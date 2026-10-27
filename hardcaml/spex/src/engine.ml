@@ -41,6 +41,9 @@ module Host_in = struct
     ; cov_re : 'a (** the host reads coverage this cycle (refused while running) *)
     ; lane_we : 'a [@bits 2] (** the host writes lane l's CSRs this cycle *)
     ; err_clear : 'a (** clears host_err *)
+    ; verify : 'a (** start the image check sweep (idle only) *)
+    ; crc_expect : 'a [@bits 32] (** CRC-32 the host expects over the whole store *)
+    ; crc_expect_we : 'a (** crc_expect was written: clears image_valid *)
     }
   [@@deriving hardcaml]
 end
@@ -71,6 +74,8 @@ module Status = struct
     ; host_err : 'a (** sticky: a host access was refused (ENGINE.md, Host access rules) *)
     ; host_err_cause : 'a [@bits 3] (** first cause: 1 store write, 2 coverage, 3 lane CSR *)
     ; lane_active : 'a [@bits 2] (** lane l is Armed or Run *)
+    ; image_valid : 'a (** the store passed the last image check; start needs it *)
+    ; verify_busy : 'a (** the image check sweep is running *)
     ; lane_status : 'a [@bits 16]
         (** per lane, lane 1 in the high byte: {done, crc_ok, sync_hit, error, 0, kind 3} *)
     }
@@ -539,7 +544,34 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ; mux2 fresh s2_max (umax old_max s2_max)
       ]
   in
-  let host_cov_we = h.cov_we &: in_idle &: ~:(s2_v.value) &: ~:(s1_v.value) in
+  (* ---- image check (ENGINE.md, Image validation): a sweep over the whole store
+     computes CRC-32 (zlib) one byte per cycle; image_valid only from a matching sweep ---- *)
+  let image_valid = rv 1 in
+  let sweeping = rv 1 in
+  let sw_cnt = rv 13 in
+  let sw_crc = Variable.reg (Reg_spec.override spec ~clear_to:(ones 32)) ~width:32 in
+  let sw_byte =
+    mux
+      (select (sw_cnt.value -:. 1) 3 0)
+      (List.init 16 ~f:(fun k -> select i.ram.rec_rdata ((8 * k) + 7) (8 * k)))
+  in
+  let crc_byte crc b =
+    List.fold (List.init 8 ~f:Fn.id) ~init:(crc ^: uresize b 32) ~f:(fun c _ ->
+      mux2 c.:(0) (srl c 1 ^: of_int ~width:32 0xEDB88320) (srl c 1))
+  in
+  let sw_crc_next = crc_byte sw_crc.value sw_byte in
+  let sw_last = sw_cnt.value ==:. 4096 in
+  let sw_match = sw_crc_next ^: ones 32 ==: h.crc_expect in
+  let verify_go = h.verify &: in_idle &: ~:(sweeping.value) in
+  let sweep_abort = sweeping.value &: (h.start |: h.rec_we |: h.crc_expect_we) in
+  let store_we = h.rec_we &: in_idle &: ~:(sweeping.value) in
+  let start_ok = h.start &: image_valid.value in
+  ignore (image_valid.value -- "f_image_valid" : Signal.t);
+  ignore (sweeping.value -- "f_sweeping" : Signal.t);
+  ignore (sw_last -- "f_sw_last" : Signal.t);
+  ignore (sw_match -- "f_sw_match" : Signal.t);
+  ignore (store_we -- "f_store_we" : Signal.t);
+  let host_cov_we = h.cov_we &: in_idle &: ~:(s2_v.value) &: ~:(s1_v.value) &: ~:(sweeping.value) in
   ignore (host_cov_we -- "f_host_cov_we" : Signal.t);
   (* host access rules: refused accesses set host_err; the first cause is kept *)
   let recover_lat = rv 6 in
@@ -557,6 +589,10 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ; { With_valid.valid =
             h.lane_we.:(0) &: lane_active 0 |: (h.lane_we.:(1) &: lane_active 1)
         ; value = of_int ~width:3 3
+        }
+      ; { With_valid.valid = h.start &: ~:(image_valid.value); value = of_int ~width:3 4 }
+      ; { With_valid.valid = sweeping.value &: (h.rec_we |: h.cov_we |: h.cov_re)
+        ; value = of_int ~width:3 5
         }
       ]
       ~default:(zero 3)
@@ -666,12 +702,24 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ; c2 3, [ phase <--. phase_idle ]
         ]
     ; when_ h.stop [ phase <--. phase_idle; poe <--. 0 ]
+    ; (* image check *)
+      when_ (store_we |: h.crc_expect_we) [ image_valid <--. 0 ]
+    ; when_
+        verify_go
+        [ sweeping <--. 1; sw_cnt <--. 0; sw_crc <-- ones 32; image_valid <--. 0 ]
+    ; when_
+        sweeping.value
+        [ sw_cnt <-- sw_cnt.value +:. 1
+        ; when_ (sw_cnt.value <>:. 0) [ sw_crc <-- sw_crc_next ]
+        ; when_ sw_last [ sweeping <--. 0; image_valid <-- sw_match ]
+        ; when_ sweep_abort [ sweeping <--. 0; image_valid <--. 0 ]
+        ]
     ; if_
         h.err_clear
         [ host_err <--. 0; host_err_cause <--. 0 ]
         [ when_ (err_now &: ~:(host_err.value)) [ host_err <--. 1; host_err_cause <-- err_cause ] ]
     ; when_
-        h.start
+        start_ok
         [ phase <--. phase_fetch
         ; beat <--. 0
         ; cur_loc <-- h.start_loc
@@ -693,9 +741,13 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   (* ---- SRAM ports ---- *)
   let fetch_rd = in_fetch &: (beat.value <:. beats) in
   let ram : _ Ram_out.t =
-    { rec_addr = mux2 fetch_rd (concat_msb [ cur_loc.value; select beat.value 1 0 ]) h.rec_waddr
-    ; rec_re = fetch_rd
-    ; rec_we = h.rec_we &: in_idle
+    { rec_addr =
+        mux2
+          fetch_rd
+          (concat_msb [ cur_loc.value; select beat.value 1 0 ])
+          (mux2 sweeping.value (select sw_cnt.value 11 4) h.rec_waddr)
+    ; rec_re = fetch_rd |: sweeping.value
+    ; rec_we = store_we
     ; rec_wdata = h.rec_wdata
     ; cov_addr =
         mux2 s2_v.value s2_addr.value (mux2 s1_v.value s1_addr.value h.cov_addr)
@@ -720,12 +772,14 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; rx_empty
     ; vlog_data = vlog_q
     ; vlog_empty
-    ; cov_rdata = mux2 in_idle i.ram.cov_rdata (zero 32)
+    ; cov_rdata = mux2 (in_idle &: ~:(sweeping.value)) i.ram.cov_rdata (zero 32)
     ; irq = ~:rx_empty |: ~:vlog_empty |: halted_viol.value |: irq_flag.value
     ; halted_viol = halted_viol.value
     ; rx_overflow = rx_ovf.value
     ; vlog_overflow = vlog_ovf.value
     ; cov_overrun = cov_ovr.value
+    ; image_valid = image_valid.value
+    ; verify_busy = sweeping.value
     ; host_err = host_err.value
     ; host_err_cause = host_err_cause.value
     ; lane_active = concat_lsb (List.init 2 ~f:(fun l -> match List.nth lanes l with Some o -> o.Lane.O.active | None -> gnd))

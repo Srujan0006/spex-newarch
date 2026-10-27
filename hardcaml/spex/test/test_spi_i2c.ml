@@ -200,7 +200,7 @@ let%expect_test "I2C: nobody at the address -> NACK is a TIMEOUT, then STOP" =
   run_i2c ~addr_on_bus:0x51 ~stretch:0 [];
   [%expect {|
     bus: START A:a2- STOP
-    TIMEOUT in ack_hi at cycle 1025
+    TIMEOUT in ack_hi at cycle 5124
     longest SCL low: 75 cycles
     |}]
 ;;

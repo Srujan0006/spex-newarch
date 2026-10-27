@@ -20,6 +20,9 @@ TARGETS = {
     "store write while running reaches the SRAM": "P8 (no host SRAM write while running)",
     "coverage read while running returns SRAM data": "P8 (no host SRAM write while running)",
     "recover jumps to the live recover_loc": "P9 (recover uses the latched recover_loc)",
+    "image_valid set by a crc_expect write": "P11 (image_valid only from a matching sweep)",
+    "the image check sweep skips the last word": "P11 (image_valid only from a matching sweep)",
+    "start allowed while the image is invalid": "P10 (never leaves IDLE while the image is invalid)",
     "AMBIGUOUS only when no edge fires": "P7 (ambiguous input never selects an edge)",
     "AMBIGUOUS: chg_mask left out of the relevant mask": "P7 (ambiguous input never selects an edge)",
 }

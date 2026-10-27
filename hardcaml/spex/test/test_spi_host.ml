@@ -53,8 +53,8 @@ let%expect_test "UART spec loaded, started and fed through SPI only; bytes decod
   uart_tx_over_spi ~half:3 ~n:16 bytes;
   uart_tx_over_spi ~half:8 ~n:16 bytes;
   [%expect {|
-    SCK half period 3 clocks: uio[0] decodes to 53 50 45 58 00 ff 55 (framing ok), 11700 cycles
-    SCK half period 8 clocks: uio[0] decodes to 53 50 45 58 00 ff 55 (framing ok), 29440 cycles
+    SCK half period 3 clocks: uio[0] decodes to 53 50 45 58 00 ff 55 (framing ok), 16458 cycles
+    SCK half period 8 clocks: uio[0] decodes to 53 50 45 58 00 ff 55 (framing ok), 35128 cycles
     |}]
 ;;
 
@@ -104,7 +104,7 @@ let%expect_test "violation log over SPI: UART Check role, low stop bit" =
   (* the timestamp crosses 2^24 between the two violations, so byte 5 of the two log
      entries differs (it catches a log popped after byte 4) *)
   let t = S.create ~internal:true () in
-  S.preload_timestamp t ((1 lsl 24) - 10_900);
+  S.preload_timestamp t ((1 lsl 24) - 15_658);
   S.load t (Protocols.uart_rx ~pin:0 ~n);
   S.start t ~role:Layout.Role.check ~recover:0 ();
   let bad = Test_uart.frame ~n 0x41 |> List.mapi ~f:(fun k (l, d) -> if k = 9 then 0, d else l, d) in

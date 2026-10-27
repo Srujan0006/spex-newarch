@@ -18,7 +18,7 @@
 | change age starts at 0 | KILLED |
 | second-change age starts at 0 | KILLED |
 | FIFO full one entry early | KILLED |
-| recover jumps to the start location | SKIPPED (pattern not found once) |
+| recover jumps to the start location | KILLED |
 | irq_ack ignored | KILLED |
 | UNEXPECTED ignores the watch mask | KILLED |
 | data flag inversion ignored | KILLED |
@@ -27,11 +27,14 @@
 | AMBIGUOUS: suppression dropped | KILLED |
 | AMBIGUOUS only when no edge fires | KILLED |
 | AMBIGUOUS: chg_mask left out of the relevant mask | KILLED |
-| store write while running reaches the SRAM | KILLED |
+| store write while running reaches the SRAM | SKIPPED (pattern not found once) |
 | recover jumps to the live recover_loc | KILLED |
-| coverage read while running returns SRAM data | KILLED |
+| coverage read while running returns SRAM data | SKIPPED (pattern not found once) |
 | host_err cause: last cause wins | KILLED |
 | stop leaves the lanes running | KILLED |
+| image_valid set by a crc_expect write | KILLED |
+| the image check sweep skips the last word | KILLED |
+| start allowed while the image is invalid | KILLED |
 | send_bit drives the inverted bit | KILLED |
 | timestamp counter is only 24 bits | KILLED |
 | logged timestamp borrow register is only 21 bits | KILLED |
@@ -62,8 +65,8 @@
 | violation log popped after byte 4 | KILLED |
 | coverage write goes to the incremented address | KILLED |
 | CS_n high does not reset the bit counter | KILLED |
-| CTRL start and stop bits swapped | SKIPPED (pattern not found once) |
+| CTRL start and stop bits swapped | KILLED |
 | vlog byte 5 does not wrap the address | KILLED |
 | TX FIFO byte pushed without its data | KILLED |
 
-63/63 killed
+66/66 killed

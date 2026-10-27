@@ -65,6 +65,11 @@ MUTANTS = [
     ("host_err cause: last cause wins", "[ when_ (err_now &: ~:(host_err.value)) [ host_err <--. 1; host_err_cause <-- err_cause ] ]",
      "[ when_ err_now [ host_err <--. 1; host_err_cause <-- err_cause ] ]"),
     ("stop leaves the lanes running", "; reset = cmd_is Lane_cmd.reset |: h.stop", "; reset = cmd_is Lane_cmd.reset"),
+    # image validation (test_image.ml, formal P10 / P11)
+    ("image_valid set by a crc_expect write", "when_ (store_we |: h.crc_expect_we) [ image_valid <--. 0 ]",
+     "when_ store_we [ image_valid <--. 0 ]; when_ h.crc_expect_we [ image_valid <--. 1 ]"),
+    ("the image check sweep skips the last word", "let sw_last = sw_cnt.value ==:. 4096 in", "let sw_last = sw_cnt.value ==:. 4080 in"),
+    ("start allowed while the image is invalid", "let start_ok = h.start &: image_valid.value in", "let start_ok = h.start in"),
     ("send_bit drives the inverted bit", "(sresize tx_sr.value.:(0) 8 &: tmask)", "(sresize ~:(tx_sr.value.:(0)) 8 &: tmask)"),
     ("timestamp counter is only 24 bits", 'reg_fb spec ~width:32 ~f:(fun t -> t +:. 1) -- "ts_reg"',
      'reg_fb spec ~width:32 ~f:(fun t -> uresize (select t 23 0 +:. 1) 32) -- "ts_reg"'),

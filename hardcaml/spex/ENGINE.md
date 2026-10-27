@@ -189,7 +189,8 @@ while S1 is busy: the same address is merged, a different address is dropped and
 
 `host_err` is sticky until the host writes `err_clear` (CTRL bit 3); `host_err_cause`
 keeps the first cause (1 store write while running, 2 coverage access while running or
-draining, 3 lane CSR write while the lane is active). The rule covers the lanes'
+draining, 3 lane CSR write while the lane is active, 4 start while the image is not
+valid, 5 store or coverage access during the image check sweep). The rule covers the lanes'
 configuration CSRs only; status, write-1-to-clear and IRQ-enable bits stay writable.
 
 `stop`: the engine's pins are released (`poe = 0`) and so are lane-sourced pins (their
@@ -203,6 +204,31 @@ bit start (the cycle after GO at the earliest), and the registered values derive
 the bit timing CSRs are first used at the sample point, 2 or more cycles into the bit
 (`div_int >= 4`). A write is therefore either refused (Armed or Run) or fully in place
 before the frame starts.
+
+## Image validation
+
+The host validates format and compatibility; the chip permits execution only of bytes
+whose read-back CRC matches the approved digest.
+
+- Read-only CSRs: `format_version` (1) and `caps` (lanes, edges per location, record
+  bits / 16, locations). The host loader checks the image header (magic, format version,
+  location count, caps required, CRC-32) against them and the CRC over the file **before
+  writing anything**, and writes unused locations as zero records, so the image always
+  covers the whole store.
+- CRC: CRC-32 as zlib's `crc32` (IEEE 802.3, reflected, initial and final XOR all ones)
+  over the **whole store**, the 256 words in address order, each as 16 bytes
+  little-endian (byte 0 = bits 7:0).
+- `image_valid` is owned by the hardware; the host cannot set it. Any accepted store
+  write clears it, and so does a `crc_expect` write.
+- `verify` (idle only) starts a sweep: the chip reads the store one word at a time and
+  feeds one byte per cycle into the CRC, 4097 cycles in all (about 0.1 ms at 40 MHz),
+  with `image_valid` 0 meanwhile. At the end `image_valid` = (CRC == `crc_expect`).
+- During the sweep the store belongs to it: host store writes and coverage accesses are
+  refused (`host_err` cause 5, BUSY). A store write, a `start`, a `crc_expect` write or
+  `clear` aborts the sweep and leaves `image_valid` 0; a refused coverage access does
+  not abort it.
+- `start` while `image_valid = 0` is refused and sets `host_err` cause 4. A refused start
+  latches nothing (`role`, `start_loc`, `recover_loc` stay as they were).
 
 ## Host side (core ports)
 
