@@ -111,6 +111,8 @@ type t =
   ; mutable hdr : int Header.t
   ; mutable edges : int Edge.t array
   ; mutable changed : int
+  ; mutable multi : int (* pins that changed again before EVAL (AMBIGUOUS) *)
+  ; ages2 : int array (* age of each pin's second change *)
   ; ages : int array
   ; clocks : int array
   ; mutable pout : int
@@ -169,6 +171,8 @@ let create () =
     ; hdr = Header.map Header.port_widths ~f:(fun _ -> 0)
     ; edges = [||]
     ; changed = 0
+    ; multi = 0
+    ; ages2 = Array.create ~len:8 0
     ; ages = Array.create ~len:8 0
     ; clocks = Array.create ~len:3 0
     ; pout = 0
@@ -326,6 +330,12 @@ let step t (i : inputs) =
       in
       max 0 (c - age))
   in
+  let multi_eff = t.multi lor (t.changed land chg_now) in
+  let relevant =
+    Array.fold t.edges ~init:t.hdr.watch ~f:(fun acc e -> if e.valid = 1 then acc lor e.chg_mask else acc)
+  in
+  let amb_pins = multi_eff land relevant in
+  let amb_now = in_eval && amb_pins <> 0 in
   let fires (e : int Edge.t) =
     let c = clock_seen e in
     e.valid = 1
@@ -343,7 +353,15 @@ let step t (i : inputs) =
         | _ -> t.lfsr land 0xF = 0 || c = e.hi)
   in
   let winner =
-    if in_eval then Array.findi t.edges ~f:(fun _ e -> fires e) |> Option.map ~f:fst else None
+    (* ENGINE.md, Pins: a relevant pin that changed more than once before EVAL is
+       ambiguous; edges waiting on it cannot fire, and unless the policy is continue
+       no edge fires *)
+    if in_eval
+    then
+      Array.findi t.edges ~f:(fun _ e ->
+        fires e && e.chg_mask land multi_eff = 0 && ((not amb_now) || t.hdr.policy = Policy.continue))
+      |> Option.map ~f:fst
+    else None
   in
   let any_fire = Option.is_some winner in
   let w = Option.value winner ~default:3 in
@@ -357,8 +375,9 @@ let step t (i : inputs) =
     && not t.to_logged
   in
   let unexp_now = in_eval && (not any_fire) && changed_all land h.watch <> 0 in
-  let viol_now = timeout_now || unexp_now in
-  let viol_kind_now = (b2i timeout_now lsl 1) lor b2i unexp_now in
+  (* one entry per cycle: AMBIGUOUS (kind 0) wins over UNEXPECTED and TIMEOUT *)
+  let viol_now = timeout_now || unexp_now || amb_now in
+  let viol_kind_now = if amb_now then 0 else (b2i timeout_now lsl 1) lor b2i unexp_now in
   (* the action of this cycle *)
   let act_en = entry_now || any_fire in
   let drive = t.role = Role.drive || stress in
@@ -512,7 +531,15 @@ let step t (i : inputs) =
     List.init 8 ~f:(fun p -> if bit t.changed p && bit h.watch p then t.ages.(p) else 0)
     |> List.fold ~init:0 ~f:max
   in
-  let log_ts = (t.timestamp - if unexp_now then watched_age else 0) land 0xFFFF_FFFF in
+  (* AMBIGUOUS is timed at the second change on the lowest ambiguous pin (seen now if
+     it is not latched yet) *)
+  let amb_age =
+    match List.find (List.init 8 ~f:Fn.id) ~f:(fun p -> bit amb_pins p) with
+    | Some p -> if bit t.multi p then t.ages2.(p) else 0
+    | None -> 0
+  in
+  let age = if amb_now then amb_age else if unexp_now then watched_age else 0 in
+  let log_ts = (t.timestamp - age) land 0xFFFF_FFFF in
   let vlog_word =
     (log_ts lsl 16) lor (t.cur_loc lsl 10) lor (viol_kind_now lsl 8) lor t.pins_s
   in
@@ -573,11 +600,19 @@ let step t (i : inputs) =
        else if bit t.changed p && t.ages.(p) < 7
        then t.ages.(p) <- t.ages.(p) + 1
      done;
+     for p = 0 to 7 do
+       if bit chg_now p && bit t.changed p && not (bit t.multi p)
+       then t.ages2.(p) <- 1
+       else if bit t.multi p && t.ages2.(p) < 7
+       then t.ages2.(p) <- t.ages2.(p) + 1
+     done;
+     t.multi <- t.multi lor (t.changed land chg_now);
      t.changed <- changed_all;
      t.phase <- (if b = beats then Eval else Fetch (b + 1));
      if b >= 1 then decode_now t
    | Eval ->
      t.changed <- 0;
+     t.multi <- 0;
      Array.fill t.ages ~pos:0 ~len:8 0;
      if any_fire
      then (
@@ -586,7 +621,8 @@ let step t (i : inputs) =
          t.cur_loc <- we.target;
          t.phase <- Fetch 0))
      else (
-       if timeout_now then t.to_logged <- true;
+       (* a TIMEOUT that lost to AMBIGUOUS is deferred *)
+       if timeout_now && not amb_now then t.to_logged <- true;
        if viol_now
        then (
          match h.policy with
@@ -610,6 +646,7 @@ let step t (i : inputs) =
     t.pout <- 0;
     t.poe <- 0;
     t.changed <- 0;
+    t.multi <- 0;
     t.halted_viol <- false;
     t.irq_flag <- false;
     t.rx_ovf <- false;

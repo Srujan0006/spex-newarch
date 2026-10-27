@@ -142,9 +142,9 @@ let%expect_test "random specs: RTL and model agree on every output, every cycle"
   printf "runs ending with: coverage overrun %d, halted on violation %d, rx overflow %d, log overflow %d\n"
     stats.(1) stats.(2) stats.(3) stats.(4);
   [%expect {|
-    runs where a lane left Idle 20, cycles with a push waiting 0, runs ending with a lane error 2
+    runs where a lane left Idle 19, cycles with a push waiting 0, runs ending with a lane error 2
     300 specs x 3000 cycles = 900000 cycles in lockstep, no mismatch
-    runs ending with: coverage overrun 1, halted on violation 82, rx overflow 2, log overflow 5
+    runs ending with: coverage overrun 1, halted on violation 92, rx overflow 1, log overflow 5
     |}]
 ;;
 

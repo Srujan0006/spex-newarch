@@ -215,6 +215,7 @@ let drain_vlog t =
 
 let kind_name k =
   match k with
+  | 0 -> "AMBIGUOUS"
   | 1 -> "UNEXPECTED"
   | 2 -> "TIMEOUT"
   | 3 -> "UNEXPECTED+TIMEOUT"

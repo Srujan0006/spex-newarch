@@ -51,7 +51,7 @@ module Status = struct
     ; taken : 'a (** pulse, one cycle after the edge fired *)
     ; taken_edge : 'a [@bits 2]
     ; viol : 'a (** pulse, one cycle after the violation was seen (uo[2]) *)
-    ; viol_kind : 'a [@bits 2]
+    ; viol_kind : 'a [@bits 2] (** 0 AMBIGUOUS, 1 UNEXPECTED, 2 TIMEOUT, 3 both *)
     ; timestamp : 'a [@bits 32]
     ; tx_full : 'a
     ; tx_empty : 'a
@@ -320,7 +320,24 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     in
     e.valid &: pin_ok &: chg_ok &: win_ok &: dat_ok &: str_ok
   in
-  let fires = List.map2_exn edges adj ~f:(fun e a -> in_eval &: fire_of e a) in
+  (* AMBIGUOUS (ENGINE.md, Pins): a relevant pin that changed more than once before
+     EVAL. multi is set in FETCH; a change in the first EVAL cycle on a pin whose change
+     is already latched counts too. Edges waiting on such a pin cannot fire; with any
+     ambiguity only the continue policy lets an edge fire. *)
+  let multi = rv 8 in
+  (* age of each pin's second change (the AMBIGUOUS timestamp) *)
+  let ages2 = List.init 8 ~f:(fun _ -> rv 3) in
+  let multi_eff = multi.value |: (changed.value &: chg_now) in
+  let relevant =
+    reduce ~f:( |: ) (hdr.watch :: List.map edges ~f:(fun e -> mux2 e.valid e.chg_mask (zero 8)))
+  in
+  let amb_pins = multi_eff &: relevant in
+  let amb_now = in_eval &: (amb_pins <>:. 0) in
+  let may_fire = ~:amb_now |: (hdr.policy ==:. Policy.continue) in
+  let fires =
+    List.map2_exn edges adj ~f:(fun e a ->
+      in_eval &: fire_of e a &: (e.chg_mask &: multi_eff ==:. 0) &: may_fire)
+  in
   let any_fire = reduce ~f:( |: ) fires in
   let winner =
     match fires with
@@ -336,6 +353,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   ignore (in_eval -- "f_in_eval" : Signal.t);
   ignore (in_fetch -- "f_in_fetch" : Signal.t);
   ignore (hdr.watch -- "f_watch" : Signal.t);
+  List.iteri edges ~f:(fun k e ->
+    ignore (e.chg_mask -- Printf.sprintf "f_chgmask%d" k : Signal.t);
+    ignore (e.valid -- Printf.sprintf "f_valid%d" k : Signal.t));
   let we = Edge.Of_signal.mux winner edges in
   let self_loop = we.target ==: cur_loc.value in
   (* ---- violations ---- *)
@@ -345,8 +365,13 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   in
   let unexp_now = in_eval &: ~:any_fire &: (changed_all &: hdr.watch <>:. 0) in
   ignore (unexp_now -- "f_unexp_now" : Signal.t);
-  let viol_now = timeout_now |: unexp_now in
-  let viol_kind_now = concat_msb [ timeout_now; unexp_now ] in
+  ignore (amb_now -- "f_amb_now" : Signal.t);
+  ignore (multi_eff -- "f_multi_eff" : Signal.t);
+  ignore (relevant -- "f_relevant" : Signal.t);
+  (* one entry per cycle: AMBIGUOUS (kind 0) wins; a TIMEOUT that loses is deferred
+     (to_logged stays clear), an UNEXPECTED that loses is covered by it *)
+  let viol_now = timeout_now |: unexp_now |: amb_now in
+  let viol_kind_now = mux2 amb_now (zero 2) (concat_msb [ timeout_now; unexp_now ]) in
   vlog_push <== viol_now;
   (* A change latched during entry is logged with the cycle it was seen, not the
      cycle EVAL got to it. *)
@@ -364,7 +389,15 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ~f:(fun x -> mux2 (select timestamp 2 0 ==:. 7) (x +:. 1) x)
     -- "ts_hi_m1"
   in
-  let age = mux2 unexp_now watched_age (zero 3) in
+  (* AMBIGUOUS: the second change on the lowest ambiguous pin (age 0 if it is seen in
+     this first EVAL cycle) *)
+  let amb_age =
+    priority_select_with_default
+      (List.mapi ages2 ~f:(fun p a ->
+         { With_valid.valid = amb_pins.:(p); value = mux2 multi.value.:(p) a.value (zero 3) }))
+      ~default:(zero 3)
+  in
+  let age = mux2 amb_now amb_age (mux2 unexp_now watched_age (zero 3)) in
   let ts_lo = select timestamp 2 0 in
   let log_ts =
     concat_msb
@@ -555,6 +588,13 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ; ( c2 phase_fetch
           , [ beat <-- beat.value +:. 1
             ; changed <-- changed_all
+            ; multi <-- (multi.value |: (changed.value &: chg_now))
+            ; proc
+                (List.mapi ages2 ~f:(fun p a ->
+                   if_
+                     (chg_now.:(p) &: changed.value.:(p) &: ~:(multi.value.:(p)))
+                     [ a <--. 1 ]
+                     [ when_ (multi.value.:(p) &: (a.value <>:. 7)) [ a <-- a.value +:. 1 ] ]))
             ; proc
                 (List.mapi ages ~f:(fun p a ->
                    if_
@@ -568,6 +608,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
             ] )
         ; ( c2 phase_eval
           , [ changed <--. 0
+            ; multi <--. 0
             ; proc (List.map ages ~f:(fun a -> a <--. 0))
             ; if_
                 any_fire
@@ -575,7 +616,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                     ~:self_loop
                     [ cur_loc <-- we.target; phase <--. phase_fetch; beat <--. 0 ]
                 ]
-                [ when_ timeout_now [ to_logged <--. 1 ]
+                [ when_ (timeout_now &: ~:amb_now) [ to_logged <--. 1 ]
                 ; when_
                     viol_now
                     [ switch
@@ -604,6 +645,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ; pout <--. 0
         ; poe <--. 0
         ; changed <--. 0
+        ; multi <--. 0
         ; halted_viol <--. 0
         ; irq_flag <--. 0
         ; rx_ovf <--. 0

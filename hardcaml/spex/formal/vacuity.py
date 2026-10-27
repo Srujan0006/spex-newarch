@@ -13,9 +13,12 @@ SRC = pathlib.Path("src/engine.ml")
 # mutant name -> property it should break
 TARGETS = {
     "edge priority: edge 1 beats edge 0": "P1 (lowest true edge wins)",
-    "pin changes during entry are lost": "P3 (no pin change lost)",
+    "pin changes during entry are lost": "P3 (first change and its time are kept)",
     "Check role drives the pins": "P2 (Check role never drives)",
     "TIMEOUT logged every cycle, not once per visit": "P4 (one TIMEOUT per visit)",
+    "AMBIGUOUS: suppression dropped": "P7 (ambiguous input never selects an edge)",
+    "AMBIGUOUS only when no edge fires": "P7 (ambiguous input never selects an edge)",
+    "AMBIGUOUS: chg_mask left out of the relevant mask": "P7 (ambiguous input never selects an edge)",
 }
 
 def main():

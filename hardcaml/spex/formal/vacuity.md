@@ -2,7 +2,7 @@
 
 `python3 formal/vacuity.py` on `new-arch` (engine with the entry-time rule, two bit lanes, pin source select,
 prescaler; every lane configuration input free), 2026-10-25. Each property must fail on a mutant that breaks it.
-P5 (TX FIFO flags) has no mutant yet. P2 is asserted for `pins_oe` always and for `pins_out` while every pin's
+P5 (TX FIFO flags) has no mutant yet. 2026-10-27: P7 (an ambiguous input history never selects a change-triggered edge; one AMBIGUOUS per fetch) fails on all three AMBIGUOUS mutants (suppression dropped, logged only when no edge fires, chg_mask left out of the relevant mask). P2 is asserted for `pins_oe` always and for `pins_out` while every pin's
 source is the engine (a lane may drive a pin's value in Check role; it is never enabled).
 
 | Mutant | Expected to break | prove.sh result |

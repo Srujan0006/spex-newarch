@@ -30,6 +30,8 @@ module spex_props (
     wire f_fire0, f_fire1, f_fire2, f_fire3, f_in_eval, f_in_fetch, f_unexp_now;
     wire [1:0] f_winner;
     wire [7:0] f_changed_all, f_chg_now, f_watch;
+    wire f_amb_now, f_valid0, f_valid1, f_valid2, f_valid3;
+    wire [7:0] f_multi_eff, f_relevant, f_chgmask0, f_chgmask1, f_chgmask2, f_chgmask3;
 
     spex_core dut (.*);
 
@@ -46,9 +48,9 @@ module spex_props (
         assert (st_taken_edge == $past(lowest));  // A4
     end
 
-    // P3: no pin change is lost. A change seen while fetching is still in
-    // changed_all on the first EVAL cycle, and in EVAL a change on a watched pin
-    // either fires an edge or is logged as UNEXPECTED.
+    // P3: the first change and its time are kept. A change seen while fetching is
+    // still in changed_all on the first EVAL cycle, and in EVAL a change on a watched
+    // pin either fires an edge or is logged as a violation.
     reg [7:0] pend = 8'd0;
     always @(posedge clock) begin
         // a host start or stop restarts the engine and drops pending changes
@@ -60,6 +62,28 @@ module spex_props (
         assert (((pend | f_chg_now) & ~f_changed_all) == 8'd0);  // A5
         if ((f_changed_all & f_watch) != 8'd0) assert (fires != 4'd0 || f_unexp_now);  // A6
     end
+
+    // P7: an ambiguous input history cannot silently select a change-triggered edge.
+    // The relevant mask is computed here from the edges, not taken from the design.
+    wire [7:0] rel = f_watch | (f_valid0 ? f_chgmask0 : 8'd0) | (f_valid1 ? f_chgmask1 : 8'd0)
+                   | (f_valid2 ? f_chgmask2 : 8'd0) | (f_valid3 ? f_chgmask3 : 8'd0);
+    wire [7:0] amb = f_multi_eff & rel;
+    wire amb_eval = f_in_eval && amb != 8'd0;
+    always @* if (!init && amb_eval) begin
+        assert (!(f_fire0 && (f_chgmask0 & amb) != 8'd0));  // A7a: no edge waiting on it fires
+        assert (!(f_fire1 && (f_chgmask1 & amb) != 8'd0));
+        assert (!(f_fire2 && (f_chgmask2 & amb) != 8'd0));
+        assert (!(f_fire3 && (f_chgmask3 & amb) != 8'd0));
+    end
+    always @(posedge clock) if (!init && !$past(init) && $past(amb_eval)) begin
+        assert (st_viol && st_viol_kind == 2'd0);  // A7b: an AMBIGUOUS entry is pushed
+    end
+    reg amb_seen = 1'b0;  // an AMBIGUOUS since the last FETCH
+    always @(posedge clock) begin
+        if (init || f_in_fetch || !(f_in_eval)) amb_seen <= 1'b0;
+        else if (amb_eval) amb_seen <= 1'b1;
+    end
+    always @* if (!init && amb_eval) assert (!amb_seen);  // A7c: at most one per fetch
 
 `ifdef CHECK_ROLE
     // P2: in Check role the engine never drives a pin. Every start is a Check start.

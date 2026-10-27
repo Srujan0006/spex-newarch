@@ -21,7 +21,7 @@ test harness stops with the cycle number and both output sets.
 | `tx_sr`, `rx_sr`, `cnt` | 8 each | data path |
 | LFSR | 16 | reset value 0xACE1, taps 16, 14, 13, 11 |
 | TX FIFO, RX FIFO | 8 x 8 | |
-| violation log | 8 x 48 | `{timestamp 32, loc 6, kind 2, pins 8}` |
+| violation log | 8 x 48 | `{timestamp 32, loc 6, kind 2, pins 8}`; kind 0 AMBIGUOUS, 1 UNEXPECTED, 2 TIMEOUT, 3 both |
 | coverage | 256 x 32 SRAM | `{count 8, min 12, max 12}` per `{loc, edge}` |
 
 ## Each cycle
@@ -67,20 +67,32 @@ The lowest k with `fire_k` wins. If an edge wins, its action runs. If its target
 the current location it is an internal transition: no fetch, no entry action, and
 evaluation continues next cycle. Otherwise the phase becomes FETCH(0) at the target.
 
+If a relevant pin is ambiguous (see Pins: it changed more than once before EVAL):
+
+- **AMBIGUOUS** (kind 0), whether or not an edge fires; edges whose `chg_mask` includes
+  such a pin cannot fire, and unless the policy is continue no edge fires this cycle.
+
 If no edge fires:
 
-- **UNEXPECTED** if `changed_all & watch != 0`;
-- **TIMEOUT** if the invariant is enabled, `clock[inv_clk] > inv_hi`, and no TIMEOUT
-  has been logged in this visit. Any taken edge re-arms it.
+- **UNEXPECTED** (kind 1) if `changed_all & watch != 0`;
+- **TIMEOUT** (kind 2) if the invariant is enabled, `clock[inv_clk] > inv_hi`, and no
+  TIMEOUT has been logged in this visit. Any taken edge re-arms it. Both: kind 3.
 
-A violation is pushed into the log and pulses `viol` the next cycle. Then the
+One entry is logged per cycle. AMBIGUOUS wins over UNEXPECTED and TIMEOUT in that cycle;
+a TIMEOUT that loses is **deferred, not dropped** (`to_logged` stays clear, so under
+continue it is logged on the next EVAL cycle if no edge fires; under halt or recover the
+visit ends anyway). Kind 0 is free because an empty cycle never logs; hosts read entries
+only while `vlog_empty = 0`. A violation is pushed into the log and pulses `viol` the
+next cycle. Then the
 policy: 0 halt (IDLE, `halted_viol` set), 1 continue, 2 jump to the host's
 `recover_loc` (with a fetch), 3 halt. `changed` and the ages are cleared in every
 EVAL cycle.
 
 The timestamp logged for UNEXPECTED is the cycle the synchronised change was first
 seen (`pins_s` changed), even when it was seen during FETCH. For TIMEOUT it is the
-first cycle the clock is past `inv_hi`.
+cycle it is logged: the first EVAL cycle with the clock past `inv_hi` (later than the
+clock's first cycle past `inv_hi` if that was during FETCH; one more cycle if it was
+deferred by AMBIGUOUS). For AMBIGUOUS it is the cycle of the second change.
 
 ## Actions
 
@@ -117,6 +129,32 @@ equals `lo`, 2 only when it equals `hi`, 3 each cycle with probability 1/16
 (`lfsr[3:0] == 0`) and always at `hi`. Clock select 3 reads clock 2.
 
 ## Pins
+
+Inputs pass a 2-flop synchroniser. A pad level is guaranteed to be seen only if it is
+held for at least **2 core-clock cycles**; a change is seen 2 or 3 cycles after the pad
+(sampling phase), so logged timestamps are exact to the synchronised change and within
++0/+1 cycle of the pad. Shorter pulses may be seen or missed.
+
+During FETCH each pin keeps one `changed` bit, the age of its first change, and a
+`multi` bit set when the pin changes again before EVAL (including a change in the first
+EVAL cycle on a pin whose `changed` bit is already set). In EVAL every cycle is judged on
+its own, so `multi` can only arise from FETCH.
+
+A pin is **relevant** if it is in the location's `watch` mask or in the `chg_mask` of
+any valid edge. On the first EVAL cycle, if `multi & relevant != 0`:
+- every edge whose `chg_mask` includes such a pin is **suppressed** (cannot fire);
+- an **AMBIGUOUS** violation is logged, whether or not another edge fires, with the
+  timestamp of the **second** change on the lowest such pin (each pin keeps a 3-bit
+  second-change age, like the first-change age);
+- then the location's policy applies: halt or recover as usual; under continue, the
+  lowest non-suppressed true edge (if any) fires in the same cycle.
+
+`multi` is set only during FETCH, judged only on the first EVAL cycle after it, then
+cleared; self-loops do not refetch, so AMBIGUOUS is logged at most once per fetch, even
+under continue. `multi` on a pin that is not relevant is ignored. Level-only guards (`pin_mask`) are
+unaffected, since they read the current level. A spec that must react to a pulse
+shorter than the 5-cycle FETCH on a relevant pin will see AMBIGUOUS, never a silent
+wrong edge: specs should allow at most one change per relevant pin per FETCH.
 
 Pin source select (host CSR, 3 bits per pin): the value of pin p is `src(p)` of
 0 `pout[p]`, 1 lane 0 `out`, 2 NOT lane 0, 3 lane 0 AND `pout[p]`, 4 NOT lane 0 AND

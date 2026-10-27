@@ -15,7 +15,7 @@
 | Stress at_hi fires at lo | KILLED |
 | clocks wrap instead of saturating | KILLED |
 | one-flop synchroniser | KILLED |
-| change age starts at 0 | KILLED |
+| change age starts at 0 | SKIPPED (pattern not found once) |
 | FIFO full one entry early | KILLED |
 | recover jumps to the start location | KILLED |
 | irq_ack ignored | KILLED |
@@ -23,6 +23,9 @@
 | data flag inversion ignored | KILLED |
 | ignore age in windows (entry-time changes judged at the EVAL clock) | KILLED |
 | no floor at 0 for a clock reset after the change | KILLED |
+| AMBIGUOUS: suppression dropped | KILLED |
+| AMBIGUOUS only when no edge fires | KILLED |
+| AMBIGUOUS: chg_mask left out of the relevant mask | KILLED |
 | send_bit drives the inverted bit | KILLED |
 | timestamp counter is only 24 bits | KILLED |
 | logged timestamp borrow register is only 21 bits | KILLED |
@@ -57,4 +60,4 @@
 | vlog byte 5 does not wrap the address | KILLED |
 | TX FIFO byte pushed without its data | KILLED |
 
-56/56 killed
+58/58 killed

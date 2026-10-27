@@ -197,4 +197,5 @@ end
 module Kind = struct
   let unexpected = 1
   let timeout = 2
+  let ambiguous = 0 (* the free code: an empty cycle never logs *)
 end
