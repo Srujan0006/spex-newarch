@@ -10,7 +10,7 @@
     the command byte, 0 during the address, then read data.
 
     Spaces (byte addresses):
-    - 0 CSRs. Write 0x00 CTRL {err_clear, irq_ack, stop, start} pulses; read 0x00 STATUS.
+    - 0 CSRs. Write 0x00 CTRL {drop_clear, verify, err_clear, irq_ack, stop, start} pulses; read 0x00 STATUS.
       0x01 CONFIG {dbg_sel 5:4, cover_en 2, role 1:0}, 0x02 START_LOC, 0x03 RECOVER_LOC,
       0x04 OPEN_DRAIN, 0x05 MATCH_ADDR (read/write). Read only: 0x06 FLAGS, 0x07 CUR_LOC,
       0x08..0x0B TIMESTAMP (reading 0x08 latches bits 31:8 for 0x09..0x0B).
@@ -28,10 +28,14 @@
       clk_pin 3}, 5 {stuff_len 3, stuff 2}, 6 crc_width, 8-11 poly, 12-15 init, 16-17
       sync, 18-19 sync_mask, 20-21 frame_bits (all little-endian).
 
-    CSRs 0x13 (read) {image_valid, verify_busy, 6'b0}; 0x14 (read) format version; 0x15
+    CSRs 0x13 (read) {image_valid, verify_busy, tx_collision, 5'b0}; 0x14 (read) format version; 0x15
     (read) caps {lanes 4, edges per location 4}; 0x16 (read) record bits / 16; 0x17 (read)
     locations; 0x18..0x1B crc_expect (little-endian; any write clears image_valid); CTRL
     bit 4 = verify (ENGINE.md, Image validation).
+
+    CSR 0x1C (read/write) WATERMARK {tx_wm_en, tx_wm 3, 0, rx_wm 3}. CSRs 0x20..0x24
+    (read) drop counters: RX lane 0, RX lane 1, RX engine, violation log, coverage
+    (saturating at 255). CTRL bit 5 clears them; CTRL bit 3 also clears tx_collision.
 
     CSRs 0x0C / 0x0D (read): lane 0 / 1 status {done, crc_ok, sync_hit, error, 0,
     kind: lost arbitration, bit error, stuff error}. 0x10..0x12 (read/write): pin source
@@ -164,6 +168,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let crc_expect = List.init 4 ~f:(fun _ -> rv 8) in
   let crc_we_p = rv 1 in
   let verify_p = rv 1 in
+  let drop_clear_p = rv 1 in
+  let wm = rv 7 in
   let lane_regs = List.init 2 ~f:(fun _ -> List.init lane_bytes ~f:(fun _ -> rv 8)) in
   (* host-side strobes and data, one cycle after the byte that causes them *)
   let start_p = rv 1 in
@@ -223,14 +229,20 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       (mux
          (select a 3 0)
          (List.map pin_src ~f:(fun r -> r.value)
-          @ [ concat_msb [ st.image_valid; st.verify_busy; zero 6 ]
+          @ [ concat_msb [ st.image_valid; st.verify_busy; st.tx_collision; zero 5 ]
             ; of_int ~width:8 format_version
             ; of_int ~width:8 ((Engine.num_lanes lsl 4) lor Layout.num_edges)
             ; of_int ~width:8 (Layout.record_bits / 16)
             ; of_int ~width:8 Layout.num_locs
             ]
           @ List.map crc_expect ~f:(fun r -> r.value)
-          @ [ zero 8 ]))
+          @ [ concat_msb [ select wm.value 6 3; gnd; select wm.value 2 0 ] ]))
+      csr_rd
+  in
+  let csr_rd =
+    mux2
+      a.:(5)
+      (mux (select a 2 0) (List.init 5 ~f:(fun k -> select st.drops ((8 * k) + 7) (8 * k)) @ [ zero 8 ]))
       csr_rd
   in
   let data_rd =
@@ -256,6 +268,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; err_clear_p <--. 0
     ; crc_we_p <--. 0
     ; verify_p <--. 0
+    ; drop_clear_p <--. 0
     ; lane_we_p <--. 0
     ; rec_we_p <--. 0
     ; cov_we_p <--. 0
@@ -274,8 +287,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ]
     ; (* writes *)
       when_
-        (wr_data &: sp Space.csr &: a.:(4))
-        [ proc (List.mapi pin_src ~f:(fun k r -> when_ (select a 3 0 ==:. k) [ r <-- byte ]))
+        (wr_data &: sp Space.csr &: ~:(a.:(5)) &: a.:(4))
+        [ when_ (select a 3 0 ==:. 12) [ wm <-- concat_msb [ select byte 7 4; select byte 2 0 ] ]
+        ; proc (List.mapi pin_src ~f:(fun k r -> when_ (select a 3 0 ==:. k) [ r <-- byte ]))
         ; proc
             (List.mapi crc_expect ~f:(fun k r ->
                when_ (select a 3 0 ==:. 8 + k) [ r <-- byte; crc_we_p <--. 1 ]))
@@ -292,7 +306,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                       [ r <-- byte ])))
         ]
     ; when_
-        (wr_data &: sp Space.csr &: ~:(a.:(4)))
+        (wr_data &: sp Space.csr &: ~:(a.:(5)) &: ~:(a.:(4)))
         [ switch
             (select a 3 0)
             [ ( of_int ~width:4 0
@@ -301,6 +315,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                 ; ack_p <-- byte.:(2)
                 ; err_clear_p <-- byte.:(3)
                 ; verify_p <-- byte.:(4)
+                ; drop_clear_p <-- byte.:(5)
                 ] )
             ; of_int ~width:4 1, [ config <-- select byte 5 0 ]
             ; of_int ~width:4 2, [ start_loc <-- select byte 5 0 ]
@@ -371,6 +386,10 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; verify = verify_p.value
     ; crc_expect = concat_msb (List.rev_map crc_expect ~f:(fun r -> r.value))
     ; crc_expect_we = crc_we_p.value
+    ; rx_wm = select wm.value 2 0
+    ; tx_wm = select wm.value 5 3
+    ; tx_wm_en = wm.value.:(6)
+    ; drop_clear = drop_clear_p.value
     }
   in
   { host; miso = active &: out_sr.value.:(7); dbg_sel = select config.value 5 4 }

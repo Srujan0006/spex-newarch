@@ -27,9 +27,9 @@
 | AMBIGUOUS: suppression dropped | KILLED |
 | AMBIGUOUS only when no edge fires | KILLED |
 | AMBIGUOUS: chg_mask left out of the relevant mask | KILLED |
-| store write while running reaches the SRAM | SKIPPED (pattern not found once) |
+| store write while running reaches the SRAM | KILLED |
 | recover jumps to the live recover_loc | KILLED |
-| coverage read while running returns SRAM data | SKIPPED (pattern not found once) |
+| coverage read while running returns SRAM data | KILLED |
 | host_err cause: last cause wins | KILLED |
 | stop leaves the lanes running | KILLED |
 | image_valid set by a crc_expect write | KILLED |
@@ -44,6 +44,11 @@
 | prescaler /8 counts every cycle | KILLED |
 | send_bit edges also command the lanes | KILLED |
 | lane flags read as 0 | KILLED |
+| tx_collision never set | KILLED (rerun alone after retargeting) |
+| drop counter wraps instead of saturating | KILLED |
+| engine push into a full RX FIFO not counted | KILLED |
+| RX watermark compared with > | KILLED |
+| TX watermark ignores its enable | KILLED |
 | stuff bit one bit early | KILLED |
 | stuff bit not complemented | KILLED |
 | CRC feedback ignores the bit | KILLED |
@@ -55,6 +60,7 @@
 | RX MSB-first shift takes the wrong end | KILLED |
 | END drops the partial byte | KILLED |
 | NRZI decode inverted | KILLED |
+| a partial RX byte lost at stop is not counted | KILLED |
 | RX Done before a trailing stuff bit | KILLED |
 | SPI samples MOSI on the falling edge | KILLED |
 | SPI address does not auto-increment | KILLED |
@@ -68,5 +74,11 @@
 | CTRL start and stop bits swapped | KILLED |
 | vlog byte 5 does not wrap the address | KILLED |
 | TX FIFO byte pushed without its data | KILLED |
+| drop counters cleared by CTRL bit 4 | KILLED |
+| drop counter bank aliases the CSRs at 0x00 | KILLED |
+| compiler ignores END | KILLED |
+| compiler ignores the lane done flag | KILLED |
+| compiler: recover jumps nowhere | KILLED |
+| compiler checks an edge's load after its own END | KILLED |
 
-66/66 killed
+80/80 killed

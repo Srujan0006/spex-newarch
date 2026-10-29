@@ -37,6 +37,7 @@ module O = struct
     ; error : 'a
     ; err_kind : 'a [@bits 3] (** {lost arbitration, bit error, stuff error} *)
     ; active : 'a (** Armed or Run: the host may not write this lane's CSRs *)
+    ; lost : 'a (** reset (or stop) dropped a partial RX byte this cycle *)
     }
   [@@deriving hardcaml]
 end
@@ -170,6 +171,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   in
   let byte_after = mux2 rx_take byte_rx byte.value in
   let end_push = i.end_ &: is_rx &: (bitpos_after <>:. 0) &: ~:push in
+  let lost =
+    i.reset &: ~:(i.end_) &: is_rx &: (in_run |: in_done) &: (bitpos_after <>:. 0) &: ~:push
+  in
   compile
     [ (* bit timing *)
       when_
@@ -294,6 +298,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ];
   { out = out.value
   ; pop
+  ; lost
   ; push = push |: end_push
   ; push_data = mux2 push byte_rx byte_after
   ; done_ = in_done

@@ -268,11 +268,123 @@ let warnings (t : t) =
         else None))
 ;;
 
+(** TX FIFO collisions (ENGINE.md, Bit lanes). A TX lane pops the TX FIFO while it runs;
+    an engine [tx load] in the same cycle reads the same byte. Reject any engine load
+    that can happen while a TX lane may be active.
+
+    The analysis searches (location, lanes that may be active). It over-approximates:
+    every location may be the start location with no lane active (start_loc is a host
+    CSR); a recover-policy location may jump to any location (recover_loc is a host
+    CSR); GO and CRC make a lane active, END and the reset command make it inactive, and
+    an edge guarded on the lane's done flag knows the lane is Done (it no longer pops).
+    Lanes are TX unless listed in [rx_lanes] (direction is a host CSR). Commands act at
+    the end of the cycle, so an edge's own load is checked against the lanes active
+    before its command, and the target's entry load against those after. Returns one
+    message per offending load, naming the loading location, the location that started
+    the lane and the path between them. *)
+let lane_conflicts ?(rx_lanes = []) (t : t) =
+  let locs = Array.of_list t.locs in
+  let n = Array.length locs in
+  let tx_lanes = List.filter [ 0; 1 ] ~f:(fun l -> not (List.mem rx_lanes l ~equal:Int.equal)) in
+  let tx_mask = List.fold tx_lanes ~init:0 ~f:(fun acc l -> acc lor bit l) in
+  let is_load op = op = Tx_op.load || op = Tx_op.load_rev in
+  let done_known (g : guard) a =
+    List.fold [ 0; 1 ] ~init:a ~f:(fun a l ->
+      if g.flag = Flag.lane_done l && not g.flag_inv then a land lnot (bit l) else a)
+  in
+  let command (e : edge) a =
+    let c = if Option.is_some e.action.tx_pin then Lane_cmd.none else e.action.lane_cmd in
+    let a =
+      List.fold [ 0; 1 ] ~init:a ~f:(fun a l ->
+        if c = Lane_cmd.go l || c = Lane_cmd.crc l
+        then a lor bit l
+        else if c = Lane_cmd.end_ l
+        then a land lnot (bit l)
+        else a)
+    in
+    (if c = Lane_cmd.reset then 0 else a) land tx_mask
+  in
+  (* parent of each reached state: the state and the step taken from it *)
+  let parent = Hashtbl.Poly.create () in
+  let queue = Queue.create () in
+  let visit st from =
+    if not (Hashtbl.mem parent st)
+    then (
+      Hashtbl.set parent ~key:st ~data:from;
+      Queue.enqueue queue st)
+  in
+  for k = 0 to n - 1 do
+    visit (k, 0) None
+  done;
+  let errors = ref [] in
+  let reported = Hash_set.Poly.create () in
+  (* the path from the step that last started lane [l] to state [st] *)
+  let path_to st l =
+    let rec back ((k, _) as st) acc =
+      match Hashtbl.find_exn parent st with
+      | Some (((pk, pa) as prev), step) ->
+        if pa land bit l = 0
+        then Printf.sprintf "location %s %s" locs.(pk).name step, pk :: k :: acc
+        else back prev (k :: acc)
+      | None -> "a host start", k :: acc
+    in
+    let started, ks = back st [] in
+    started, String.concat ~sep:" -> " (List.map ks ~f:(fun k -> locs.(k).name))
+  in
+  let report st where a =
+    let k = fst st in
+    if not (Hash_set.mem reported (k, where))
+    then (
+      Hash_set.add reported (k, where);
+      let l = if a land 1 <> 0 then 0 else 1 in
+      let started, path = path_to st l in
+      errors
+      := Printf.sprintf
+           "%s: location %s loads TX (%s) while TX lane %d may be active: lane %d started by %s, path %s"
+           t.name
+           locs.(k).name
+           where
+           l
+           l
+           started
+           path
+         :: !errors)
+  in
+  while not (Queue.is_empty queue) do
+    let ((k, a) as st) = Queue.dequeue_exn queue in
+    let l = locs.(k) in
+    if a <> 0 && is_load l.entry.tx_op then report st "entry action" a;
+    List.iteri l.edges ~f:(fun j e ->
+      let a_edge = done_known e.guard a in
+      if a_edge <> 0 && is_load e.action.tx_op then report st (Printf.sprintf "edge %d" j) a_edge;
+      visit (index_of t e.goto, command e a_edge) (Some (st, Printf.sprintf "edge %d" j)));
+    if l.policy = Policy.recover
+    then
+      for r = 0 to n - 1 do
+        visit (r, a) (Some (st, "recover"))
+      done
+  done;
+  List.rev !errors
+;;
+
 (** Compile to one 512-bit record per location. Entry-time warnings go to [warn]
-    (stderr by default). *)
-let compile ?(warn = fun s -> Stdio.eprintf "warning: %s\n%!" s) (t : t) : Bits.t array =
+    (stderr by default). A spec whose engine may load TX while a TX lane is active is
+    rejected ([lane_conflicts]); [lane_check = false] skips that check (tests of the RTL
+    backstop, random specs). *)
+let compile
+  ?(warn = fun s -> Stdio.eprintf "warning: %s\n%!" s)
+  ?(lane_check = true)
+  ?rx_lanes
+  (t : t)
+  : Bits.t array
+  =
   if List.length t.locs > num_locs then raise_s [%message "too many locations" t.name];
   List.iter (warnings t) ~f:warn;
+  if lane_check
+  then (
+    match lane_conflicts ?rx_lanes t with
+    | [] -> ()
+    | errs -> raise_s [%message "TX FIFO collision" (errs : string list)]);
   List.map t.locs ~f:(fun l ->
     if List.length l.edges > num_edges
     then raise_s [%message "too many edges" (l.name : string)];
@@ -290,8 +402,8 @@ let compile ?(warn = fun s -> Stdio.eprintf "warning: %s\n%!" s) (t : t) : Bits.
 (** The whole location store as the loader writes it: the spec's records, then zero
     records (no valid edges) up to [num_locs], 4 words each. The image check (CRC-32 over
     the whole store) needs every word written. *)
-let store_image (t : t) =
-  let records = compile ~warn:ignore t in
+let store_image ?lane_check ?rx_lanes (t : t) =
+  let records = compile ~warn:ignore ?lane_check ?rx_lanes t in
   Array.init (num_locs * beats) ~f:(fun a ->
     let loc = a / beats
     and b = a % beats in

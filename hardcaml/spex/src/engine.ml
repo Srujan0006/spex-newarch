@@ -44,6 +44,10 @@ module Host_in = struct
     ; verify : 'a (** start the image check sweep (idle only) *)
     ; crc_expect : 'a [@bits 32] (** CRC-32 the host expects over the whole store *)
     ; crc_expect_we : 'a (** crc_expect was written: clears image_valid *)
+    ; rx_wm : 'a [@bits 3] (** IRQ while the RX FIFO holds >= rx_wm bytes (0 acts as 1) *)
+    ; tx_wm : 'a [@bits 3]
+    ; tx_wm_en : 'a (** IRQ while the TX FIFO holds <= tx_wm bytes *)
+    ; drop_clear : 'a (** clears the drop counters *)
     }
   [@@deriving hardcaml]
 end
@@ -76,6 +80,10 @@ module Status = struct
     ; lane_active : 'a [@bits 2] (** lane l is Armed or Run *)
     ; image_valid : 'a (** the store passed the last image check; start needs it *)
     ; verify_busy : 'a (** the image check sweep is running *)
+    ; tx_collision : 'a (** sticky: the engine and a lane popped TX in one cycle *)
+    ; drops : 'a [@bits 40]
+        (** saturating drop counters, 8 bits each from bit 0: RX lane 0, RX lane 1, RX
+            engine, violation log, coverage *)
     ; lane_status : 'a [@bits 16]
         (** per lane, lane 1 in the high byte: {done, crc_ok, sync_hit, error, 0, kind 3} *)
     }
@@ -143,7 +151,7 @@ let small_fifo spec ~depth ~push ~pop ~d =
         spec
         (mux2 (do_push ^: do_pop) (mux2 do_push (used +:. 1) (used -:. 1)) used);
   let mem = List.init depth ~f:(fun k -> reg spec ~enable:(do_push &: (wp ==:. k)) d) in
-  mux rp mem, empty, full, push &: full
+  mux rp mem, empty, full, push &: full, used
 ;;
 
 let phase_idle = 0
@@ -202,12 +210,12 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let clk_of sel = mux sel (clock_v @ [ List.nth_exn clock_v 2 ]) in
   (* ---- FIFOs ---- *)
   let tx_pop = wire 1 in
-  let tx_q, tx_empty, tx_full, _ =
+  let tx_q, tx_empty, tx_full, _, tx_used =
     small_fifo spec ~depth:8 ~push:h.tx_push ~pop:tx_pop ~d:h.tx_data
   in
   let rx_push = wire 1 in
   let rx_push_d = wire 8 in
-  let rx_q, rx_empty, rx_full, rx_drop =
+  let rx_q, rx_empty, rx_full, rx_drop, rx_used =
     small_fifo spec ~depth:8 ~push:rx_push ~pop:h.rx_pop ~d:rx_push_d
   in
   (* ---- bit lanes ---- *)
@@ -240,7 +248,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let lane_out l = match List.nth lanes l with Some (o : _ Lane.O.t) -> o.out | None -> vdd in
   let vlog_push = wire 1 in
   let vlog_d = wire 48 in
-  let vlog_q, vlog_empty, _, vlog_drop =
+  let vlog_q, vlog_empty, _, vlog_drop, _ =
     small_fifo spec ~depth:8 ~push:vlog_push ~pop:h.vlog_pop ~d:vlog_d
   in
   (* ---- guard evaluation ---- *)
@@ -437,7 +445,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let o2 = o1 |: tmask in
   let is_load = a_tx_op ==:. Tx_op.load |: (a_tx_op ==:. Tx_op.load_rev) in
   (* a lane pop and an engine load in the same cycle both read the head; one pop *)
-  tx_pop <== (act_en &: is_load |: reduce ~f:( |: ) (gnd :: List.map lanes ~f:(fun o -> o.Lane.O.pop)));
+  let lane_pop = reduce ~f:( |: ) (gnd :: List.map lanes ~f:(fun o -> o.Lane.O.pop)) in
+  tx_pop <== (act_en &: is_load |: lane_pop);
+  let tx_collision_now = act_en &: is_load &: lane_pop in
   (* lane commands: the winning edge's tx_pin field when tx_pin_en = 0 *)
   lane_cmd <== mux2 (any_fire &: ~:(we.tx_pin_en)) we.tx_pin (zero 3);
   let loaded = mux2 tx_empty (ones 8) tx_q in
@@ -488,6 +498,16 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   in
   Always.compile (List.map buf_logic ~f:fst);
   buf_drop <== reduce ~f:( |: ) (List.map buf_logic ~f:snd);
+  (* RX drops per source: a full FIFO, a full wait buffer, or a partial byte that a lane
+     reset or stop dropped *)
+  let lane_lost l = match List.nth lanes l with Some (o : _ Lane.O.t) -> o.lost | None -> gnd in
+  let buf_drop_of k = snd (List.nth_exn buf_logic k) in
+  let rx_drops =
+    [ l0_push &: rx_full |: lane_lost 0
+    ; buf_drop_of 0 |: (acc1 &: rx_full) |: lane_lost 1
+    ; buf_drop_of 1 |: (acc2 &: rx_full)
+    ]
+  in
   let cnt_next =
     mux a_cnt_op [ cnt.value; cnt.value -:. 1; of_int ~width:8 7; of_int ~width:8 8 ]
   in
@@ -569,6 +589,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   ignore (image_valid.value -- "f_image_valid" : Signal.t);
   ignore (sweeping.value -- "f_sweeping" : Signal.t);
   ignore (sw_last -- "f_sw_last" : Signal.t);
+  ignore (sw_cnt.value -- "f_sw_cnt" : Signal.t);
   ignore (sw_match -- "f_sw_match" : Signal.t);
   ignore (store_we -- "f_store_we" : Signal.t);
   let host_cov_we = h.cov_we &: in_idle &: ~:(s2_v.value) &: ~:(s1_v.value) &: ~:(sweeping.value) in
@@ -577,6 +598,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let recover_lat = rv 6 in
   let host_err = rv 1 in
   let host_err_cause = rv 3 in
+  let tx_collision = rv 1 in
+  let drop_cnt = List.init 5 ~f:(fun _ -> rv 8) in
+  let drop_events = rx_drops @ [ vlog_drop; drop_now ] in
   let lane_active l = match List.nth lanes l with Some o -> o.Lane.O.active | None -> gnd in
   let err_cause =
     priority_select_with_default
@@ -718,6 +742,13 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         h.err_clear
         [ host_err <--. 0; host_err_cause <--. 0 ]
         [ when_ (err_now &: ~:(host_err.value)) [ host_err <--. 1; host_err_cause <-- err_cause ] ]
+    ; if_ h.err_clear [ tx_collision <--. 0 ] [ when_ tx_collision_now [ tx_collision <--. 1 ] ]
+    ; proc
+        (List.map2_exn drop_cnt drop_events ~f:(fun c ev ->
+           if_
+             h.drop_clear
+             [ c <--. 0 ]
+             [ when_ (ev &: (c.value <>:. 255)) [ c <-- c.value +:. 1 ] ]))
     ; when_
         start_ok
         [ phase <--. phase_fetch
@@ -773,13 +804,20 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; vlog_data = vlog_q
     ; vlog_empty
     ; cov_rdata = mux2 (in_idle &: ~:(sweeping.value)) i.ram.cov_rdata (zero 32)
-    ; irq = ~:rx_empty |: ~:vlog_empty |: halted_viol.value |: irq_flag.value
+    ; irq =
+        rx_used >=: uresize (mux2 (h.rx_wm ==:. 0) (of_int ~width:3 1) h.rx_wm) 4
+        |: (h.tx_wm_en &: (tx_used <=: uresize h.tx_wm 4))
+        |: ~:vlog_empty
+        |: halted_viol.value
+        |: irq_flag.value
     ; halted_viol = halted_viol.value
     ; rx_overflow = rx_ovf.value
     ; vlog_overflow = vlog_ovf.value
     ; cov_overrun = cov_ovr.value
     ; image_valid = image_valid.value
     ; verify_busy = sweeping.value
+    ; tx_collision = tx_collision.value
+    ; drops = concat_lsb (List.map drop_cnt ~f:(fun c -> c.value))
     ; host_err = host_err.value
     ; host_err_cause = host_err_cause.value
     ; lane_active = concat_lsb (List.init 2 ~f:(fun l -> match List.nth lanes l with Some o -> o.Lane.O.active | None -> gnd))

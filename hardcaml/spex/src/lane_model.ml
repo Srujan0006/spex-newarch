@@ -72,6 +72,7 @@ let no_cmd = { go = false; end_ = false; crc = false; reset = false }
 type step =
   { pop : bool
   ; push : int option
+  ; lost : bool (** reset (or stop) dropped a partial RX byte *)
   }
 
 let bit v k = (v lsr k) land 1
@@ -90,6 +91,7 @@ let flags t =
 (** One cycle. [tx_head] is the TX FIFO head ([None] when empty). *)
 let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
   let rx = c.dir = 1 in
+  let mode0 = t.mode in
   let d = bit pins_s c.data_pin in
   let dedge = d <> bit pins_q c.data_pin in
   let cedge =
@@ -251,6 +253,14 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
         if t.crc_left = 0 then t.crc_ok <- not t.crc_bad);
       finish ()));
   (* commands, after this cycle's step *)
+  let lost =
+    k.reset
+    && (not k.end_)
+    && rx
+    && (equal_mode mode0 Run || equal_mode mode0 Done)
+    && t.bitpos <> 0
+    && not !pushed
+  in
   if k.end_
   then (
     if rx && t.bitpos <> 0 && not !pushed then push := Some t.byte;
@@ -289,5 +299,5 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
     t.sync_hit <- false;
     t.error <- false;
     t.kind <- 0);
-  { pop = !pop; push = !push }
+  { pop = !pop; push = !push; lost }
 ;;

@@ -73,13 +73,16 @@ let lane_active = ref 0
 let wait_used = ref 0
 let sweeps_matched = ref 0
 let runs_start_refused = ref 0
+let runs_with_drops = ref 0
+let runs_with_collision = ref 0
 
 let run_one ~seed ~cycles =
   let rs = Random.State.make [| seed |] in
   let int n = Random.State.int rs n in
   let t = H.create () in
   let spec = random_spec rs in
-  H.load t spec;
+  (* random specs may load TX while a lane runs: the RTL flags it (tx_collision) *)
+  H.load ~lane_check:false t spec;
   let h = t.i.host in
   let nlocs = List.length spec.locs in
   let pins = ref (int 256) in
@@ -109,6 +112,13 @@ let run_one ~seed ~cycles =
     H.set h.cov_re (Bool.to_int (int 30 = 0));
     H.set h.lane_we (if int 40 = 0 then 1 + int 3 else 0);
     H.set h.err_clear (Bool.to_int (int 200 = 0));
+    (* watermarks and the drop counters *)
+    if int 500 = 0
+    then (
+      H.set h.rx_wm (int 8);
+      H.set h.tx_wm (int 8);
+      H.set h.tx_wm_en (int 2));
+    H.set h.drop_clear (Bool.to_int (int 2000 = 0));
     if int 300 = 0 then H.set h.recover_loc (int nlocs);
     (* image check: re-verify now and then (mostly with the right CRC) so restarts after
        a store write are possible again; a crc_expect write now and then *)
@@ -140,6 +150,8 @@ let run_one ~seed ~cycles =
   done;
   if !active then Int.incr lane_active;
   if t.model.host_err_cause = 4 then Int.incr runs_start_refused;
+  if Array.exists t.model.drops ~f:(fun c -> c > 0) then Int.incr runs_with_drops;
+  if t.model.tx_collision then Int.incr runs_with_collision;
   t
 ;;
 
@@ -161,14 +173,17 @@ let%expect_test "random specs: RTL and model agree on every output, every cycle"
     !lane_active !wait_used stats.(5);
   printf "image checks passed during the runs %d, runs whose first host error is a refused start %d\n"
     !sweeps_matched !runs_start_refused;
+  printf "runs ending with a non-zero drop counter %d, with tx_collision set %d\n"
+    !runs_with_drops !runs_with_collision;
   printf "%d specs x %d cycles = %d cycles in lockstep, no mismatch\n" specs cycles (specs * cycles);
   printf "runs ending with: coverage overrun %d, halted on violation %d, rx overflow %d, log overflow %d\n"
     stats.(1) stats.(2) stats.(3) stats.(4);
   [%expect {|
-    runs where a lane left Idle 17, cycles with a push waiting 0, runs ending with a lane error 1
-    image checks passed during the runs 0, runs whose first host error is a refused start 1
+    runs where a lane left Idle 11, cycles with a push waiting 0, runs ending with a lane error 0
+    image checks passed during the runs 0, runs whose first host error is a refused start 3
+    runs ending with a non-zero drop counter 17, with tx_collision set 0
     300 specs x 3000 cycles = 900000 cycles in lockstep, no mismatch
-    runs ending with: coverage overrun 0, halted on violation 123, rx overflow 3, log overflow 7
+    runs ending with: coverage overrun 1, halted on violation 127, rx overflow 4, log overflow 8
     |}]
 ;;
 

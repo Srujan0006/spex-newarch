@@ -12,6 +12,7 @@ module spex_props (
     input host_tx_push, input [7:0] pins_in, input host_stop, input host_start,
     input host_cov_re, input [1:0] host_lane_we, input host_err_clear,
     input host_verify, input [31:0] host_crc_expect, input host_crc_expect_we,
+    input [2:0] host_rx_wm, input [2:0] host_tx_wm, input host_tx_wm_en, input host_drop_clear,
     // bit lanes (new-arch): lane configurations and pin source select, all free
     input host_lane0_clk_edge, input [2:0] host_lane0_clk_pin, input host_lane0_clk_pin_en, input [1:0] host_lane0_code, input host_lane0_crc_inv, input [5:0] host_lane0_crc_width, input [2:0] host_lane0_data_pin, input host_lane0_dir, input [7:0] host_lane0_div_frac, input [15:0] host_lane0_div_int, input [15:0] host_lane0_frame_bits, input [31:0] host_lane0_init, input host_lane0_lsb_first, input [31:0] host_lane0_poly, input host_lane0_readback, input [1:0] host_lane0_stuff, input [2:0] host_lane0_stuff_len, input [15:0] host_lane0_sync, input [15:0] host_lane0_sync_mask, input host_lane1_clk_edge, input [2:0] host_lane1_clk_pin, input host_lane1_clk_pin_en, input [1:0] host_lane1_code, input host_lane1_crc_inv, input [5:0] host_lane1_crc_width, input [2:0] host_lane1_data_pin, input host_lane1_dir, input [7:0] host_lane1_div_frac, input [15:0] host_lane1_div_int, input [15:0] host_lane1_frame_bits, input [31:0] host_lane1_init, input host_lane1_lsb_first, input [31:0] host_lane1_poly, input host_lane1_readback, input [1:0] host_lane1_stuff, input [2:0] host_lane1_stuff_len, input [15:0] host_lane1_sync, input [15:0] host_lane1_sync_mask, input [23:0] host_pin_src
 );
@@ -27,9 +28,11 @@ module spex_props (
     wire [7:0] ram_rec_addr, ram_cov_addr; wire ram_rec_re, ram_rec_we, ram_cov_re, ram_cov_we;
     wire [127:0] ram_rec_wdata; wire [31:0] ram_cov_wdata;
     wire [15:0] st_lane_status;
+    wire st_tx_collision; wire [39:0] st_drops;
     wire st_host_err; wire [2:0] st_host_err_cause; wire [1:0] st_lane_active;
     wire f_viol_now, f_host_cov_we; wire [1:0] f_policy;
     wire st_image_valid, st_verify_busy, f_image_valid, f_sweeping, f_sw_last, f_sw_match, f_store_we;
+    wire [12:0] f_sw_cnt, \f_sw_cnt.i ;  // the cut, free sweep counter outside P10/P11 (prove.sh)
     wire f_recover_jump = f_in_eval && fires == 4'd0 && f_viol_now && f_policy == 2'd2;
 
     // internal signals, made ports of spex_core by `expose` in prove.sh
@@ -126,9 +129,14 @@ module spex_props (
     // P11: image_valid rises only on the cycle a complete sweep ends with a CRC match,
     // and falls on any accepted store write.
 `ifdef P11
+    // sweep length counted here, not taken from the design's sw_last: a complete sweep
+    // reads all 4096 bytes, so it ends on its 4097th cycle
+    reg [12:0] sc = 13'd0;
+    always @(posedge clock) sc <= (init || !f_sweeping) ? 13'd0 : sc + 13'd1;
     always @(posedge clock) if (!init && !$past(init)) begin
         if (st_image_valid && !$past(st_image_valid))
-            assert ($past(f_sweeping && f_sw_last && f_sw_match));  // A11a
+            assert ($past(f_sweeping && sc == 13'd4096 && f_sw_match));  // A11a
+        if (f_sweeping) assert (sc == f_sw_cnt);  // A11c, a lemma that makes A11a inductive
         if ($past(f_store_we)) assert (!st_image_valid);              // A11b
     end
 

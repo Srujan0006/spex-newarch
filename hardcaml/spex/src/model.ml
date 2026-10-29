@@ -37,6 +37,10 @@ type inputs =
   ; verify : bool
   ; crc_expect : int
   ; crc_expect_we : bool
+  ; rx_wm : int
+  ; tx_wm : int
+  ; tx_wm_en : bool
+  ; drop_clear : bool
   }
 
 let zero_lane_cfg = Lane_cfg.map Lane_cfg.port_widths ~f:(fun _ -> 0)
@@ -71,6 +75,10 @@ let idle_inputs =
   ; verify = false
   ; crc_expect = 0
   ; crc_expect_we = false
+  ; rx_wm = 0
+  ; tx_wm = 0
+  ; tx_wm_en = false
+  ; drop_clear = false
   }
 ;;
 
@@ -103,6 +111,8 @@ type outputs =
   ; verify_busy : bool
   ; host_err : bool
   ; host_err_cause : int
+  ; tx_collision : bool
+  ; drops : int
   ; lane_active : int
   ; lane_status : int
   }
@@ -161,6 +171,8 @@ type t =
   ; mutable sweeping : bool
   ; mutable sw_cnt : int
   ; mutable host_err_cause : int
+  ; mutable tx_collision : bool
+  ; drops : int array (* RX lane 0, RX lane 1, RX engine, violation log, coverage *)
   ; (* coverage pipeline *)
     mutable s1 : (int * int) option (* addr, offset *)
   ; mutable s2 : (int * int * int * int) option (* addr, n, min, max *)
@@ -227,6 +239,8 @@ let create () =
     ; sweeping = false
     ; sw_cnt = 0
     ; host_err_cause = 0
+    ; tx_collision = false
+    ; drops = Array.create ~len:5 0
     ; s1 = None
     ; s2 = None
     }
@@ -301,7 +315,9 @@ let outputs t (i : inputs) =
       (* refused while running or while the image check sweep runs *)
       (if in_idle t && not t.sweeping then t.cov_rdata else 0)
   ; irq =
-      (not (Queue.is_empty t.rx_fifo))
+      (* watermarks: RX holds at least rx_wm bytes (0 acts as 1); TX at most tx_wm *)
+      Queue.length t.rx_fifo >= max 1 i.rx_wm
+      || (i.tx_wm_en && Queue.length t.tx_fifo <= i.tx_wm)
       || (not (Queue.is_empty t.vlog_fifo))
       || t.halted_viol
       || t.irq_flag
@@ -313,6 +329,8 @@ let outputs t (i : inputs) =
   ; verify_busy = t.sweeping
   ; host_err = t.host_err
   ; host_err_cause = t.host_err_cause
+  ; tx_collision = t.tx_collision
+  ; drops = Array.foldi t.drops ~init:0 ~f:(fun k acc c -> acc lor (c lsl (8 * k)))
   ; lane_active =
       List.init num_lanes ~f:(fun l -> if Lane_model.active t.lanes.(l) then 1 lsl l else 0)
       |> List.fold ~init:0 ~f:( lor )
@@ -530,6 +548,7 @@ let step t (i : inputs) =
   then (
     t.host_err <- true;
     t.host_err_cause <- err_cause);
+  if i.err_clear then t.tx_collision <- false;
   (* bit lanes: the winning edge's tx_pin field is the command when tx_pin_en = 0 *)
   let cmd = if any_fire && we.tx_pin_en = 0 then we.tx_pin else 0 in
   let tx_head = Queue.peek t.tx_fifo in
@@ -625,6 +644,8 @@ let step t (i : inputs) =
     else ovf
   in
   let tx_pop_now = (tx_pop || lane_pop) && not tx_empty in
+  (* the engine and a lane take the same head byte; one pop, and it is flagged *)
+  if tx_pop && lane_pop && not i.err_clear then t.tx_collision <- true;
   let rx_pop_now = i.rx_pop && not (Queue.is_empty t.rx_fifo) in
   let vlog_pop_now = i.vlog_pop && not (Queue.is_empty t.vlog_fifo) in
   let tx_full_now = Queue.length t.tx_fifo = fifo_depth in
@@ -663,14 +684,24 @@ let step t (i : inputs) =
        | None, None -> None)
   in
   let buf_drop = ref false in
+  (* drop events per source: RX lane 0, RX lane 1, RX engine, violation log, coverage *)
+  let drop_ev = Array.create ~len:5 false in
   Array.iteri news ~f:(fun s n ->
     let won = match accepted with Some (_, w) -> w = s | None -> false in
     match t.rx_wait.(s), n, won with
     | Some _, Some nb, true -> t.rx_wait.(s) <- Some nb
     | Some _, None, true -> t.rx_wait.(s) <- None
     | None, Some nb, false -> t.rx_wait.(s) <- Some nb
-    | Some _, Some _, false -> buf_drop := true
+    | Some _, Some _, false ->
+      buf_drop := true;
+      drop_ev.(s + 1) <- true
     | _ -> ());
+  Option.iter accepted ~f:(fun (_, w) -> if rx_full_now then drop_ev.(w + 1) <- true);
+  Array.iteri lane_steps ~f:(fun l s -> if s.Lane_model.lost then drop_ev.(l) <- true);
+  drop_ev.(3) <- viol_now && vlog_full_now;
+  drop_ev.(4) <- drop_now;
+  Array.iteri drop_ev ~f:(fun k ev ->
+    if i.drop_clear then t.drops.(k) <- 0 else if ev then t.drops.(k) <- min 255 (t.drops.(k) + 1));
   let rx_push = Option.is_some accepted in
   Option.iter accepted ~f:(fun (b, _) -> if not rx_full_now then Queue.enqueue t.rx_fifo b);
   if vlog_pop_now then ignore (Queue.dequeue_exn t.vlog_fifo : int);

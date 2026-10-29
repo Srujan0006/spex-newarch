@@ -5,7 +5,7 @@ Verilog into formal/mut/, and runs formal/prove.sh on it.
 
 usage: python3 formal/vacuity.py      (from the repo root, with opam env loaded)
 """
-import subprocess, pathlib, sys
+import subprocess, pathlib, sys, re
 sys.path.insert(0, "mutation")
 from mutate import MUTANTS
 
@@ -38,7 +38,9 @@ def main():
             g = subprocess.run(f"dune exec bin/gen.exe -- {out}", shell=True, capture_output=True, text=True)
             if g.returncode != 0:
                 rows.append((name, TARGETS[name], "BUILD FAILED")); continue
-            p = subprocess.run(f"formal/prove.sh {out.resolve()}/spex_core.v", shell=True, capture_output=True, text=True)
+            group = re.match(r"(P\d+)", TARGETS[name]).group(1)
+            group = "CHECK_ROLE" if group == "P2" else group
+            p = subprocess.run(f"PROPS={group} formal/prove.sh {out.resolve()}/spex_core.v", shell=True, capture_output=True, text=True)
             res = p.stdout.strip().replace("\n", "; ")
             rows.append((name, TARGETS[name], res))
     finally:
@@ -46,13 +48,12 @@ def main():
     # Verilog-level mutant for P6: the timestamp skips a count when it is odd
     # (the net name of the increment changes with the RTL, so find it: the non-clear
     # branch of ts_reg's always block)
-    import re
     v = pathlib.Path("out/spex_core.v").read_text()
     m = re.search(r"else\n\s+ts_reg <= (_\d+);", v)
     if m:
         n = m.group(1)
         (out / "ts_skip.v").write_text(v[:m.start()] + f"else\n            ts_reg <= {n} + {{31'b0, {n}[0]}};" + v[m.end():])
-        p = subprocess.run(f"formal/prove.sh {out.resolve()}/ts_skip.v", shell=True, capture_output=True, text=True)
+        p = subprocess.run(f"PROPS=P6 formal/prove.sh {out.resolve()}/ts_skip.v", shell=True, capture_output=True, text=True)
         rows.append(("Verilog: timestamp skips odd values", "P6 (timestamp counts)", p.stdout.strip().replace("\n", "; ")))
     print("| Mutant | Expected to break | prove.sh result |\n|---|---|---|")
     for r in rows: print("| %s | %s | %s |" % r)

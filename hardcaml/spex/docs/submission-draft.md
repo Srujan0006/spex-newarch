@@ -10,7 +10,7 @@ SPEX runs a **spec**: a protocol written as a timed automaton (locations, clocks
 edges). The same spec can be used in three roles. In **Drive** it is the protocol: it
 drives the bus as a controller or a target. In **Check** it watches another device on the
 bus and logs every violation with an exact cycle timestamp. In **Stress** it drives at
-the edges of the spec's own timing windows (earliest, latest or random point) to find
+the edges of the spec's own timing windows (earliest point, latest point, or a random point drawn with probability 1/16 per eligible cycle and forced at the latest, so earlier points are more likely) to find
 the margins of the device under test. **Cover** (edge counts plus min and max timing per
 edge) can be switched on in any role. A new protocol is a new spec loaded over SPI, not
 new silicon, which is the flexibility the judges ask for: a protocol nobody named before

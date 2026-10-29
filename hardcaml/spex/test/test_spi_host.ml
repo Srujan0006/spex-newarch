@@ -257,3 +257,24 @@ let%expect_test "frame_bits written while lane 0 is Done is used by the next fra
     node received (((id 273)(data(170)))((id 546)(data(1 2 3 4)))); FLAGS 10
     |}]
 ;;
+
+let%expect_test "drop counters, WATERMARK and tx_collision over SPI" =
+  let t = S.create () in
+  S.load t Test_drops.pusher;
+  let csr addr n = S.read t ~space:S.Space.csr ~addr n in
+  let hex l = String.concat ~sep:" " (List.map l ~f:(Printf.sprintf "%02x")) in
+  S.write t ~space:S.Space.csr ~addr:0x1C [ 0xA3 ];
+  printf "WATERMARK reads back %s\n" (hex (csr 0x1C 1));
+  S.start t ();
+  S.ticks t 600;
+  printf "drop counters 0x20..0x24: %s; 0x13 %s\n" (hex (csr 0x20 5)) (hex (csr 0x13 1));
+  (* CTRL bit 5 clears the counters; the engine keeps pushing into the full FIFO *)
+  S.stop t;
+  S.write t ~space:S.Space.csr ~addr:S.csr_ctrl [ 0x20 ];
+  printf "after CTRL bit 5: %s\n" (hex (csr 0x20 5));
+  [%expect {|
+    WATERMARK reads back a3
+    drop counters 0x20..0x24: 00 00 ff 00 00; 0x13 80
+    after CTRL bit 5: 00 00 00 00 00
+    |}]
+;;

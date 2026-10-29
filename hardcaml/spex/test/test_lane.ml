@@ -55,6 +55,7 @@ let cycle l ~pins_s ~pins_q (k : Lane_model.cmd) =
     , [ get l.o.done_; get l.o.crc_ok; get l.o.sync_hit; get l.o.error ]
     , get l.o.err_kind )
   in
+  let r_lost = get l.o.lost = 1 in
   let out_before = l.model.out in
   let flags_before = List.map (Lane_model.flags l.model) ~f:Bool.to_int in
   let kind_before = l.model.kind in
@@ -66,7 +67,8 @@ let cycle l ~pins_s ~pins_q (k : Lane_model.cmd) =
         && Bool.equal r_pop s.pop
         && Option.equal Int.equal r_push s.push
         && List.equal Int.equal r_flags flags_before
-        && r_kind = kind_before)
+        && r_kind = kind_before
+        && Bool.equal r_lost s.lost)
   then
     raise_s
       [%message
@@ -77,6 +79,8 @@ let cycle l ~pins_s ~pins_q (k : Lane_model.cmd) =
           (r_push : int option)
           (r_flags : int list)
           (r_kind : int)
+          (r_lost : bool)
+          ~mdl_lost:(s.lost : bool)
           ~mdl:(mdl : int * bool * int option * int list * int)];
   if s.pop then ignore (Queue.dequeue_exn l.fifo : int);
   Option.iter s.push ~f:(Queue.enqueue l.rx);

@@ -13,6 +13,7 @@ import subprocess, sys, pathlib
 SRC = pathlib.Path("src/engine.ml")
 SPI = pathlib.Path("src/host_spi.ml")
 LANE = pathlib.Path("src/lane.ml")
+SPEC = pathlib.Path("src/spec.ml")
 
 MUTANTS = [
     ("edge priority: edge 1 beats edge 0",
@@ -58,10 +59,12 @@ MUTANTS = [
      "reduce ~f:( |: ) (hdr.watch :: List.map edges ~f:(fun e -> mux2 e.valid e.chg_mask (zero 8)))",
      "reduce ~f:( |: ) (hdr.watch :: List.map edges ~f:(fun e -> mux2 e.valid (zero 8) (zero 8)))"),
     # host access rules (test_host_access.ml, formal P8 / P9)
-    ("store write while running reaches the SRAM", "; rec_we = h.rec_we &: in_idle", "; rec_we = h.rec_we"),
+    ("store write while running reaches the SRAM", "let store_we = h.rec_we &: in_idle &: ~:(sweeping.value) in",
+     "let store_we = h.rec_we &: ~:(sweeping.value) in"),
     ("recover jumps to the live recover_loc", "cur_loc <-- recover_lat.value", "cur_loc <-- h.recover_loc"),
-    ("coverage read while running returns SRAM data", "; cov_rdata = mux2 in_idle i.ram.cov_rdata (zero 32)",
-     "; cov_rdata = i.ram.cov_rdata"),
+    ("coverage read while running returns SRAM data",
+     "; cov_rdata = mux2 (in_idle &: ~:(sweeping.value)) i.ram.cov_rdata (zero 32)",
+     "; cov_rdata = mux2 ~:(sweeping.value) i.ram.cov_rdata (zero 32)"),
     ("host_err cause: last cause wins", "[ when_ (err_now &: ~:(host_err.value)) [ host_err <--. 1; host_err_cause <-- err_cause ] ]",
      "[ when_ err_now [ host_err <--. 1; host_err_cause <-- err_cause ] ]"),
     ("stop leaves the lanes running", "; reset = cmd_is Lane_cmd.reset |: h.stop", "; reset = cmd_is Lane_cmd.reset"),
@@ -89,6 +92,13 @@ MUTANTS += [
      "lane_cmd <== mux2 (any_fire &: ~:(we.tx_pin_en)) we.tx_pin (zero 3);",
      "lane_cmd <== mux2 any_fire we.tx_pin (zero 3);"),
     ("lane flags read as 0", "    @ lane_flags", "    @ List.map lane_flags ~f:(fun _ -> gnd)"),
+    # section 3 and 4 of review-fixes.md (test_tx_collision.ml, test_drops.ml)
+    ("tx_collision never set", "[ when_ tx_collision_now [ tx_collision <--. 1 ] ]",
+     "[ when_ (tx_collision_now &: gnd) [ tx_collision <--. 1 ] ]"),
+    ("drop counter wraps instead of saturating", "when_ (ev &: (c.value <>:. 255))", "when_ ev"),
+    ("engine push into a full RX FIFO not counted", "; buf_drop_of 1 |: (acc2 &: rx_full)", "; buf_drop_of 1"),
+    ("RX watermark compared with >", "rx_used >=: uresize", "rx_used >: uresize"),
+    ("TX watermark ignores its enable", "(h.tx_wm_en &: (tx_used", "(vdd &: (tx_used"),
 ]
 
 # bit lane (test_lane.ml lockstep and loopback, test_can.ml)
@@ -107,6 +117,7 @@ LANE_MUTANTS = [
      "(concat_msb [ rbit; select byte.value 6 0 ])"),
     ("END drops the partial byte", "&: (bitpos_after <>:. 0) &: ~:push in", "&: (bitpos_after <>:. 0) &: ~:push &: gnd in"),
     ("NRZI decode inverted", "(d ==: prev.value)", "(d <>: prev.value)"),
+    ("a partial RX byte lost at stop is not counted", "i.reset &: ~:(i.end_) &: is_rx", "i.reset &: gnd &: is_rx"),
     ("RX Done before a trailing stuff bit", "&: left_done &: ~:stuff_after in", "&: left_done &: ~:(stuff_after &: gnd) in"),
 ]
 
@@ -131,6 +142,18 @@ SPI_MUTANTS = [
      "[ start_p <-- byte.:(1)\n                ; stop_p <-- byte.:(0)"),
     ("vlog byte 5 does not wrap the address", "(concat_msb [ select a 15 3; zero 3 ])", "(a +:. 1)"),
     ("TX FIFO byte pushed without its data", "[ tx_push_p <--. 1; tx_data <-- byte ]", "[ tx_push_p <--. 1 ]"),
+    ("drop counters cleared by CTRL bit 4", "drop_clear_p <-- byte.:(5)", "drop_clear_p <-- byte.:(4)"),
+    ("drop counter bank aliases the CSRs at 0x00", "      a.:(5)\n      (mux (select a 2 0)", "      gnd\n      (mux (select a 2 0)"),
+]
+
+# compiler: TX FIFO collision check (test_tx_collision.ml)
+SPEC_MUTANTS = [
+    ("compiler ignores END", "        else if c = Lane_cmd.end_ l\n        then a land lnot (bit l)",
+     "        else if c = Lane_cmd.end_ l\n        then a"),
+    ("compiler ignores the lane done flag", "then a land lnot (bit l) else a)", "then a else a)"),
+    ("compiler: recover jumps nowhere", "if l.policy = Policy.recover\n", "if false\n"),
+    ("compiler checks an edge's load after its own END", "let a_edge = done_known e.guard a in\n      if a_edge <> 0",
+     "let a_edge = done_known e.guard a in\n      if command e a_edge <> 0"),
 ]
 
 
@@ -139,12 +162,13 @@ def run(cmd):
 
 
 def main():
-    originals = {SRC: SRC.read_text(), SPI: SPI.read_text(), LANE: LANE.read_text()}
+    originals = {f: f.read_text() for f in (SRC, SPI, LANE, SPEC)}
     killed = 0
     rows = []
     try:
         for src, (name, old, new) in (
             [(SRC, m) for m in MUTANTS] + [(LANE, m) for m in LANE_MUTANTS] + [(SPI, m) for m in SPI_MUTANTS]
+            + [(SPEC, m) for m in SPEC_MUTANTS]
         ):
             for f, text in originals.items():
                 f.write_text(text)

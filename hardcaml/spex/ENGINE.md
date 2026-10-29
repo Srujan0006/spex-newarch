@@ -125,8 +125,12 @@ every cycle; with ÷N the clocks count only in cycles where the low log2(N) bits
 is the new record's from beat 1 on, like every other header field.
 
 Stress role, per edge: 0 fire as soon as the guard holds, 1 only when the clock
-equals `lo`, 2 only when it equals `hi`, 3 each cycle with probability 1/16
-(`lfsr[3:0] == 0`) and always at `hi`. Clock select 3 reads clock 2.
+equals `lo`, 2 only when it equals `hi`, 3 random (below). Clock select 3 reads clock 2.
+
+Stress mode 3: once the guard holds inside the window, the edge fires on each eligible
+cycle with probability 1/16 (`lfsr[3:0] == 0`), and is forced at `hi`. The firing point
+is therefore a **truncated geometric distribution**: earlier eligible cycles are more
+likely, and all remaining probability is concentrated at `hi`.
 
 ## Pins
 
@@ -173,6 +177,9 @@ count + 1 (saturating at 255), and min/max of the edge's `v_k` (saturated to
 while S1 is busy: the same address is merged, a different address is dropped and
 `cov_overrun` is set.
 
+Coverage collected while `cov_overrun` is set (or the coverage drop count is non-zero)
+is incomplete: counts and min/max are lower bounds.
+
 ## Host access rules
 
 | Access | Idle | Running |
@@ -195,8 +202,8 @@ configuration CSRs only; status, write-1-to-clear and IRQ-enable bits stay writa
 
 `stop`: the engine's pins are released (`poe = 0`) and so are lane-sourced pins (their
 enable is `poe`), so a stopped chip drives nothing. Both lanes go Idle: a partial RX byte
-is dropped, a partial TX frame is cut off and its line released. The FIFOs keep their
-bytes.
+is dropped (and counted in that lane's RX drop counter), a partial TX frame is cut off
+and its line released. The FIFOs keep their bytes.
 
 A lane CSR write in the same cycle as the engine's GO for that lane lands (the lane was
 not active yet), and the frame uses it: the lane reads `frame_bits` directly at its first
@@ -233,9 +240,24 @@ whose read-back CRC matches the approved digest.
 ## Host side (core ports)
 
 `start` (role, `start_loc`, `recover_loc`), `stop` (see Host access rules; a `start` while running restarts the engine at `start_loc` and drops the pin changes latched so far; found by formal property P3); location-store and coverage writes are ignored
-while running; TX push, RX pop, log pop. `irq` = RX not empty, or log not empty, or
-halted on violation, or an entry with `irq_on_entry` since the last `irq_ack`. FIFO
-heads are only defined when the FIFO is not empty.
+while running; TX push, RX pop, log pop. `irq` = RX holds at least `rx_wm` bytes (`rx_wm`
+= 0 acts as 1, so any byte), or TX holds at most `tx_wm` bytes while `tx_wm_en`, or log
+not empty, or halted on violation, or an entry with `irq_on_entry` since the last
+`irq_ack`. FIFO heads are only defined when the FIFO is not empty.
+
+## Limits and loss accounting
+
+The TX, RX and violation-log FIFOs are 8 entries deep. The host SPI clock is at most
+clk/6 (6.7 MHz at 40 MHz). The host must drain RX at the protocol's byte rate; bytes it
+does not take in time are dropped and counted.
+
+Five saturating 8-bit drop counters count lost data, one event per source per cycle:
+RX lane 0, RX lane 1, RX engine (a push into a full FIFO, a push into a full wait
+buffer, and for a lane a partial RX byte dropped by `stop` or the reset command), the
+violation log (an entry into a full log), and coverage (an update dropped while S1 is
+busy). They are not cleared by `start` (the overflow bits are); only `drop_clear` clears
+them. `tx_collision` (sticky, cleared by `err_clear`) is set when the engine and a lane
+pop the TX FIFO in the same cycle.
 
 ## Bit lanes
 
@@ -334,7 +356,11 @@ Commands act at the end of the cycle (after this cycle's lane step).
 **RX FIFO arbitration.** Lane 0, lane 1 and the engine (`rx_op` push) can push in the
 same cycle. Priority: lane 0, lane 1, engine. A push that loses waits in its own
 one-entry buffer and goes in the first cycle no higher-priority push happens; a push
-into a full buffer is dropped and sets `rx_overflow`.
+into a full buffer is dropped, sets `rx_overflow` and is counted.
 
-**TX FIFO.** A lane pop and an engine load in the same cycle both read the head; the
-FIFO pops once.
+**TX FIFO.** If the engine and a lane both pop TX in one cycle, both receive the same
+byte and one byte is popped; `tx_collision` is set. Compiled specs never do this: the
+compiler rejects an engine `tx load` / `load_rev` that may run while a TX lane may be
+active (from a GO or CRC command to an END, the reset command, or an edge guarded on the
+lane's done flag), searching the location graph with every location a possible start
+and a recover-policy location able to jump to any location.

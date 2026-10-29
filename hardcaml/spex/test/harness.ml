@@ -85,6 +85,10 @@ let model_inputs (t : t) : Model.inputs =
   ; verify = getb h.verify
   ; crc_expect = get h.crc_expect
   ; crc_expect_we = getb h.crc_expect_we
+  ; rx_wm = get h.rx_wm
+  ; tx_wm = get h.tx_wm
+  ; tx_wm_en = getb h.tx_wm_en
+  ; drop_clear = getb h.drop_clear
   }
 ;;
 
@@ -117,6 +121,8 @@ let rtl_outputs (t : t) : Model.outputs =
   ; verify_busy = getb s.verify_busy
   ; host_err = getb s.host_err
   ; host_err_cause = get s.host_err_cause
+  ; tx_collision = getb s.tx_collision
+  ; drops = get s.drops
   ; lane_active = get s.lane_active
   ; lane_status = get s.lane_status
   }
@@ -163,8 +169,8 @@ let pulse t r v =
   set r 0
 ;;
 
-let load t (spec : Spec.t) =
-  let records = Spec.compile ~warn:ignore spec in
+let load ?lane_check t (spec : Spec.t) =
+  let records = Spec.compile ~warn:ignore ?lane_check spec in
   let h = t.i.host in
   Array.iteri records ~f:(fun loc record ->
     List.iteri (Spec.beats_of record) ~f:(fun b word ->
@@ -174,7 +180,7 @@ let load t (spec : Spec.t) =
   h.rec_wdata := Bits.zero 128;
   (* image check: the simulated store starts at zero, so the spec's records plus zeros
      are the whole store; a loader on silicon writes every word *)
-  set h.crc_expect (Model.store_crc32 (Spec.store_image spec));
+  set h.crc_expect (Model.store_crc32 (Spec.store_image ?lane_check spec));
   pulse t h.crc_expect_we 1;
   pulse t h.verify 1;
   let n = ref 0 in
