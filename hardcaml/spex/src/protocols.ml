@@ -293,6 +293,87 @@ let can_rx ~pin ~n =
   }
 ;;
 
+(** CAN 2.0A to UART bridge, CAN -> UART, on the chip alone. Lane 1 receives CAN frames
+    on [can_pin] with its length field (frame length from DLC) and header skip, so only
+    the data bytes (DLC 0..8; 9..15 count as 8) arrive, MSB first, aligned; with the
+    host's rx_to_tx bit they go into the TX FIFO. A frame is forwarded only after its
+    CRC checked: the engine ACKs it, then sends its bytes as UART 8N1 on [uart_pin]
+    ([baud] cycles per bit). A frame with a bad CRC or a lane error (stuff error, or a
+    remote frame with DLC > 0: the lane expects data that never comes) is dropped: its
+    bytes are popped from the TX FIFO without touching a pin, then location [bad] logs a
+    TIMEOUT and recovers (recover_loc = "idle", index 0). Frames that arrive while the
+    bridge is forwarding are missed (it waits for 11 recessive bits before re-arming).
+
+    Host setup ([n] cycles per CAN bit, >= 16): lane 1 RX as [can_rx] plus skip 19,
+    len_en, len_pos 18, len_max 8, frame_bits 83; CONFIG rx_to_tx; [can_pin] open-drain,
+    pin source "engine" on both pins; compile with [~rx_lanes:[ 1 ]]. *)
+let can_uart_bridge ~can_pin ~uart_pin ~n ~baud =
+  let bit_end g = g |> at (baud - 1) in
+  { name = "can_uart_bridge"
+  ; locs =
+      [ (* bus idle: 11 recessive bits, then arm the lane for the next SOF *)
+        loc
+          "idle"
+          ~entry:(nop |> set can_pin true |> set uart_pin true)
+          ~accepting:true
+          [ edge ~goto:"idle" (always |> falls can_pin) (nop |> reset 0)
+          ; edge ~goto:"arm" (always |> after ((11 * n) - 1)) (nop |> lane (Lane_cmd.go 1))
+          ]
+      ; loc "arm" [ edge ~goto:"frame" always (nop |> lane (Lane_cmd.crc 1)) ]
+      ; loc
+          "frame"
+          [ edge ~goto:"drop" (always |> flag (Flag.lane_error 1)) nop
+          ; edge ~goto:"check" (always |> flag (Flag.lane_done 1)) (nop |> reset 0)
+          ]
+      ; loc
+          "check"
+          [ edge ~goto:"wait_ack" (always |> flag (Flag.lane_crc_ok 1)) nop
+          ; edge ~goto:"drop" always (nop |> lane (Lane_cmd.end_ 1))
+          ]
+      ; (* as can_rx: drive the ACK slot dominant *)
+        loc
+          "wait_ack"
+          [ edge ~goto:"acking" (always |> at (n + (n / 2) - 5)) (nop |> set can_pin false |> reset 0) ]
+      ; loc "acking" [ edge ~goto:"eof" (always |> at (n - 1)) (nop |> set can_pin true |> reset 0) ]
+      ; loc
+          "eof"
+          [ edge ~goto:"send" (always |> at ((8 * n) - 1)) (nop |> lane (Lane_cmd.end_ 1) |> reset 0) ]
+      ; (* UART 8N1 from the TX FIFO until it is empty, as uart_tx *)
+        loc
+          "send"
+          [ edge ~goto:"idle" (always |> flag Flag.tx_empty) (nop |> reset 0)
+          ; edge
+              ~goto:"data"
+              always
+              (nop |> set uart_pin false |> tx Tx_op.load |> cnt Cnt_op.load8 |> reset 0)
+          ]
+      ; loc
+          "data"
+          [ edge ~goto:"stop" (always |> bit_end |> flag Flag.cnt_zero) (nop |> set uart_pin true |> reset 0)
+          ; edge
+              ~goto:"data"
+              (always |> bit_end)
+              (nop |> send_bit uart_pin |> tx Tx_op.shift |> cnt Cnt_op.dec |> reset 0)
+          ]
+      ; loc
+          "stop"
+          [ edge
+              ~goto:"data"
+              (always |> bit_end |> not_flag Flag.tx_empty)
+              (nop |> set uart_pin false |> tx Tx_op.load |> cnt Cnt_op.load8 |> reset 0)
+          ; edge ~goto:"idle" (always |> bit_end) (nop |> reset 0)
+          ]
+      ; (* a bad frame: its bytes leave the TX FIFO without reaching a pin *)
+        loc
+          "drop"
+          [ edge ~goto:"bad" (always |> flag Flag.tx_empty) (nop |> reset 0)
+          ; edge ~goto:"drop" always (nop |> tx Tx_op.load)
+          ]
+      ; loc "bad" ~inv:(0, 1) ~policy:Policy.recover []
+      ]
+  }
+;;
+
 (** SPI target, any mode ([cpol], [cpha] in 0/1), MSB first. Follows the controller's
     SCK edges: each byte received on MOSI goes to the RX FIFO, and each byte sent on
     MISO comes from the TX FIFO (0xFF when it is empty). MISO is released while CS is

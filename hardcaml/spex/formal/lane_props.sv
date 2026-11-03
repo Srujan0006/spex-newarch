@@ -1,6 +1,8 @@
 // Formal properties of one bit lane (out/spex_lane.v), stated on the line it drives
 // against ENGINE.md (Bit lanes), not against lane.ml. Every configuration, command
-// sequence, TX FIFO byte and pin input is free, except as assumed below. One group per
+// sequence, TX FIFO byte and pin input is free, except as assumed below; the RX header
+// skip and length field (skip, len_en) are off here: they are covered by the lane
+// lockstep and the CAN bridge tests (test_bridge.ml). One group per
 // run (prove_lanes.sh), each guarded by `ifdef L<n>`.
 //   L1  stuffing: the line never shows more than stuff_len equal bits (mode 1, CAN) or
 //       stuff_len ones (mode 2, USB) in a row
@@ -20,7 +22,8 @@
     .cfg_clk_pin(clk_pin), .cfg_clk_edge(edge_v), .cfg_code(code), .cfg_stuff(stuff), \
     .cfg_stuff_len(stuff_len), .cfg_poly(poly), .cfg_init(init), .cfg_crc_width(crc_width), \
     .cfg_crc_inv(crc_inv), .cfg_sync(sync), .cfg_sync_mask(sync_mask), .cfg_data_pin(data_pin), \
-    .cfg_lsb_first(lsb_first), .cfg_readback(rb_v), .cfg_frame_bits(frame_bits)
+    .cfg_lsb_first(lsb_first), .cfg_readback(rb_v), .cfg_frame_bits(frame_bits), \
+    .cfg_skip(6'd0), .cfg_len_en(1'b0), .cfg_len_pos(6'd0), .cfg_len_max(4'd0)
 
 `define CFG_BUS {clk_edge, clk_pin, clk_pin_en, code, crc_inv, crc_width, data_pin, div_frac, \
     div_int, frame_bits, init, lsb_first, poly, readback, stuff, stuff_len, sync, sync_mask}
@@ -39,13 +42,13 @@ module lane_tx_props (
 
     wire out, pop, push, done_, crc_ok, sync_hit, error, active, lost, g_tx_bit, g_data_left;
     wire [7:0] push_data; wire [2:0] err_kind;
-    wire [15:0] g_cnt; wire [31:0] g_crc; wire [2:0] g_run; wire g_last;  // lemma only
+    wire [15:0] g_cnt; wire [31:0] g_crc; wire [2:0] g_run; wire g_last; wire [1:0] g_len;  // lemma only
     spex_lane dut (.clock(clock), .clear(init0), `LANE_CFG_CONNECT(1'b0, clk_edge, readback),
         .go(go), .end_(end_), .crc_cmd(crc_cmd), .reset(reset), .pins_s(pins_s), .pins_q(pins_q),
         .tx_head(tx_head), .tx_empty(tx_empty), .out(out), .pop(pop), .push(push),
         .push_data(push_data), .done_(done_), .crc_ok(crc_ok), .sync_hit(sync_hit),
         .error(error), .err_kind(err_kind), .active(active), .lost(lost), .g_tx_bit(g_tx_bit),
-        .g_data_left(g_data_left), .g_cnt(g_cnt), .g_crc(g_crc), .g_run(g_run), .g_last(g_last));
+        .g_data_left(g_data_left), .g_cnt(g_cnt), .g_crc(g_crc), .g_run(g_run), .g_last(g_last), .g_len_cap(g_len[1]), .g_len_known(g_len[0]));
 
     // The host writes the CSRs only while the lane is Idle (ENGINE.md), never in the cycle
     // of a GO; the divider is >= 4. The engine sends one command code per cycle; the stop
@@ -109,6 +112,7 @@ module lane_tx_props (
         if (stuff != 2'd0) assert ((bit_valid ? run_n : run) == {1'b0, g_run});
     end
     always @* if (!init0 && (active || done_) && stuff != 2'd0) assert (g_run <= stuff_len);
+    always @* if (!init0) assert (g_len == 2'b00);  // len_en is tied off
 `endif  // NO_LEMMAS
 `endif
 endmodule
@@ -132,7 +136,7 @@ module lane_loop_props (
     // lane registers, for the helper lemmas only
     wire [15:0] t_cnt, r_cnt; wire [31:0] t_crc, r_crc; wire [2:0] t_run, r_run, t_bitpos, r_bitpos;
     wire [7:0] t_byte, r_byte; wire [5:0] t_cleft, r_cleft; wire [1:0] t_mode, r_mode;
-    wire t_last, r_last, t_crc_bad, r_crc_bad, t_prev, r_prev;
+    wire t_last, r_last, t_crc_bad, r_crc_bad, t_prev, r_prev; wire [1:0] t_len, r_len;
     // RX data pin = TX out; clock pin = sck; other pins free
     wire [7:0] pins_s = (pins_free & ~(8'd1 << data_pin) & ~(8'd1 << clk_pin))
                       | ({7'd0, t_out} << data_pin) | ({7'd0, sck} << clk_pin);
@@ -145,14 +149,16 @@ module lane_loop_props (
         .push_data(t_pd), .done_(t_done), .crc_ok(t_crc_ok), .sync_hit(t_sync), .error(t_err),
         .err_kind(t_kind), .active(t_active), .lost(t_lost), .g_tx_bit(t_g), .g_data_left(t_left),
         .g_cnt(t_cnt), .g_crc(t_crc), .g_run(t_run), .g_last(t_last), .g_bitpos(t_bitpos),
-        .g_byte(t_byte), .g_left(t_cleft), .g_crc_bad(t_crc_bad), .g_prev(t_prev), .g_mode(t_mode));
+        .g_byte(t_byte), .g_left(t_cleft), .g_crc_bad(t_crc_bad), .g_prev(t_prev), .g_mode(t_mode),
+        .g_len_cap(t_len[1]), .g_len_known(t_len[0]));
     spex_lane rx (.clock(clock), .clear(init0), `LANE_CFG_CONNECT(1'b1, !clk_edge, 1'b0),
         .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .pins_s(pins_s), .pins_q(pins_q),
         .tx_head(8'hFF), .tx_empty(1'b1), .out(r_out), .pop(r_pop), .push(r_push),
         .push_data(r_pd), .done_(r_done), .crc_ok(r_crc_ok), .sync_hit(r_sync), .error(r_err),
         .err_kind(r_kind), .active(r_active), .lost(r_lost), .g_tx_bit(r_g), .g_data_left(r_left),
         .g_cnt(r_cnt), .g_crc(r_crc), .g_run(r_run), .g_last(r_last), .g_bitpos(r_bitpos),
-        .g_byte(r_byte), .g_left(r_cleft), .g_crc_bad(r_crc_bad), .g_prev(r_prev), .g_mode(r_mode));
+        .g_byte(r_byte), .g_left(r_cleft), .g_crc_bad(r_crc_bad), .g_prev(r_prev), .g_mode(r_mode),
+        .g_len_cap(r_len[1]), .g_len_known(r_len[0]));
 
     // One configuration for the whole run; clocked, not Manchester (whose mid-bit
     // transition needs the divider); clock and data on different pins. Both lanes get
@@ -259,6 +265,7 @@ module lane_loop_props (
                      && t_cleft == s_cleft - 6'd1 && s_cleft != 6'd0 && w_slot == (s_crc[31] ^ crc_inv));
     end
     always @* if (!init0 && !in_frame) assert (t_mode == 2'd0 && r_mode == 2'd0 && !want_ok && !inflight && !r_err);
+    always @* if (!init0) assert (t_len == 2'b00 && r_len == 2'b00);  // len_en is tied off
 `endif  // NO_LEMMAS
     always @* if (!init0) begin
         if (t_pop) assert (!inflight);                         // A: the previous byte arrived

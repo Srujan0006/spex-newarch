@@ -41,6 +41,7 @@ type inputs =
   ; tx_wm : int
   ; tx_wm_en : bool
   ; drop_clear : bool
+  ; rx_to_tx : bool
   }
 
 let zero_lane_cfg = Lane_cfg.map Lane_cfg.port_widths ~f:(fun _ -> 0)
@@ -79,6 +80,7 @@ let idle_inputs =
   ; tx_wm = 0
   ; tx_wm_en = false
   ; drop_clear = false
+  ; rx_to_tx = false
   }
 ;;
 
@@ -538,6 +540,8 @@ let step t (i : inputs) =
     then 4 (* start refused: the store has not passed the image check *)
     else if t.sweeping && (i.rec_we || i.cov_we || i.cov_re)
     then 5 (* busy: the image check sweep owns the store *)
+    else if i.tx_push && i.rx_to_tx
+    then 6 (* the bridge owns the TX FIFO *)
     else 0
   in
   if i.err_clear
@@ -668,7 +672,7 @@ let step t (i : inputs) =
     (log_ts lsl 16) lor (t.cur_loc lsl 10) lor (viol_kind_now lsl 8) lor t.pins_s
   in
   if tx_pop_now then ignore (Queue.dequeue_exn t.tx_fifo : int);
-  if i.tx_push && not tx_full_now then Queue.enqueue t.tx_fifo i.tx_data;
+  if i.tx_push && (not i.rx_to_tx) && not tx_full_now then Queue.enqueue t.tx_fifo i.tx_data;
   if rx_pop_now then ignore (Queue.dequeue_exn t.rx_fifo : int);
   (* RX FIFO: lane 0, then lane 1, then the engine; a push that loses waits in its
      one-entry buffer, a push into a full buffer is dropped *)
@@ -696,18 +700,22 @@ let step t (i : inputs) =
       buf_drop := true;
       drop_ev.(s + 1) <- true
     | _ -> ());
-  Option.iter accepted ~f:(fun (_, w) -> if rx_full_now then drop_ev.(w + 1) <- true);
+  (* bridge (rx_to_tx): a lane's byte goes into the TX FIFO instead *)
+  let bridged = i.rx_to_tx && match accepted with Some (_, w) -> w < 1 | None -> false in
+  let dest_full = if bridged then tx_full_now else rx_full_now in
+  Option.iter accepted ~f:(fun (_, w) -> if dest_full then drop_ev.(w + 1) <- true);
   Array.iteri lane_steps ~f:(fun l s -> if s.Lane_model.lost then drop_ev.(l) <- true);
   drop_ev.(3) <- viol_now && vlog_full_now;
   drop_ev.(4) <- drop_now;
   Array.iteri drop_ev ~f:(fun k ev ->
     if i.drop_clear then t.drops.(k) <- 0 else if ev then t.drops.(k) <- min 255 (t.drops.(k) + 1));
   let rx_push = Option.is_some accepted in
-  Option.iter accepted ~f:(fun (b, _) -> if not rx_full_now then Queue.enqueue t.rx_fifo b);
+  Option.iter accepted ~f:(fun (b, _) ->
+    if not dest_full then Queue.enqueue (if bridged then t.tx_fifo else t.rx_fifo) b);
   if vlog_pop_now then ignore (Queue.dequeue_exn t.vlog_fifo : int);
   if viol_now && not vlog_full_now then Queue.enqueue t.vlog_fifo vlog_word;
   ignore push;
-  if (rx_push && rx_full_now) || !buf_drop then t.rx_ovf <- true;
+  if (rx_push && dest_full) || !buf_drop then t.rx_ovf <- true;
   if viol_now && vlog_full_now then t.vlog_ovf <- true;
   if drop_now then t.cov_ovr <- true;
   (* ---- registers ---- *)

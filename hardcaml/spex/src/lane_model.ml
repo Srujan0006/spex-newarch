@@ -33,6 +33,9 @@ type t =
   ; mutable sync_hit : bool
   ; mutable error : bool
   ; mutable kind : int (* {lost arbitration, bit error, stuff error} *)
+  ; mutable len_cap : bool (* RX: the length field's last bit came in the previous step *)
+  ; mutable len_known : bool
+  ; mutable lim : int (* the data length the field gave, once known and below frame_bits *)
   }
 
 let create () =
@@ -56,6 +59,9 @@ let create () =
   ; sync_hit = false
   ; error = false
   ; kind = 0
+  ; len_cap = false
+  ; len_known = false
+  ; lim = 0
   }
 ;;
 
@@ -151,14 +157,16 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
     t.crc <- ((t.crc lsl 1) lxor if fb = 1 then c.poly else 0) land 0xFFFF_FFFF
   in
   let crc_bit () = bit t.crc 31 lxor c.crc_inv in
+  let limit = if t.len_known then t.lim else c.frame_bits in
   let pop = ref false in
   let push = ref None in
   let became_done = ref false in
+  let len_now = ref false in
   let pushed = ref false in
   (* TX: pick the slot at a bit start *)
   if in_run && (not rx) && start
   then (
-    let data_avail = t.cnt < c.frame_bits in
+    let data_avail = t.cnt < limit in
     if stuff_due
     then (
       count stuff_bit;
@@ -214,7 +222,7 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
     if c.code = Code.nrzi then t.prev <- d;
     let finish () =
       (* Done once the frame and its CRC are in and no stuff bit is due *)
-      if t.cnt = c.frame_bits
+      if t.cnt = limit
          && t.crc_left = 0
          && not (c.stuff <> 0 && t.run = c.stuff_len)
       then (
@@ -235,16 +243,20 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
       count b;
       t.sr <- ((t.sr lsl 1) lor b) land 0xFFFF;
       if (t.sr lxor c.sync) land c.sync_mask = 0 then t.sync_hit <- true;
-      if t.cnt < c.frame_bits
+      if t.cnt < limit
       then (
         crc_update b;
-        t.byte <- (if c.lsb_first = 1 then (b lsl 7) lor (t.byte lsr 1) else ((t.byte lsl 1) lor b) land 0xFF);
-        t.cnt <- t.cnt + 1;
-        if t.bitpos = 7
+        (* bits before [skip]: CRC and sr only; the length field ends at [len_pos] *)
+        if t.cnt >= c.skip
         then (
-          push := Some t.byte;
-          pushed := true);
-        t.bitpos <- (t.bitpos + 1) land 7)
+          t.byte <- (if c.lsb_first = 1 then (b lsl 7) lor (t.byte lsr 1) else ((t.byte lsl 1) lor b) land 0xFF);
+          if t.bitpos = 7
+          then (
+            push := Some t.byte;
+            pushed := true);
+          t.bitpos <- (t.bitpos + 1) land 7);
+        if c.len_en = 1 && t.cnt = c.len_pos then len_now := true;
+        t.cnt <- t.cnt + 1)
       else if t.crc_left > 0
       then (
         t.crc_bad <- t.crc_bad || b <> crc_bit ();
@@ -252,6 +264,16 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
         t.crc_left <- t.crc_left - 1;
         if t.crc_left = 0 then t.crc_ok <- not t.crc_bad);
       finish ()));
+  (* the length, a step after the field's last bit: skip + 8 min(field, len_max),
+     used when below frame_bits *)
+  if t.len_cap
+  then (
+    let l = c.skip + (8 * min (t.sr land 0xF) c.len_max) in
+    if l < c.frame_bits
+    then (
+      t.lim <- l;
+      t.len_known <- true));
+  t.len_cap <- !len_now;
   (* commands, after this cycle's step *)
   let lost =
     k.reset
@@ -286,6 +308,8 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
     t.prev <- 1;
     t.sr <- 0;
     t.out <- 1;
+    t.len_cap <- false;
+    t.len_known <- false;
     t.crc_ok <- false;
     t.sync_hit <- false;
     t.error <- false;

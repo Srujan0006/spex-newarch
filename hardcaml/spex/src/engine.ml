@@ -48,6 +48,9 @@ module Host_in = struct
     ; tx_wm : 'a [@bits 3]
     ; tx_wm_en : 'a (** IRQ while the TX FIFO holds <= tx_wm bytes *)
     ; drop_clear : 'a (** clears the drop counters *)
+    ; rx_to_tx : 'a
+        (** bridge: lane RX bytes go into the TX FIFO instead of the RX FIFO; host TX
+            pushes are refused (host_err cause 6) *)
     }
   [@@deriving hardcaml]
 end
@@ -76,7 +79,9 @@ module Status = struct
     ; vlog_overflow : 'a
     ; cov_overrun : 'a
     ; host_err : 'a (** sticky: a host access was refused (ENGINE.md, Host access rules) *)
-    ; host_err_cause : 'a [@bits 3] (** first cause: 1 store write, 2 coverage, 3 lane CSR *)
+    ; host_err_cause : 'a [@bits 3]
+        (** first cause: 1 store write, 2 coverage, 3 lane CSR, 4 start while the image is
+            invalid, 5 access during the image check, 6 TX push while bridging *)
     ; lane_active : 'a [@bits 2] (** lane l is Armed or Run *)
     ; image_valid : 'a (** the store passed the last image check; start needs it *)
     ; verify_busy : 'a (** the image check sweep is running *)
@@ -210,8 +215,17 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let clk_of sel = mux sel (clock_v @ [ List.nth_exn clock_v 2 ]) in
   (* ---- FIFOs ---- *)
   let tx_pop = wire 1 in
+  (* bridge (rx_to_tx): a lane's RX byte goes into the TX FIFO; the host's TX push is
+     refused then *)
+  let br_push = wire 1 in
+  let br_d = wire 8 in
   let tx_q, tx_empty, tx_full, _, tx_used =
-    small_fifo spec ~depth:8 ~push:h.tx_push ~pop:tx_pop ~d:h.tx_data
+    small_fifo
+      spec
+      ~depth:8
+      ~push:(br_push |: (h.tx_push &: ~:(h.rx_to_tx)))
+      ~pop:tx_pop
+      ~d:(mux2 br_push br_d h.tx_data)
   in
   let rx_push = wire 1 in
   let rx_push_d = wire 8 in
@@ -465,7 +479,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ]
   in
   (* RX FIFO: lane 0, lane 1, engine; a push that loses waits in a one-entry buffer *)
-  let eng_push = act_en &: (a_rx_op ==:. Rx_op.push) in
+  let eng_push = act_en &: (a_rx_op ==:. Rx_op.push) -- "f_eng_push" in
   let lane_push l =
     match List.nth lanes l with
     | Some (o : _ Lane.O.t) -> o.push, o.push_data
@@ -483,8 +497,16 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let b1, b2 = match bufs with [ a; b ] -> a, b | _ -> assert false in
   let acc1 = ~:l0_push &: req b1 in
   let acc2 = ~:l0_push &: ~:(req b1) &: req b2 in
-  rx_push <== (l0_push |: req b1 |: req b2);
+  (* one push a cycle; with rx_to_tx a lane's byte goes to the TX FIFO instead *)
+  let any_push = l0_push |: req b1 |: req b2 in
+  let to_tx = h.rx_to_tx &: (l0_push |: acc1) in
+  rx_push <== (any_push &: ~:to_tx);
+  ignore (rx_push -- "f_rx_push" : Signal.t);
   rx_push_d <== mux2 l0_push l0_data (mux2 acc1 (dat b1) (dat b2));
+  br_push <== to_tx;
+  br_d <== rx_push_d;
+  (* a lane byte's FIFO: RX, or TX when bridging *)
+  let lane_full = mux2 h.rx_to_tx tx_full rx_full in
   let buf_drop = wire 1 in
   let buf_logic =
     List.map [ b1, acc1; b2, acc2 ] ~f:(fun ((n, nd, bv, bd), accepted) ->
@@ -503,8 +525,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let lane_lost l = match List.nth lanes l with Some (o : _ Lane.O.t) -> o.lost | None -> gnd in
   let buf_drop_of k = snd (List.nth_exn buf_logic k) in
   let rx_drops =
-    [ l0_push &: rx_full |: lane_lost 0
-    ; buf_drop_of 0 |: (acc1 &: rx_full) |: lane_lost 1
+    [ l0_push &: lane_full |: lane_lost 0
+    ; buf_drop_of 0 |: (acc1 &: lane_full) |: lane_lost 1
     ; buf_drop_of 1 |: (acc2 &: rx_full)
     ]
   in
@@ -618,6 +640,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
       ; { With_valid.valid = sweeping.value &: (h.rec_we |: h.cov_we |: h.cov_re)
         ; value = of_int ~width:3 5
         }
+      ; { With_valid.valid = h.tx_push &: h.rx_to_tx; value = of_int ~width:3 6 }
       ]
       ~default:(zero 3)
   in
@@ -657,7 +680,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; when_ act_en [ tx_sr <-- tx_next; rx_sr <-- rx_next; cnt <-- cnt_next ]
     ; when_ (entry_now &: hdr.irq_on_entry) [ irq_flag <--. 1 ]
     ; when_ h.irq_ack [ irq_flag <--. 0 ]
-    ; when_ (rx_drop |: buf_drop) [ rx_ovf <--. 1 ]
+    ; when_ (rx_drop |: buf_drop |: (br_push &: tx_full)) [ rx_ovf <--. 1 ]
     ; when_ vlog_drop [ vlog_ovf <--. 1 ]
     ; when_ drop_now [ cov_ovr <--. 1 ]
     ; (* coverage pipeline *)

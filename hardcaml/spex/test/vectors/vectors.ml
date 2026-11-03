@@ -115,6 +115,7 @@ let () =
        fresh := false);
   Test_spi_host.uart_tx_over_spi ~half:3 ~n:16 [ 0x53; 0x50; 0x45; 0x58; 0x00; 0xFF; 0x55 ];
   Test_spi_host.can_tx_over_spi ();
+  Test_spi_host.bridge_over_spi ();
   Out_channel.write_all (dir ^ "/vectors_chip.txt") ~data:(Buffer.contents cbuf);
   let tb = Buffer.create 10000 in
   let p fmt = Printf.bprintf tb fmt in

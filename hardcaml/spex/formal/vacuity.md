@@ -19,7 +19,11 @@ proved by k-induction with helper lemmas (k = 6 and 12); their mutants are check
 properties alone (`-DNO_LEMMAS`, `BMC=40 formal/prove_lanes.sh`), so a mutant must break the
 property, not just a lemma.
 
-All 12 core groups prove unbounded on the unmutated core (`formal/prove.sh`, slowest P6 3 s);
+P12 (bridge, 2026-11-03): with `rx_to_tx` held, the RX FIFO takes at most one push more than
+the engine made since the bit was set (one engine byte may already wait in its buffer), so no
+lane byte reaches it.
+
+All 13 core groups prove unbounded on the unmutated core (`formal/prove.sh`, slowest P6 4.5 s);
 L1 (PDR, 13 s), L2 and L3 (k-induction, seconds) prove with `formal/prove_lanes.sh`.
 
 | Mutant | Expected to break | prove.sh result |
@@ -45,3 +49,4 @@ L1 (PDR, 13 s), L2 and L3 (k-induction, seconds) prove with `formal/prove_lanes.
 | RX MSB-first shift takes the wrong end | L2 (TX -> RX loopback returns the bytes) | L2          no counterexample to depth 40 in 900 s; rerun with a 3000 s limit: assertion B (`r_push`: same byte, in order) fails in step 17 (20.6 min) |
 | NRZI decode inverted | L2 (TX -> RX loopback returns the bytes) | L2          counterexample: Checking assertions in step 5.. Assert failed in lane_loop_props: lane_props.sv:265.59-266.24 ($assert$lane_props.sv:265$597) Status: FAILED |
 | Verilog: timestamp skips odd values | P6 (timestamp counts) | P6          Output 0 of miter "model" was asserted in frame 3.  Time =     0.02 sec |
+| rx_to_tx ignored: lane bytes stay in the RX FIFO | P12 (with rx_to_tx, lane bytes never reach the RX FIFO) | P12         Output 0 of miter "model" was asserted in frame 13.  Time =     9.56 sec (run alone, 2026-11-03) |

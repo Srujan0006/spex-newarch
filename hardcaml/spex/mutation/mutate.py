@@ -103,6 +103,9 @@ MUTANTS += [
     ("pin source select read from the next pin's field", "(select h.pin_src ((3 * p) + 2) (3 * p))",
      "(select h.pin_src ((3 * ((p + 1) % 8)) + 2) (3 * ((p + 1) % 8)))"),
     ("pin source 'lane 1 AND engine' reads lane 0", "~:l1; l1 &: e ]", "~:l1; l0 &: e ]"),
+    # CAN -> UART bridge route (test_bridge.ml; formal P12)
+    ("rx_to_tx ignored: lane bytes stay in the RX FIFO", "let to_tx = h.rx_to_tx &: (l0_push |: acc1) in",
+     "let to_tx = gnd &: (l0_push |: acc1) in"),
 ]
 
 # bit lane (test_lane.ml lockstep and loopback, test_can.ml)
@@ -123,6 +126,13 @@ LANE_MUTANTS = [
     ("NRZI decode inverted", "(d ==: prev.value)", "(d <>: prev.value)"),
     ("a partial RX byte lost at stop is not counted", "i.reset &: ~:(i.end_) &: is_rx", "i.reset &: gnd &: is_rx"),
     ("RX Done before a trailing stuff bit", "&: left_done &: ~:stuff_after in", "&: left_done &: ~:(stuff_after &: gnd) in"),
+    # CAN -> UART bridge: header skip and DLC length field (test_bridge.ml)
+    ("skip one bit short (18 for CAN)", "(select cnt.value 5 0 >=: c.skip)", "(select cnt.value 5 0 >=: c.skip -:. 1)"),
+    ("skip one bit long (20 for CAN)", "(select cnt.value 5 0 >=: c.skip)", "(select cnt.value 5 0 >: c.skip)"),
+    ("skipped bits left out of the CRC", "[ crc <-- crc_next rbit\n                    ; cnt <-- cnt.value +:. 1",
+     "[ crc <-- mux2 past_skip (crc_next rbit) crc.value\n                    ; cnt <-- cnt.value +:. 1"),
+    ("length field read one bit late", "(select cnt.value 5 0 ==: c.len_pos))", "(select cnt.value 5 0 ==: c.len_pos +:. 1))"),
+    ("len_max ignored", "let n = mux2 (f >: c.len_max) c.len_max f in", "let n = f in"),
 ]
 
 # host SPI port (test/test_spi_host.ml drives it through its pins only)

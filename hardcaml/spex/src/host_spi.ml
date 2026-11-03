@@ -11,7 +11,7 @@
 
     Spaces (byte addresses):
     - 0 CSRs. Write 0x00 CTRL {drop_clear, verify, err_clear, irq_ack, stop, start} pulses; read 0x00 STATUS.
-      0x01 CONFIG {dbg_sel 5:4, cover_en 2, role 1:0}, 0x02 START_LOC, 0x03 RECOVER_LOC,
+      0x01 CONFIG {dbg_sel 5:4, rx_to_tx 3, cover_en 2, role 1:0}, 0x02 START_LOC, 0x03 RECOVER_LOC,
       0x04 OPEN_DRAIN, 0x05 MATCH_ADDR (read/write). Read only: 0x06 FLAGS, 0x07 CUR_LOC,
       0x08..0x0B TIMESTAMP (reading 0x08 latches bits 31:8 for 0x09..0x0B).
     - 1 location store, write only: address {loc 6, beat 2, byte 4}. Bytes are
@@ -25,8 +25,9 @@
     - 5 RX FIFO, read only: each data byte read pops the head (0 when empty).
     - 6 bit-lane configuration, write only: lane l at 32 l. Bytes 0-1 div_int, 2 div_frac,
       3 {crc_inv, readback, lsb_first, code 2, clk_edge, clk_pin_en, dir}, 4 {data_pin 3,
-      clk_pin 3}, 5 {stuff_len 3, stuff 2}, 6 crc_width, 8-11 poly, 12-15 init, 16-17
-      sync, 18-19 sync_mask, 20-21 frame_bits (all little-endian).
+      clk_pin 3}, 5 {stuff_len 3, stuff 2}, 6 crc_width, 7 {len_en, 0, skip 6}, 8-11 poly,
+      12-15 init, 16-17 sync, 18-19 sync_mask, 20-21 frame_bits (all little-endian),
+      22 len_pos, 23 len_max.
 
     CSRs 0x13 (read) {image_valid, verify_busy, tx_collision, 5'b0}; 0x14 (read) format version; 0x15
     (read) caps {lanes 4, edges per location 4}; 0x16 (read) record bits / 16; 0x17 (read)
@@ -84,7 +85,7 @@ module Space = struct
   let lanes = 6
 end
 
-let lane_bytes = 22
+let lane_bytes = 24
 
 (** Record and CSR format of this chip; the host loader refuses an image built for
     another version (CSR 0x14). *)
@@ -113,6 +114,10 @@ let lane_cfg_of (b : Signal.t list) : Signal.t Layout.Lane_cfg.t =
   ; sync = le [ 16; 17 ]
   ; sync_mask = le [ 18; 19 ]
   ; frame_bits = le [ 20; 21 ]
+  ; skip = select (b 7) 5 0
+  ; len_en = (b 7).:(7)
+  ; len_pos = select (b 22) 5 0
+  ; len_max = select (b 23) 3 0
   }
 ;;
 
@@ -390,6 +395,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; tx_wm = select wm.value 5 3
     ; tx_wm_en = wm.value.:(6)
     ; drop_clear = drop_clear_p.value
+    ; rx_to_tx = config.value.:(3)
     }
   in
   { host; miso = active &: out_sr.value.:(7); dbg_sel = select config.value 5 4 }

@@ -192,13 +192,15 @@ is incomplete: counts and min/max are lower bounds.
 | Coverage read (`cov_re`) | done | ignored (read data 0), sets `host_err` (cause 2) |
 | Lane configuration CSR write (`lane_we`) | done while the lane is Idle or Done | refused while that lane is Armed or Run, sets `host_err` (cause 3) |
 | TX push / RX pop / log pop | done | done (the FIFOs are dual-access) |
+| TX push while `rx_to_tx` (bridge) | refused, sets `host_err` (cause 6) | refused, sets `host_err` (cause 6) |
 | Any access during `clear` | ignored | ignored |
 
 `host_err` is sticky until the host writes `err_clear` (CTRL bit 3); `host_err_cause`
 keeps the first cause (1 store write while running, 2 coverage access while running or
 draining, 3 lane CSR write while the lane is active, 4 start while the image is not
-valid, 5 store or coverage access during the image check sweep). The rule covers the lanes'
-configuration CSRs only; status, write-1-to-clear and IRQ-enable bits stay writable.
+valid, 5 store or coverage access during the image check sweep, 6 TX push while
+`rx_to_tx`). The rule covers the lanes' configuration CSRs only; status, write-1-to-clear
+and IRQ-enable bits stay writable.
 
 `stop`: the engine's pins are released (`poe = 0`) and so are lane-sourced pins (their
 enable is `poe`), so a stopped chip drives nothing. Both lanes go Idle: a partial RX byte
@@ -278,7 +280,9 @@ line `code` (0 NRZ, 1 NRZI, 2 Manchester); `stuff` (0 off, 1 after `stuff_len` e
 insert the complement (CAN), 2 after `stuff_len` ones insert a 0 (USB)); CRC `poly` and
 `init` (32 bits, left-aligned: bit 31 is the CRC's MSB), `crc_width` (0..32), `crc_inv`;
 `sync` and `sync_mask` (16 bits); `data_pin`; `lsb_first`; `readback` (TX); `frame_bits`
-(16 bits, written by the host per frame).
+(16 bits, written by the host per frame); RX only: `skip` (6 bits, leading data bits not
+put into bytes), `len_en`, `len_pos` (6 bits) and `len_max` (4 bits) for a frame length
+taken from a 4-bit length field (CAN DLC).
 
 **State:** `mode` (Idle, Armed, Run, Done); phase `ph`, fraction `acc`, `extra`; data
 bits so far `cnt`; `bitpos` (0..7) and `byte`; `crc` (32), `crc_left`, `crc_bad`; stuffing
@@ -330,16 +334,29 @@ Manchester) or `raw == prev` (NRZI, then `prev = raw`). Then:
 1. if `stuff` is on and `run == stuff_len`, it is a stuff bit: if it is not the expected
    value (as for TX), `error` (kind stuff) and Idle;
 2. else it is a data bit: `sr = {sr[14:0], bit}`, `sync_hit` if `(sr ^ sync) & sync_mask
-   == 0`; if `cnt < frame_bits`: CRC update, shift into `byte` (`lsb_first`:
-   `{bit, byte[7:1]}`, else `{byte[6:0], bit}`), `cnt += 1`, and when `bitpos` wraps the
-   byte is pushed to the RX FIFO; else if `crc_left > 0`: `crc_bad |= bit ≠ crc[31] xor
-   crc_inv`, `crc <<= 1`, `crc_left −= 1`, and on the last one `crc_ok = NOT crc_bad`;
-3. after a data bit or a good stuff bit, if `cnt == frame_bits`, `crc_left == 0` and no
+   == 0`; if `cnt < limit`: CRC update; if `cnt ≥ skip`, shift into `byte` (`lsb_first`:
+   `{bit, byte[7:1]}`, else `{byte[6:0], bit}`) and when `bitpos` wraps the byte is
+   pushed to the RX FIFO (the first `skip` data bits only enter the CRC and `sr`);
+   `cnt += 1`; else if `crc_left > 0`: `crc_bad |= bit ≠ crc[31] xor crc_inv`,
+   `crc <<= 1`, `crc_left −= 1`, and on the last one `crc_ok = NOT crc_bad`;
+3. after a data bit or a good stuff bit, if `cnt == limit`, `crc_left == 0` and no
    stuff bit is due (`run ≠ stuff_len` after this bit, or stuffing off): `mode = Done`.
    So a stuff bit that follows the last CRC bit (CAN) is read and checked first, as TX
    sends it before going Done.
 Armed: the first change on the data pin starts Run with that cycle as the bit start
 (`ph = 1` next). With `clk_pin_en`, GO goes straight to Run.
+**Length field (RX, `len_en`).** `limit` is `frame_bits` until the field is known. The
+field is the 4 data bits ending at data-bit index `len_pos` (first received is the MSB,
+as CAN's DLC); in the cycle after that bit is taken, the lane computes
+`L = skip + 8 × min(field, len_max)` (8 bits) and, if `L < frame_bits`, uses `limit = L`
+from the next cycle on (a bit takes at least 2 cycles, so no sample falls in between);
+GO clears it. `frame_bits` stays the cap. The host keeps `skip > len_pos` (the bytes
+start after the field), so `cnt` never already exceeds `L`. CAN 2.0A: `skip` 19,
+`len_pos` 18, `len_max` 8, `frame_bits` 83 (DLC 9..15 mean 8 bytes); CAN 2.0B (29-bit
+identifier): `skip` 39, `len_pos` 38, `frame_bits` 103. One configuration takes one
+format. A remote frame (RTR 1) has a DLC but no data: the lane expects data and reports
+a CRC or stuff error (DLC 0: a good frame with nothing to push). TX lanes ignore these
+fields.
 An RX frame with `frame_bits = 0` and no CRC still takes one sample (step 2 with nothing
 to receive) before Done; with stuffing and `stuff_len = 1` that sample can make a stuff
 bit due, so the lane waits for it. Do not use an empty RX frame with `stuff_len = 1`.
@@ -363,6 +380,14 @@ Commands act at the end of the cycle (after this cycle's lane step).
 same cycle. Priority: lane 0, lane 1, engine. A push that loses waits in its own
 one-entry buffer and goes in the first cycle no higher-priority push happens; a push
 into a full buffer is dropped, sets `rx_overflow` and is counted.
+**Bridge (`rx_to_tx`, CONFIG bit 3).** A lane byte that wins the arbitration goes into
+the TX FIFO instead of the RX FIFO (engine pushes still go to RX), so a spec can forward
+received bytes on another pin with `tx load` and no host traffic. A lane byte into a
+full TX FIFO is dropped, sets `rx_overflow` and is counted in that lane's RX drop
+counter. While the bit is set the host's TX pushes are refused (`host_err` cause 6).
+Formal P12: with the bit set, the RX FIFO takes no lane byte. The collision rule below
+is about two consumers of TX; an RX lane feeding TX is a producer (compile with the
+lane in `rx_lanes`), and `tx_collision` keeps its meaning (two pops in one cycle).
 
 **TX FIFO.** If the engine and a lane both pop TX in one cycle, both receive the same
 byte and one byte is popped; `tx_collision` is set. Compiled specs never do this: the

@@ -39,6 +39,10 @@ let can_cfg ~dir ~frame_bits : int Lane_cfg.t =
   ; lsb_first = 0
   ; readback = 1 - dir
   ; frame_bits
+  ; skip = 0
+  ; len_en = 0
+  ; len_pos = 0
+  ; len_max = 0
   }
 ;;
 

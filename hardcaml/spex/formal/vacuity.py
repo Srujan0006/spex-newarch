@@ -29,6 +29,7 @@ TARGETS = {
     "AMBIGUOUS: chg_mask left out of the relevant mask": "P7 (ambiguous input never selects an edge)",
     "pin source select read from the next pin's field": "L4 (a lane drives only the pins selected for it)",
     "pin source 'lane 1 AND engine' reads lane 0": "L4 (a lane drives only the pins selected for it)",
+    "rx_to_tx ignored: lane bytes stay in the RX FIFO": "P12 (with rx_to_tx, lane bytes never reach the RX FIFO)",
 }
 # bit-lane mutants (src/lane.ml) -> property
 LANE_TARGETS = {

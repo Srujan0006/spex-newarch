@@ -73,6 +73,10 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let sync_hit = rv 1 in
   let error = rv 1 in
   let kind = rv 3 in
+  (* RX length field: flag set by the field's last bit, then the length, a cycle later *)
+  let len_cap = rv 1 in
+  let len_known = rv 1 in
+  let lim = rv 8 in
   (* named for the helper lemmas in formal/lane_props.sv *)
   ignore (cnt.value -- "g_cnt" : Signal.t);
   ignore (crc.value -- "g_crc" : Signal.t);
@@ -84,6 +88,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   ignore (crc_bad.value -- "g_crc_bad" : Signal.t);
   ignore (prev.value -- "g_prev" : Signal.t);
   ignore (mode.value -- "g_mode" : Signal.t);
+  ignore (len_cap.value -- "g_len_cap" : Signal.t);
+  ignore (len_known.value -- "g_len_known" : Signal.t);
   let is_rx = c.dir in
   let in_run = mode.value ==:. m_run in
   let in_armed = mode.value ==:. m_armed in
@@ -139,7 +145,10 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     sll crc.value 1 ^: mux2 fb c.poly (zero 32)
   in
   let crc_bit = crc.value.:(31) ^: c.crc_inv in
-  let data_avail = (cnt.value <: c.frame_bits) -- "g_data_left" in
+  (* the frame's data length: frame_bits, or (RX, len_en) the length the field gave
+     once it is known and shorter *)
+  let limit = mux2 len_known.value (uresize lim.value 16) c.frame_bits in
+  let data_avail = (cnt.value <: limit) -- "g_data_left" in
   let crc_avail = crc_left.value <>:. 0 in
   (* ---- TX: the slot at a bit start ---- *)
   let tx_step = in_run &: ~:is_rx &: start in
@@ -168,11 +177,14 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let sr_next = concat_msb [ select sr.value 14 0; rbit ] in
   let byte_rx = mux2 c.lsb_first (concat_msb [ rbit; select byte.value 7 1 ]) (concat_msb [ select byte.value 6 0; rbit ]) in
   let rx_take = rx_step &: rx_data &: data_avail in
-  let push = rx_take &: (bitpos.value ==:. 7) in
+  (* data bits before [skip] go into the CRC and [sr] but not into a byte *)
+  let past_skip = (select cnt.value 15 6 <>:. 0) |: (select cnt.value 5 0 >=: c.skip) in
+  let rx_byte = rx_take &: past_skip in
+  let push = rx_byte &: (bitpos.value ==:. 7) in
   let rx_crc = rx_step &: rx_data &: ~:data_avail &: crc_avail in
   let crc_bad_next = crc_bad.value |: (rbit <>: crc_bit) in
   (* the same comparisons, formed from the registers for each outcome and then selected *)
-  let cnt_done = mux2 rx_take (cnt.value +:. 1 ==: c.frame_bits) (cnt.value ==: c.frame_bits) in
+  let cnt_done = mux2 rx_take (cnt.value +:. 1 ==: limit) (cnt.value ==: limit) in
   let left_done = mux2 rx_crc (crc_left.value ==:. 1) (crc_left.value ==:. 0) in
   let stuff_after = stuff_on &: mux2 rbit (run_next vdd ==: c.stuff_len) (run_next gnd ==: c.stuff_len) in
   let rx_finish = rx_step &: ~:rx_stuff_bad &: cnt_done &: left_done &: ~:stuff_after in
@@ -180,9 +192,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   (* the cycle a TX slot is sent (out takes it next cycle); read by formal/lane_props.sv *)
   let tx_bit = (tx_step &: has_slot) -- "g_tx_bit" in
   let bitpos_after =
-    mux2 (rx_take |: (tx_bit &: ~:stuff_due &: data_avail)) (bitpos.value +:. 1) bitpos.value
+    mux2 (rx_byte |: (tx_bit &: ~:stuff_due &: data_avail)) (bitpos.value +:. 1) bitpos.value
   in
-  let byte_after = mux2 rx_take byte_rx byte.value in
+  let byte_after = mux2 rx_byte byte_rx byte.value in
   let end_push = i.end_ &: is_rx &: (bitpos_after <>:. 0) &: ~:push in
   let lost =
     i.reset &: ~:(i.end_) &: is_rx &: (in_run |: in_done) &: (bitpos_after <>:. 0) &: ~:push
@@ -252,9 +264,11 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                 ; when_
                     rx_take
                     [ crc <-- crc_next rbit
-                    ; byte <-- byte_rx
                     ; cnt <-- cnt.value +:. 1
-                    ; bitpos <-- bitpos.value +:. 1
+                    ; when_ rx_byte [ byte <-- byte_rx; bitpos <-- bitpos.value +:. 1 ]
+                    ; when_
+                        (c.len_en &: (select cnt.value 15 6 ==:. 0) &: (select cnt.value 5 0 ==: c.len_pos))
+                        [ len_cap <--. 1 ]
                     ]
                 ; when_
                     rx_crc
@@ -266,6 +280,16 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                 ]
             ; when_ rx_finish [ mode <--. m_done ]
             ]
+        ]
+    ; (* the length field is in sr[3:0] (first bit in bit 3): L = skip + 8 min(field,
+         len_max), used when shorter than frame_bits *)
+      when_
+        len_cap.value
+        [ len_cap <--. 0
+        ; (let f = select sr.value 3 0 in
+           let n = mux2 (f >: c.len_max) c.len_max f in
+           let l = uresize c.skip 8 +: concat_msb [ zero 1; n; zero 3 ] in
+           when_ (uresize l 16 <: c.frame_bits) [ lim <-- l; len_known <--. 1 ])
         ]
     ; (* commands, after this cycle's step *)
       when_ i.end_ [ mode <--. m_idle; out <--. 1 ]
@@ -293,6 +317,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ; prev <--. 1
         ; sr <--. 0
         ; out <--. 1
+        ; len_cap <--. 0
+        ; len_known <--. 0
         ; crc_ok <--. 0
         ; sync_hit <--. 0
         ; error <--. 0

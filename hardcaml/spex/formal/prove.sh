@@ -7,7 +7,7 @@
 set -e
 cd "$(dirname "$0")"
 V=${1:-../out/spex_core.v}
-for g in ${PROPS:-P1 P3 P4 P5 P6 P7 P8 P9 P10 P11 L4 CHECK_ROLE}; do
+for g in ${PROPS:-P1 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12 L4 CHECK_ROLE}; do
   # Outside P10/P11 the image-check sweep counter is cut to a free input: the sweep may
   # end on any cycle. This only adds behaviours, so a proof still holds for the design,
   # and counterexamples need not first run the 4097-cycle sweep.

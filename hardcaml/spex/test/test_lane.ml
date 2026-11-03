@@ -110,6 +110,10 @@ let random_cfg rs : int Lane_cfg.t =
   ; lsb_first = int 2
   ; readback = int 2
   ; frame_bits = int 40
+  ; skip = (if int 4 = 0 then int 40 else 0)
+  ; len_en = Bool.to_int (int 3 = 0)
+  ; len_pos = int 40
+  ; len_max = int 16
   }
 ;;
 
@@ -118,7 +122,8 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
   and pops = ref 0
   and errors = ref 0
   and crc_oks = ref 0
-  and dones = ref 0 in
+  and dones = ref 0
+  and len_set = ref 0 in
   for seed = 1 to 400 do
     let rs = Random.State.make [| seed |] in
     let int n = Random.State.int rs n in
@@ -128,7 +133,8 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
     done;
     let pins = ref (int 256)
     and q = ref 0 in
-    let seen_done = ref false in
+    let seen_done = ref false
+    and seen_len = ref false in
     for _ = 1 to 3000 do
       let prev = !pins in
       (* the data pin follows the lane's own output half the time, like a bus *)
@@ -151,16 +157,19 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
       q := !pins;
       if l.model.error then Int.incr errors;
       if l.model.crc_ok then Int.incr crc_oks;
-      if Lane_model.equal_mode l.model.mode Done then seen_done := true
+      if Lane_model.equal_mode l.model.mode Done then seen_done := true;
+      if l.model.len_known then seen_len := true
     done;
     if !seen_done then Int.incr dones;
+    if !seen_len then Int.incr len_set;
     pushes := !pushes + Queue.length l.rx;
     pops := !pops + (20 - Queue.length l.fifo)
   done;
   printf
-    "pushes %d, pops %d, configurations reaching Done %d, cycles with error %d, with crc_ok %d\n"
-    !pushes !pops !dones !errors !crc_oks;
-  [%expect {| pushes 1733, pops 3697, configurations reaching Done 40, cycles with error 24952, with crc_ok 0 |}]
+    "pushes %d, pops %d, configurations reaching Done %d, cycles with error %d, with crc_ok %d, \
+     with a length from the field %d\n"
+    !pushes !pops !dones !errors !crc_oks !len_set;
+  [%expect {| pushes 1290, pops 3665, configurations reaching Done 31, cycles with error 24830, with crc_ok 0, with a length from the field 3 |}]
 ;;
 
 (* ---- TX -> RX loopback ---- *)
@@ -187,6 +196,10 @@ let loopback ~code ~stuff ~stuff_len ~div_int ~div_frac bytes =
     ; lsb_first = 1
     ; readback = 0
     ; frame_bits = 8 * List.length bytes
+    ; skip = 0
+    ; len_en = 0
+    ; len_pos = 0
+    ; len_max = 0
     }
   in
   let tx = create base in

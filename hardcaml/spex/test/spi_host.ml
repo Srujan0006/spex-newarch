@@ -102,24 +102,24 @@ let csr_timestamp = 8
 
 (** Load a compiled spec into the location store: one frame per location, 64 bytes
     (4 beats, little-endian) from address {loc, 0, 0}. *)
-let load t (spec : Spec.t) =
-  Array.iteri (Spec.compile ~warn:ignore spec) ~f:(fun loc record ->
+let load ?rx_lanes t (spec : Spec.t) =
+  Array.iteri (Spec.compile ~warn:ignore ?rx_lanes spec) ~f:(fun loc record ->
     let bytes = List.init 64 ~f:(fun k -> Bits.to_int (Bits.select record ((8 * k) + 7) (8 * k))) in
     write t ~space:Space.records ~addr:(loc lsl 6) bytes);
   (* image check. Simulation shortcut: only the spec's locations are written, as the
      simulated store starts at zero; a loader on silicon writes every word. *)
-  let crc = Model.store_crc32 (Spec.store_image spec) in
+  let crc = Model.store_crc32 (Spec.store_image ?rx_lanes spec) in
   write t ~space:Space.csr ~addr:0x18 (List.init 4 ~f:(fun k -> (crc lsr (8 * k)) land 0xFF));
   write t ~space:Space.csr ~addr:csr_ctrl [ 0x10 ];
   ticks t 4200
 ;;
 
-let start t ?(loc = 0) ?(recover = 0) ?(role = Layout.Role.drive) ?(cover = false) () =
+let start t ?(loc = 0) ?(recover = 0) ?(role = Layout.Role.drive) ?(cover = false) ?(bridge = false) () =
   write
     t
     ~space:Space.csr
     ~addr:csr_config
-    [ role lor (if cover then 4 else 0); loc; recover ];
+    [ role lor (if cover then 4 else 0) lor (if bridge then 8 else 0); loc; recover ];
   write t ~space:Space.csr ~addr:csr_ctrl [ 1 ]
 ;;
 
@@ -136,9 +136,10 @@ let lane_bytes (c : int Layout.Lane_cfg.t) =
     ; c.clk_pin lor (c.data_pin lsl 3)
     ; c.stuff lor (c.stuff_len lsl 2)
     ; c.crc_width
-    ; 0
+    ; c.skip lor (c.len_en lsl 7)
     ]
   @ le c.poly 4 @ le c.init 4 @ le c.sync 2 @ le c.sync_mask 2 @ le c.frame_bits 2
+  @ [ c.len_pos; c.len_max ]
 ;;
 
 let set_lane t l cfg = write t ~space:Space.lanes ~addr:(32 * l) (lane_bytes cfg)

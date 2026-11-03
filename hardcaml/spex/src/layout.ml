@@ -164,6 +164,10 @@ module Lane_cfg = struct
     ; lsb_first : 'a
     ; readback : 'a
     ; frame_bits : 'a [@bits 16]
+    ; skip : 'a [@bits 6] (** RX: leading data bits not put into bytes (still destuffed, CRC) *)
+    ; len_en : 'a (** RX: the frame length follows a 4-bit length field *)
+    ; len_pos : 'a [@bits 6] (** RX: data-bit index where the length field ends *)
+    ; len_max : 'a [@bits 4] (** RX: the field is clipped to this many bytes *)
     }
   [@@deriving hardcaml]
 end

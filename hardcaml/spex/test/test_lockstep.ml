@@ -119,6 +119,8 @@ let run_one ~seed ~cycles =
       H.set h.tx_wm (int 8);
       H.set h.tx_wm_en (int 2));
     H.set h.drop_clear (Bool.to_int (int 2000 = 0));
+    (* bridge: lane RX bytes into the TX FIFO, host TX pushes refused *)
+    if int 400 = 0 then H.set h.rx_to_tx (int 2);
     if int 300 = 0 then H.set h.recover_loc (int nlocs);
     (* image check: re-verify now and then (mostly with the right CRC) so restarts after
        a store write are possible again; a crc_expect write now and then *)
@@ -179,11 +181,11 @@ let%expect_test "random specs: RTL and model agree on every output, every cycle"
   printf "runs ending with: coverage overrun %d, halted on violation %d, rx overflow %d, log overflow %d\n"
     stats.(1) stats.(2) stats.(3) stats.(4);
   [%expect {|
-    runs where a lane left Idle 11, cycles with a push waiting 0, runs ending with a lane error 0
+    runs where a lane left Idle 16, cycles with a push waiting 0, runs ending with a lane error 2
     image checks passed during the runs 0, runs whose first host error is a refused start 3
-    runs ending with a non-zero drop counter 17, with tx_collision set 0
+    runs ending with a non-zero drop counter 16, with tx_collision set 0
     300 specs x 3000 cycles = 900000 cycles in lockstep, no mismatch
-    runs ending with: coverage overrun 1, halted on violation 127, rx overflow 4, log overflow 8
+    runs ending with: coverage overrun 1, halted on violation 120, rx overflow 2, log overflow 12
     |}]
 ;;
 
@@ -224,6 +226,8 @@ let%expect_test "lanes and the engine push into the RX FIFO together: RTL and mo
       ; clk_pin_en = 0
       ; data_pin = 0
       ; readback = 0
+      ; skip = 0
+      ; len_en = 0
       }
     in
     Layout.Lane_cfg.iter2 h.lane0 { c with dir = (if rxl = 0 then 1 else 0) } ~f:H.set;
@@ -245,5 +249,5 @@ let%expect_test "lanes and the engine push into the RX FIFO together: RTL and mo
   printf "40 runs x 4000 cycles in lockstep; runs where a push waited %d, cycles with a push waiting %d\n"
     !runs_with_wait !waits;
   ignore !pushed;
-  [%expect {| 40 runs x 4000 cycles in lockstep; runs where a push waited 28, cycles with a push waiting 242 |}]
+  [%expect {| 40 runs x 4000 cycles in lockstep; runs where a push waited 29, cycles with a push waiting 147 |}]
 ;;

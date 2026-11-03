@@ -3,7 +3,9 @@
    cycle at a time: [n] cycles per bit, wired-AND bus (0 dominant).
 
    Frame (standard format): SOF 0, identifier 11 bits MSB first, RTR, IDE 0, r0 0,
-   DLC 4 bits, data 0..8 bytes MSB first, CRC 15 bits (x^15+x^14+x^10+x^8+x^7+x^4+x^3+1,
+   DLC 4 bits, data 0..8 bytes MSB first (DLC 9..15 also mean 8 bytes); extended format
+   (CAN 2.0B): SOF, base identifier 11, SRR 1, IDE 1, identifier extension 18, RTR, r1 0,
+   r0 0, DLC; a remote frame (RTR 1) has a DLC and no data; CRC 15 bits (x^15+x^14+x^10+x^8+x^7+x^4+x^3+1,
    initial 0, over SOF..data); bit stuffing from SOF to the end of the CRC sequence: after
    5 equal bits the complement is inserted; then CRC delimiter 1, ACK slot (transmitter
    1, receivers drive 0), ACK delimiter 1, end of frame 7 x 1, intermission 3 x 1.
@@ -27,10 +29,26 @@ let crc15 bits =
     if fb = 1 then crc lxor 0x4599 else crc)
 ;;
 
+(** How a transmitter sends a frame: the DLC field (default: the data length), remote
+    (RTR 1, no data), extended format (29-bit identifier). *)
+type tx_opts =
+  { dlc : int option
+  ; rtr : bool
+  ; ext : bool
+  }
+
+let std = { dlc = None; rtr = false; ext = false }
+
 (** SOF .. data, unstuffed. *)
-let header_and_data f =
-  [ 0 ] @ bits_msb f.id 11 @ [ 0; 0; 0 ] @ bits_msb (List.length f.data) 4
-  @ List.concat_map f.data ~f:(fun b -> bits_msb b 8)
+let header_and_data ?(o = std) f =
+  let dlc = Option.value o.dlc ~default:(List.length f.data) in
+  let rtr = Bool.to_int o.rtr in
+  let data = if o.rtr then [] else List.concat_map f.data ~f:(fun b -> bits_msb b 8) in
+  if o.ext
+  then
+    [ 0 ] @ bits_msb (f.id lsr 18) 11 @ [ 1; 1 ] @ bits_msb f.id 18 @ [ rtr; 0; 0 ]
+    @ bits_msb dlc 4 @ data
+  else [ 0 ] @ bits_msb f.id 11 @ [ rtr; 0; 0 ] @ bits_msb dlc 4 @ data
 ;;
 
 let stuff bits =
@@ -50,8 +68,8 @@ let stuff bits =
 ;;
 
 (** What a transmitter puts on the bus, stuffed, up to the ACK slot (exclusive). *)
-let tx_bits ?(corrupt = false) f =
-  let u = header_and_data f in
+let tx_bits ?(corrupt = false) ?o f =
+  let u = header_and_data ?o f in
   let crc = crc15 u lxor if corrupt then 1 else 0 in
   stuff (u @ bits_msb crc 15) @ [ 1 ]
 ;;
@@ -84,6 +102,7 @@ type t =
   ; mutable ack_drive : bool
   ; idle_needed : int (* recessive bits before our own SOF (11 per the standard) *)
   ; mutable corrupt : bool (* send a wrong CRC (test of the receiver) *)
+  ; mutable opts : tx_opts (* how our frames are sent *)
   }
 
 let create ?(idle_needed = 11) ~n () =
@@ -108,6 +127,7 @@ let create ?(idle_needed = 11) ~n () =
   ; ack_drive = false
   ; idle_needed
   ; corrupt = false
+  ; opts = std
   }
 ;;
 
@@ -123,13 +143,14 @@ let start_frame t =
   t.crc_ok <- None;
   match t.pending with
   | Some f ->
-    t.role <- Tx (Array.of_list (tx_bits ~corrupt:t.corrupt f), 0);
+    t.role <- Tx (Array.of_list (tx_bits ~corrupt:t.corrupt ~o:t.opts f), 0);
     t.acked <- None
   | None -> t.role <- Rx
 ;;
 
-(* the frame length once DLC is known: SOF..data *)
-let data_end dlc = 19 + (8 * min dlc 8)
+(* the frame length once DLC is known: SOF..data (header 19 bits, extended 39; a remote
+   frame has no data) *)
+let data_end ?(hdr = 19) ?(rtr = false) dlc = if rtr then hdr else hdr + (8 * min dlc 8)
 
 (** One bit sampled at the sample point (receivers and transmitters). Returns false
     when the frame is over (back to Idle). *)
@@ -162,22 +183,23 @@ let on_sample t b =
       t.last <- b;
       let u = List.rev t.unstuffed in
       let k = List.length u in
-      if k = 19
-      then (
-        let dlc = List.foldi (List.sub u ~pos:15 ~len:4) ~init:0 ~f:(fun j acc x -> acc lor (x lsl (3 - j))) in
-        t.expect_len <- Some (data_end dlc));
+      let field pos len = List.foldi (List.sub u ~pos ~len) ~init:0 ~f:(fun j acc x -> acc lor (x lsl (len - 1 - j))) in
+      (* IDE (bit 13) tells the format; DLC ends the control field *)
+      if k = 19 && field 13 1 = 0
+      then t.expect_len <- Some (data_end ~rtr:(field 12 1 = 1) (field 15 4));
+      if k = 39 && field 13 1 = 1
+      then t.expect_len <- Some (data_end ~hdr:39 ~rtr:(field 32 1 = 1) (field 35 4));
       match t.expect_len with
       | Some len when k = len + 15 ->
         let body = List.sub u ~pos:0 ~len in
         let crc = List.foldi (List.sub u ~pos:len ~len:15) ~init:0 ~f:(fun j acc x -> acc lor (x lsl (14 - j))) in
         let ok = crc = crc15 body in
         t.crc_ok <- Some ok;
-        let id = List.foldi (List.sub u ~pos:1 ~len:11) ~init:0 ~f:(fun j acc x -> acc lor (x lsl (10 - j))) in
-        let nbytes = (len - 19) / 8 in
-        let data =
-          List.init nbytes ~f:(fun j ->
-            List.foldi (List.sub u ~pos:(19 + (8 * j)) ~len:8) ~init:0 ~f:(fun i acc x -> acc lor (x lsl (7 - i))))
-        in
+        let ext = field 13 1 = 1 in
+        let hdr = if ext then 39 else 19 in
+        let id = if ext then (field 1 11 lsl 18) lor field 14 18 else field 1 11 in
+        let nbytes = (len - hdr) / 8 in
+        let data = List.init nbytes ~f:(fun j -> field (hdr + (8 * j)) 8) in
         (match t.role with
          | Tx _ -> if ok then t.sent <- { id; data } :: t.sent
          | _ -> if ok then t.received <- { id; data } :: t.received)

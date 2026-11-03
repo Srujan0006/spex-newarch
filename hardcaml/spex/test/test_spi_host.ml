@@ -282,3 +282,40 @@ let%expect_test "drop counters, WATERMARK and tx_collision over SPI" =
     after CTRL bit 5: 00 00 00 00 00
     |}]
 ;;
+
+let bridge_over_spi () =
+  let t = S.create () in
+  let node = Can_node.create ~n:Test_can.n () in
+  let uart = ref [] in
+  t.device
+  <- (fun ~out ~oe ->
+       let chip = if oe land 1 = 1 then out land 1 else 1 in
+       let bus = chip land node.drive in
+       Can_node.step node ~bus;
+       let u = Harness.pin_level ~out ~oe 1 in
+       uart := u :: !uart;
+       0xFC lor bus lor (u lsl 1));
+  S.set_lane t 1 Test_bridge.std_cfg;
+  S.write t ~space:S.Space.csr ~addr:S.csr_open_drain [ 1 ];
+  S.load ~rx_lanes:[ 1 ] t Test_bridge.spec;
+  S.start t ~bridge:true ();
+  (* the bridge arms its lane after 11 recessive bits; a frame before that is missed *)
+  S.ticks t (12 * Test_can.n);
+  Can_node.send node { id = 0x3C5; data = [ 0x53; 0x50; 0x45; 0x58 ] };
+  S.ticks t ((200 * Test_can.n) + (100 * Test_bridge.baud));
+  let bytes, _ = Test_uart.decode_uart (List.rev !uart) ~n:Test_bridge.baud in
+  printf "UART %s; node acked %s; FLAGS %02x\n"
+    (hex (List.map bytes ~f:fst))
+    (Sexp.to_string [%sexp (node.acked : bool option)])
+    (flags t);
+  S.push_tx t [ 0x99 ];
+  printf "host TX push while bridging: FLAGS %02x (host_err, cause 6)\n" (flags t)
+;;
+
+let%expect_test "CAN -> UART bridge set up and run through SPI only" =
+  bridge_over_spi ();
+  [%expect {|
+    UART 53 50 45 58; node acked (true); FLAGS 10
+    host TX push while bridging: FLAGS 1e (host_err, cause 6)
+    |}]
+;;
