@@ -340,6 +340,9 @@ Manchester) or `raw == prev` (NRZI, then `prev = raw`). Then:
    sends it before going Done.
 Armed: the first change on the data pin starts Run with that cycle as the bit start
 (`ph = 1` next). With `clk_pin_en`, GO goes straight to Run.
+An RX frame with `frame_bits = 0` and no CRC still takes one sample (step 2 with nothing
+to receive) before Done; with stuffing and `stuff_len = 1` that sample can make a stuff
+bit due, so the lane waits for it. Do not use an empty RX frame with `stuff_len = 1`.
 
 CRC update with bit b: `fb = b xor crc[31]`, `crc = (crc << 1) xor (fb ? poly : 0)`.
 
@@ -349,7 +352,10 @@ CRC update with bit b: `fb = b xor crc[31]`, `crc = (crc << 1) xor (fb ? poly : 
   `last = 1`, `prev = 1`, `sr = 0`, `out = 1`, flags and error cleared.
 - END: an RX lane with `bitpos ≠ 0` pushes the partial `byte`; `mode` = Idle.
 - CRC: `crc_left = crc_width`; if `mode == Done`, back to Run (the bit timing has kept
-  running). Armed during the frame, the CRC follows the data with no gap.
+  running). Armed during the frame, the CRC follows the data with no gap. A CRC command
+  in or after the cycle of the bit start that found no data left sends at least one idle
+  bit (1) before the CRC, which a receiver counting bits cannot know about: arm the CRC
+  before the data ends (formal L2 assumes this).
 - reset (code 4): both lanes Idle, flags and errors cleared, `crc = 0`.
 Commands act at the end of the cycle (after this cycle's lane step).
 

@@ -35,5 +35,7 @@ test/gate_level_netlist.v
 hardcaml/spex/_build/
 hardcaml/spex/out/simv
 hardcaml/spex/out/vectors.txt
+hardcaml/spex/out/simv_chip
+hardcaml/spex/out/vectors_chip.txt
 hardcaml/spex/synth/ihp/*.log
 hardcaml/spex/synth/net.json

@@ -144,7 +144,7 @@ module spex_lane (
     wire _357;
     wire _359;
     wire _14;
-    reg _341;
+    reg g_crc_bad;
     wire _353;
     wire _365;
     wire [5:0] _363;
@@ -163,7 +163,7 @@ module spex_lane (
     wire _390;
     wire [2:0] _244;
     wire _236;
-    wire _235;
+    wire g_tx_bit;
     wire _237;
     wire _238;
     wire _239;
@@ -303,7 +303,7 @@ module spex_lane (
     wire [7:0] _433;
     wire [7:0] _437;
     wire [7:0] _30;
-    reg [7:0] _377;
+    reg [7:0] g_byte;
     wire _396;
     wire _393;
     wire _394;
@@ -326,7 +326,7 @@ module spex_lane (
     wire [2:0] _449;
     wire [2:0] _451;
     wire [2:0] _33;
-    reg [2:0] _242;
+    reg [2:0] g_bitpos;
     reg _425;
     wire _35;
     wire [31:0] _347;
@@ -354,7 +354,7 @@ module spex_lane (
     wire [5:0] _464;
     wire [5:0] _466;
     wire [5:0] _40;
-    reg [5:0] _230;
+    reg [5:0] g_left;
     wire _232;
     wire _233;
     wire _343;
@@ -381,7 +381,7 @@ module spex_lane (
     wire [31:0] _498;
     wire [31:0] _500;
     wire [31:0] _43;
-    reg [31:0] _348;
+    reg [31:0] g_crc;
     wire _349;
     wire _350;
     wire [15:0] _45;
@@ -397,7 +397,7 @@ module spex_lane (
     wire _504;
     wire _506;
     wire _46;
-    reg _288;
+    reg g_last;
     wire _289;
     wire _285;
     wire _290;
@@ -406,7 +406,7 @@ module spex_lane (
     wire _510;
     wire _512;
     wire _47;
-    reg _281;
+    reg g_prev;
     wire _282;
     wire _279;
     wire _283;
@@ -422,8 +422,8 @@ module spex_lane (
     wire [15:0] _524;
     wire [15:0] _526;
     wire [15:0] _48;
-    reg [15:0] _214;
-    wire _215;
+    reg [15:0] g_cnt;
+    wire g_data_left;
     wire _426;
     wire _427;
     wire _532;
@@ -438,7 +438,7 @@ module spex_lane (
     wire [2:0] _562;
     wire [2:0] _564;
     wire [2:0] _49;
-    reg [2:0] _207;
+    reg [2:0] g_run;
     wire _208;
     wire [1:0] _51;
     wire _203;
@@ -610,7 +610,7 @@ module spex_lane (
     wire [1:0] _696;
     wire [1:0] _698;
     wire [1:0] _81;
-    reg [1:0] _96;
+    reg [1:0] g_mode;
     wire _98;
     wire _257;
     wire _258;
@@ -704,22 +704,22 @@ module spex_lane (
     end
     assign _351 = _283 == _350;
     assign _352 = ~ _351;
-    assign _354 = _345 ? _353 : _341;
-    assign _355 = _210 ? _354 : _341;
-    assign _356 = _293 ? _341 : _355;
-    assign _357 = _201 ? _356 : _341;
+    assign _354 = _345 ? _353 : g_crc_bad;
+    assign _355 = _210 ? _354 : g_crc_bad;
+    assign _356 = _293 ? g_crc_bad : _355;
+    assign _357 = _201 ? _356 : g_crc_bad;
     assign _359 = _85 ? _302 : _357;
     assign _14 = _359;
     always @(posedge _63) begin
         if (_61)
-            _341 <= _302;
+            g_crc_bad <= _302;
         else
-            _341 <= _14;
+            g_crc_bad <= _14;
     end
-    assign _353 = _341 | _352;
+    assign _353 = g_crc_bad | _352;
     assign _365 = ~ _353;
     assign _363 = 6'b000001;
-    assign _364 = _230 == _363;
+    assign _364 = g_left == _363;
     assign _366 = _364 ? _365 : _362;
     assign _367 = _345 ? _366 : _362;
     assign _368 = _210 ? _367 : _362;
@@ -734,23 +734,23 @@ module spex_lane (
         else
             _362 <= _15;
     end
-    assign _383 = _216 ? _382 : _377;
+    assign _383 = _216 ? _382 : g_byte;
     assign _384 = _252 ? _382 : _383;
     assign _390 = ~ _252;
-    assign _244 = _242 + _294;
+    assign _244 = g_bitpos + _294;
     assign _236 = ~ _209;
-    assign _235 = _226 & _234;
-    assign _237 = _235 & _236;
-    assign _238 = _237 & _215;
+    assign g_tx_bit = _226 & _234;
+    assign _237 = g_tx_bit & _236;
+    assign _238 = _237 & g_data_left;
     assign _239 = _216 | _238;
-    assign _245 = _239 ? _244 : _242;
+    assign _245 = _239 ? _244 : g_bitpos;
     assign _387 = _245 == _246;
     assign _388 = ~ _387;
     assign _385 = _83 & _78;
     assign _389 = _385 & _388;
     assign _391 = _389 & _390;
     assign _250 = 3'b111;
-    assign _251 = _242 == _250;
+    assign _251 = g_bitpos == _250;
     assign _252 = _216 & _251;
     assign _392 = _252 | _391;
     assign _399 = ~ _29;
@@ -809,19 +809,19 @@ module spex_lane (
     assign _687 = _686 | _676;
     assign _689 = _687 ? _701 : _683;
     assign _677 = 2'b11;
-    assign _670 = _207 + _294;
-    assign _667 = _207 + _294;
-    assign _663 = vdd == _288;
-    assign _661 = _207 == _246;
+    assign _670 = g_run + _294;
+    assign _667 = g_run + _294;
+    assign _663 = vdd == g_last;
+    assign _661 = g_run == _246;
     assign _662 = ~ _661;
     assign _664 = _662 & _663;
     assign _668 = _664 ? _667 : _294;
     assign _659 = _51 == _701;
     assign _671 = _659 ? _670 : _668;
     assign _672 = _671 == _25;
-    assign _653 = _207 + _294;
-    assign _649 = gnd == _288;
-    assign _647 = _207 == _246;
+    assign _653 = g_run + _294;
+    assign _649 = gnd == g_last;
+    assign _647 = g_run == _246;
     assign _648 = ~ _647;
     assign _650 = _648 & _649;
     assign _654 = _650 ? _653 : _294;
@@ -831,14 +831,14 @@ module spex_lane (
     assign _673 = _283 ? _672 : _657;
     assign _674 = _204 & _673;
     assign _675 = ~ _674;
-    assign _641 = _230 == _363;
+    assign _641 = g_left == _363;
     assign _638 = 6'b000000;
-    assign _639 = _230 == _638;
+    assign _639 = g_left == _638;
     assign _642 = _345 ? _641 : _639;
     assign _633 = 16'b0000000000000001;
-    assign _634 = _214 + _633;
+    assign _634 = g_cnt + _633;
     assign _635 = _634 == _45;
-    assign _632 = _214 == _45;
+    assign _632 = g_cnt == _45;
     assign _636 = _216 ? _635 : _632;
     assign _630 = ~ _293;
     assign _631 = _201 & _630;
@@ -848,20 +848,20 @@ module spex_lane (
     assign _678 = _676 ? _677 : _629;
     assign _680 = _293 ? _94 : _678;
     assign _25 = cfg_stuff_len;
-    assign _558 = _207 + _294;
+    assign _558 = g_run + _294;
     assign _559 = _283 ? _558 : _246;
-    assign _554 = _207 + _294;
-    assign _550 = _283 == _288;
-    assign _548 = _207 == _246;
+    assign _554 = g_run + _294;
+    assign _550 = _283 == g_last;
+    assign _548 = g_run == _246;
     assign _549 = ~ _548;
     assign _551 = _549 & _550;
     assign _555 = _551 ? _554 : _294;
     assign _546 = _51 == _701;
     assign _560 = _546 ? _559 : _555;
     assign _561 = _293 ? _544 : _560;
-    assign _540 = _207 + _294;
+    assign _540 = g_run + _294;
     assign _541 = _427 ? _540 : _246;
-    assign _536 = _207 + _294;
+    assign _536 = g_run + _294;
     assign _424 = _416[7:7];
     assign _423 = _416[6:6];
     assign _422 = _416[5:5];
@@ -881,33 +881,33 @@ module spex_lane (
     assign _29 = tx_empty;
     assign _405 = _29 ? _404 : _27;
     assign _376 = 8'b00000000;
-    assign _380 = _377[7:1];
+    assign _380 = g_byte[7:1];
     assign _381 = { _283,
                     _380 };
-    assign _378 = _377[6:0];
+    assign _378 = g_byte[6:0];
     assign _379 = { _378,
                     _283 };
     assign _382 = _32 ? _381 : _379;
     assign _434 = _216 ? _382 : _433;
     assign _435 = _210 ? _434 : _433;
     assign _436 = _293 ? _433 : _435;
-    assign _430 = _215 ? _406 : _377;
-    assign _431 = _209 ? _377 : _430;
-    assign _432 = _234 ? _431 : _377;
-    assign _433 = _226 ? _432 : _377;
+    assign _430 = g_data_left ? _406 : g_byte;
+    assign _431 = _209 ? g_byte : _430;
+    assign _432 = _234 ? _431 : g_byte;
+    assign _433 = _226 ? _432 : g_byte;
     assign _437 = _201 ? _436 : _433;
     assign _30 = _437;
     always @(posedge _63) begin
         if (_61)
-            _377 <= _376;
+            g_byte <= _376;
         else
-            _377 <= _30;
+            g_byte <= _30;
     end
-    assign _396 = _242 == _246;
+    assign _396 = g_bitpos == _246;
     assign _393 = ~ _209;
-    assign _394 = _393 & _215;
+    assign _394 = _393 & g_data_left;
     assign _397 = _394 & _396;
-    assign _406 = _397 ? _405 : _377;
+    assign _406 = _397 ? _405 : g_byte;
     assign _407 = _406[0:0];
     assign _415 = { _407,
                     _408,
@@ -920,26 +920,26 @@ module spex_lane (
     assign _32 = cfg_lsb_first;
     assign _416 = _32 ? _406 : _415;
     assign _417 = _416[0:0];
-    assign _445 = _242 + _294;
+    assign _445 = g_bitpos + _294;
     assign _446 = _216 ? _445 : _443;
     assign _447 = _210 ? _446 : _443;
     assign _448 = _293 ? _443 : _447;
-    assign _439 = _242 + _294;
-    assign _440 = _215 ? _439 : _242;
-    assign _441 = _209 ? _242 : _440;
-    assign _442 = _234 ? _441 : _242;
-    assign _443 = _226 ? _442 : _242;
+    assign _439 = g_bitpos + _294;
+    assign _440 = g_data_left ? _439 : g_bitpos;
+    assign _441 = _209 ? g_bitpos : _440;
+    assign _442 = _234 ? _441 : g_bitpos;
+    assign _443 = _226 ? _442 : g_bitpos;
     assign _449 = _201 ? _448 : _443;
     assign _451 = _85 ? _246 : _449;
     assign _33 = _451;
     always @(posedge _63) begin
         if (_61)
-            _242 <= _246;
+            g_bitpos <= _246;
         else
-            _242 <= _33;
+            g_bitpos <= _33;
     end
     always @* begin
-        case (_242)
+        case (g_bitpos)
         0:
             _425 <= _417;
         1:
@@ -961,40 +961,40 @@ module spex_lane (
     assign _35 = cfg_crc_inv;
     assign _347 = 32'b00000000000000000000000000000000;
     assign _37 = cfg_init;
-    assign _491 = _348[30:0];
+    assign _491 = g_crc[30:0];
     assign _493 = { _491,
                     _302 };
-    assign _485 = _348[31:31];
+    assign _485 = g_crc[31:31];
     assign _486 = _283 ^ _485;
     assign _488 = _486 ? _42 : _347;
-    assign _482 = _348[30:0];
+    assign _482 = g_crc[30:0];
     assign _484 = { _482,
                     _302 };
     assign _489 = _484 ^ _488;
     assign _490 = _216 ? _489 : _481;
     assign _39 = cfg_crc_width;
-    assign _459 = _230 - _363;
+    assign _459 = g_left - _363;
     assign _460 = _345 ? _459 : _457;
     assign _461 = _210 ? _460 : _457;
     assign _462 = _293 ? _457 : _461;
-    assign _453 = _230 - _363;
-    assign _454 = _215 ? _230 : _453;
-    assign _455 = _209 ? _230 : _454;
-    assign _456 = _234 ? _455 : _230;
-    assign _457 = _226 ? _456 : _230;
+    assign _453 = g_left - _363;
+    assign _454 = g_data_left ? g_left : _453;
+    assign _455 = _209 ? g_left : _454;
+    assign _456 = _234 ? _455 : g_left;
+    assign _457 = _226 ? _456 : g_left;
     assign _463 = _201 ? _462 : _457;
     assign _464 = _80 ? _39 : _463;
     assign _466 = _85 ? _638 : _464;
     assign _40 = _466;
     always @(posedge _63) begin
         if (_61)
-            _230 <= _638;
+            g_left <= _638;
         else
-            _230 <= _40;
+            g_left <= _40;
     end
-    assign _232 = _230 == _638;
+    assign _232 = g_left == _638;
     assign _233 = ~ _232;
-    assign _343 = ~ _215;
+    assign _343 = ~ g_data_left;
     assign _342 = _201 & _210;
     assign _344 = _342 & _343;
     assign _345 = _344 & _233;
@@ -1002,117 +1002,117 @@ module spex_lane (
     assign _495 = _210 ? _494 : _481;
     assign _496 = _293 ? _481 : _495;
     assign _42 = cfg_poly;
-    assign _473 = _348[31:31];
+    assign _473 = g_crc[31:31];
     assign _474 = _427 ^ _473;
     assign _476 = _474 ? _42 : _347;
-    assign _470 = _348[30:0];
+    assign _470 = g_crc[30:0];
     assign _472 = { _470,
                     _302 };
     assign _477 = _472 ^ _476;
-    assign _467 = _348[30:0];
+    assign _467 = g_crc[30:0];
     assign _469 = { _467,
                     _302 };
-    assign _478 = _215 ? _477 : _469;
-    assign _479 = _209 ? _348 : _478;
-    assign _480 = _234 ? _479 : _348;
-    assign _481 = _226 ? _480 : _348;
+    assign _478 = g_data_left ? _477 : _469;
+    assign _479 = _209 ? g_crc : _478;
+    assign _480 = _234 ? _479 : g_crc;
+    assign _481 = _226 ? _480 : g_crc;
     assign _497 = _201 ? _496 : _481;
     assign _498 = _85 ? _37 : _497;
     assign _500 = _87 ? _347 : _498;
     assign _43 = _500;
     always @(posedge _63) begin
         if (_61)
-            _348 <= _347;
+            g_crc <= _347;
         else
-            _348 <= _43;
+            g_crc <= _43;
     end
-    assign _349 = _348[31:31];
+    assign _349 = g_crc[31:31];
     assign _350 = _349 ^ _35;
     assign _45 = cfg_frame_bits;
-    assign _520 = _214 + _633;
+    assign _520 = g_cnt + _633;
     assign _211 = _201 & _210;
-    assign _216 = _211 & _215;
+    assign _216 = _211 & g_data_left;
     assign _521 = _216 ? _520 : _518;
     assign _210 = ~ _209;
     assign _522 = _210 ? _521 : _518;
     assign _503 = _293 ? _502 : _283;
-    assign _501 = _234 ? _427 : _288;
-    assign _502 = _226 ? _501 : _288;
+    assign _501 = _234 ? _427 : g_last;
+    assign _502 = _226 ? _501 : g_last;
     assign _504 = _201 ? _503 : _502;
     assign _506 = _85 ? _306 : _504;
     assign _46 = _506;
     always @(posedge _63) begin
         if (_61)
-            _288 <= vdd;
+            g_last <= vdd;
         else
-            _288 <= _46;
+            g_last <= _46;
     end
-    assign _289 = ~ _288;
+    assign _289 = ~ g_last;
     assign _285 = _51 == _694;
     assign _290 = _285 ? _289 : gnd;
     assign _508 = _68 == _694;
-    assign _509 = _508 ? _112 : _281;
-    assign _510 = _201 ? _509 : _281;
+    assign _509 = _508 ? _112 : g_prev;
+    assign _510 = _201 ? _509 : g_prev;
     assign _512 = _85 ? _306 : _510;
     assign _47 = _512;
     always @(posedge _63) begin
         if (_61)
-            _281 <= vdd;
+            g_prev <= vdd;
         else
-            _281 <= _47;
+            g_prev <= _47;
     end
-    assign _282 = _112 == _281;
+    assign _282 = _112 == g_prev;
     assign _279 = _68 == _694;
     assign _283 = _279 ? _282 : _112;
     assign _291 = _283 == _290;
     assign _292 = ~ _291;
     assign _293 = _209 & _292;
     assign _523 = _293 ? _518 : _522;
-    assign _514 = _214 + _633;
-    assign _515 = _215 ? _514 : _214;
-    assign _516 = _209 ? _214 : _515;
-    assign _517 = _234 ? _516 : _214;
-    assign _518 = _226 ? _517 : _214;
+    assign _514 = g_cnt + _633;
+    assign _515 = g_data_left ? _514 : g_cnt;
+    assign _516 = _209 ? g_cnt : _515;
+    assign _517 = _234 ? _516 : g_cnt;
+    assign _518 = _226 ? _517 : g_cnt;
     assign _524 = _201 ? _523 : _518;
     assign _526 = _85 ? _328 : _524;
     assign _48 = _526;
     always @(posedge _63) begin
         if (_61)
-            _214 <= _328;
+            g_cnt <= _328;
         else
-            _214 <= _48;
+            g_cnt <= _48;
     end
-    assign _215 = _214 < _45;
-    assign _426 = _215 ? _425 : _350;
+    assign g_data_left = g_cnt < _45;
+    assign _426 = g_data_left ? _425 : _350;
     assign _427 = _209 ? _290 : _426;
-    assign _532 = _427 == _288;
-    assign _530 = _207 == _246;
+    assign _532 = _427 == g_last;
+    assign _530 = g_run == _246;
     assign _531 = ~ _530;
     assign _533 = _531 & _532;
     assign _537 = _533 ? _536 : _294;
     assign _528 = _51 == _701;
     assign _542 = _528 ? _541 : _537;
-    assign _543 = _234 ? _542 : _207;
-    assign _544 = _226 ? _543 : _207;
+    assign _543 = _234 ? _542 : g_run;
+    assign _544 = _226 ? _543 : g_run;
     assign _562 = _201 ? _561 : _544;
     assign _564 = _85 ? _246 : _562;
     assign _49 = _564;
     always @(posedge _63) begin
         if (_61)
-            _207 <= _246;
+            g_run <= _246;
         else
-            _207 <= _49;
+            g_run <= _49;
     end
-    assign _208 = _207 == _25;
+    assign _208 = g_run == _25;
     assign _51 = cfg_stuff;
     assign _203 = _51 == _94;
     assign _204 = ~ _203;
     assign _209 = _204 & _208;
-    assign _227 = _209 | _215;
+    assign _227 = _209 | g_data_left;
     assign _234 = _227 | _233;
     assign _626 = _234 ? _624 : _677;
     assign _622 = _127 & _125;
-    assign _624 = _622 ? _701 : _96;
+    assign _624 = _622 ? _701 : g_mode;
     assign _222 = _171 == _328;
     assign _220 = _136 == _328;
     assign _223 = _164 ? _222 : _220;
@@ -1299,7 +1299,7 @@ module spex_lane (
     assign _618 = _596 ? _328 : _616;
     assign _568 = ~ _76;
     assign _566 = _127 & _125;
-    assign _100 = _96 == _677;
+    assign _100 = g_mode == _677;
     assign _565 = _98 | _100;
     assign _567 = _565 | _566;
     assign _569 = _567 & _568;
@@ -1322,7 +1322,7 @@ module spex_lane (
     assign _68 = cfg_code;
     assign _129 = _68 == _701;
     assign _130 = ~ _129;
-    assign _127 = _96 == _694;
+    assign _127 = g_mode == _694;
     assign _131 = _127 | _130;
     assign _124 = ~ _76;
     assign _120 = _70[7:7];
@@ -1403,11 +1403,11 @@ module spex_lane (
     assign _81 = _698;
     always @(posedge _63) begin
         if (_61)
-            _96 <= _94;
+            g_mode <= _94;
         else
-            _96 <= _81;
+            g_mode <= _81;
     end
-    assign _98 = _96 == _701;
+    assign _98 = g_mode == _701;
     assign _257 = _98 & _256;
     assign _258 = _257 & _23;
     assign _260 = _258 & _259;

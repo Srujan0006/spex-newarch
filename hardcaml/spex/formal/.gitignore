@@ -1,2 +1,3 @@
 *.aig
 mut/
+*.smt2

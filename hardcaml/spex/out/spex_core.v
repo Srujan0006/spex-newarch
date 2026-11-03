@@ -933,7 +933,7 @@ module spex_core (
     wire [7:0] _2619;
     wire [7:0] _2621;
     wire [7:0] _116;
-    reg [7:0] _2564;
+    reg [7:0] f_poe;
     wire [7:0] _2700;
     wire [7:0] _119;
     wire [7:0] _4133;
@@ -1664,7 +1664,7 @@ module spex_core (
     wire _2911;
     wire _2913;
     wire _146;
-    reg _2895;
+    reg g_crc_bad;
     wire _2907;
     wire _2916;
     wire [5:0] _2914;
@@ -1714,7 +1714,7 @@ module spex_core (
     wire _2976;
     wire _2978;
     wire _155;
-    reg _2960;
+    reg g_crc_bad_0;
     wire _2972;
     wire _2981;
     wire _2980;
@@ -1777,7 +1777,7 @@ module spex_core (
     wire _1755;
     wire [2:0] _1749;
     wire _1744;
-    wire _1743;
+    wire g_tx_bit;
     wire _1745;
     wire _1746;
     wire _1747;
@@ -1800,7 +1800,7 @@ module spex_core (
     wire _1678;
     wire [2:0] _1672;
     wire _1667;
-    wire _1666;
+    wire g_tx_bit_0;
     wire _1668;
     wire _1669;
     wire _1670;
@@ -1968,7 +1968,7 @@ module spex_core (
     wire [7:0] _3133;
     wire [7:0] _3137;
     wire [7:0] _170;
-    reg [7:0] _2447;
+    reg [7:0] g_byte;
     wire _1886;
     wire _1883;
     wire _1884;
@@ -1991,7 +1991,7 @@ module spex_core (
     wire [2:0] _3149;
     wire [2:0] _3151;
     wire [2:0] _173;
-    reg [2:0] _1718;
+    reg [2:0] g_bitpos;
     reg _3125;
     wire _175;
     wire [31:0] _177;
@@ -2018,7 +2018,7 @@ module spex_core (
     wire [5:0] _3166;
     wire [5:0] _3168;
     wire [5:0] _180;
-    reg [5:0] _1738;
+    reg [5:0] g_left;
     wire _1740;
     wire _1741;
     wire _2897;
@@ -2045,7 +2045,7 @@ module spex_core (
     wire [31:0] _3200;
     wire [31:0] _3202;
     wire [31:0] _183;
-    reg [31:0] _2902;
+    reg [31:0] g_crc;
     wire _2903;
     wire _2904;
     wire [15:0] _185;
@@ -2061,7 +2061,7 @@ module spex_core (
     wire _3206;
     wire _3208;
     wire _186;
-    reg _1616;
+    reg g_last;
     wire _1617;
     wire _1614;
     wire _1618;
@@ -2070,7 +2070,7 @@ module spex_core (
     wire _3212;
     wire _3214;
     wire _187;
-    reg _1610;
+    reg g_prev;
     wire _1611;
     wire _1608;
     wire _1612;
@@ -2086,8 +2086,8 @@ module spex_core (
     wire [15:0] _3226;
     wire [15:0] _3228;
     wire [15:0] _188;
-    reg [15:0] _1713;
-    wire _1714;
+    reg [15:0] g_cnt;
+    wire g_data_left;
     wire _3126;
     wire _3127;
     wire _3234;
@@ -2102,7 +2102,7 @@ module spex_core (
     wire [2:0] _3264;
     wire [2:0] _3266;
     wire [2:0] _189;
-    reg [2:0] _1604;
+    reg [2:0] g_run;
     wire _1605;
     wire [1:0] _191;
     wire _1600;
@@ -2130,7 +2130,7 @@ module spex_core (
     wire _3288;
     wire _3290;
     wire _192;
-    reg _1588;
+    reg f_lane1_out;
     wire _1589;
     wire _1590;
     wire _1583;
@@ -2293,7 +2293,7 @@ module spex_core (
     wire _1473;
     wire [1:0] _3424;
     wire [1:0] _214;
-    reg [1:0] _654;
+    reg [1:0] g_mode;
     wire _1477;
     wire _1726;
     wire _1734;
@@ -2435,7 +2435,7 @@ module spex_core (
     wire [7:0] _3465;
     wire [7:0] _3469;
     wire [7:0] _222;
-    reg [7:0] _2473;
+    reg [7:0] g_byte_0;
     wire _1878;
     wire _1875;
     wire _1876;
@@ -2458,7 +2458,7 @@ module spex_core (
     wire [2:0] _3481;
     wire [2:0] _3483;
     wire [2:0] _225;
-    reg [2:0] _1641;
+    reg [2:0] g_bitpos_0;
     reg _3449;
     wire _227;
     wire [31:0] _229;
@@ -2485,7 +2485,7 @@ module spex_core (
     wire [5:0] _3498;
     wire [5:0] _3500;
     wire [5:0] _232;
-    reg [5:0] _1661;
+    reg [5:0] g_left_0;
     wire _1663;
     wire _1664;
     wire _2962;
@@ -2512,7 +2512,7 @@ module spex_core (
     wire [31:0] _3532;
     wire [31:0] _3534;
     wire [31:0] _235;
-    reg [31:0] _2967;
+    reg [31:0] g_crc_0;
     wire _2968;
     wire _2969;
     wire [15:0] _237;
@@ -2528,7 +2528,7 @@ module spex_core (
     wire _3538;
     wire _3540;
     wire _238;
-    reg _1458;
+    reg g_last_0;
     wire _1459;
     wire _1456;
     wire _1460;
@@ -2537,7 +2537,7 @@ module spex_core (
     wire _3544;
     wire _3546;
     wire _239;
-    reg _1452;
+    reg g_prev_0;
     wire _1453;
     wire _1450;
     wire _1454;
@@ -2553,8 +2553,8 @@ module spex_core (
     wire [15:0] _3558;
     wire [15:0] _3560;
     wire [15:0] _240;
-    reg [15:0] _1636;
-    wire _1637;
+    reg [15:0] g_cnt_0;
+    wire g_data_left_0;
     wire _3450;
     wire _3451;
     wire _3566;
@@ -2569,7 +2569,7 @@ module spex_core (
     wire [2:0] _3596;
     wire [2:0] _3598;
     wire [2:0] _241;
-    reg [2:0] _1446;
+    reg [2:0] g_run_0;
     wire _1447;
     wire [1:0] _243;
     wire _1442;
@@ -2597,7 +2597,7 @@ module spex_core (
     wire _3620;
     wire _3622;
     wire _244;
-    reg _1430;
+    reg f_lane0_out;
     wire _1431;
     wire _1432;
     wire _1425;
@@ -2773,7 +2773,7 @@ module spex_core (
     wire _1315;
     wire [1:0] _3760;
     wire [1:0] _267;
-    reg [1:0] _640;
+    reg [1:0] g_mode_0;
     wire _1319;
     wire _1649;
     wire _1657;
@@ -3300,7 +3300,7 @@ module spex_core (
     wire _1960;
     wire [7:0] _4132;
     wire [7:0] _309;
-    reg [7:0] _2625;
+    reg [7:0] f_pout;
     wire _2626;
     wire [23:0] _311;
     wire [2:0] _2622;
@@ -3488,7 +3488,7 @@ module spex_core (
     assign _1464 = 3'b001;
     assign _1465 = _1463 ? _1464 : _1440;
     assign _1437 = 3'b010;
-    assign _1439 = _1430 ? _1301 : _1437;
+    assign _1439 = f_lane0_out ? _1301 : _1437;
     assign _1440 = _1433 ? _1439 : _1436;
     assign _1466 = _1418 ? _1465 : _1440;
     assign _1468 = _1317 ? _1104 : _1466;
@@ -3507,7 +3507,7 @@ module spex_core (
                      gnd,
                      _1436 };
     assign _1623 = _1621 ? _1464 : _1598;
-    assign _1597 = _1588 ? _1301 : _1437;
+    assign _1597 = f_lane1_out ? _1301 : _1437;
     assign _1598 = _1591 ? _1597 : _1594;
     assign _1624 = _1576 ? _1623 : _1598;
     assign _1626 = _1475 ? _1104 : _1624;
@@ -4319,7 +4319,7 @@ module spex_core (
     end
     assign _2493 = _2436 == _1104;
     assign _2494 = _2433 & _2493;
-    assign _2479 = _1638 ? _2478 : _2473;
+    assign _2479 = _1638 ? _2478 : g_byte_0;
     assign _2480 = _1644 ? _2478 : _2479;
     assign _2457 = _2456 ? _2454 : _2444;
     assign _2455 = _2441 ? _2454 : _2444;
@@ -4331,7 +4331,7 @@ module spex_core (
         else
             _2444 <= _99;
     end
-    assign _2453 = _1715 ? _2452 : _2447;
+    assign _2453 = _1715 ? _2452 : g_byte;
     assign _2454 = _1721 ? _2452 : _2453;
     assign _2469 = _1708 ? _2444 : _2454;
     assign _2466 = _2465 ? _625 : _2463;
@@ -4446,36 +4446,36 @@ module spex_core (
     assign _2580 = _1795 ? _2579 : _2578;
     assign _2581 = _2580 & _2571;
     assign _2572 = ~ _2571;
-    assign _2573 = _2564 & _2572;
+    assign _2573 = f_poe & _2572;
     assign _2582 = _2573 | _2581;
     assign _2616 = _2582 | _2615;
-    assign _2617 = _2561 ? _2616 : _2564;
+    assign _2617 = _2561 ? _2616 : f_poe;
     assign _2619 = _301 ? _1253 : _2617;
     assign _2621 = _1960 ? _1253 : _2619;
     assign _116 = _2621;
     always @(posedge _294) begin
         if (_292)
-            _2564 <= _1253;
+            f_poe <= _1253;
         else
-            _2564 <= _116;
+            f_poe <= _116;
     end
-    assign _2700 = _2564 & _2699;
+    assign _2700 = f_poe & _2699;
     assign _119 = host_open_drain;
     assign _4133 = ~ _119;
-    assign _2695 = _1588 & _2689;
-    assign _2694 = ~ _1588;
-    assign _2692 = ~ _1430;
+    assign _2695 = f_lane1_out & _2689;
+    assign _2694 = ~ f_lane1_out;
+    assign _2692 = ~ f_lane0_out;
     assign _2693 = _2692 & _2689;
-    assign _2691 = _1430 & _2689;
-    assign _2690 = ~ _1430;
-    assign _2689 = _2625[0:0];
+    assign _2691 = f_lane0_out & _2689;
+    assign _2690 = ~ f_lane0_out;
+    assign _2689 = f_pout[0:0];
     assign _2688 = _311[2:0];
     always @* begin
         case (_2688)
         0:
             _2696 <= _2689;
         1:
-            _2696 <= _1430;
+            _2696 <= f_lane0_out;
         2:
             _2696 <= _2690;
         3:
@@ -4483,27 +4483,27 @@ module spex_core (
         4:
             _2696 <= _2693;
         5:
-            _2696 <= _1588;
+            _2696 <= f_lane1_out;
         6:
             _2696 <= _2694;
         default:
             _2696 <= _2695;
         endcase
     end
-    assign _2686 = _1588 & _2680;
-    assign _2685 = ~ _1588;
-    assign _2683 = ~ _1430;
+    assign _2686 = f_lane1_out & _2680;
+    assign _2685 = ~ f_lane1_out;
+    assign _2683 = ~ f_lane0_out;
     assign _2684 = _2683 & _2680;
-    assign _2682 = _1430 & _2680;
-    assign _2681 = ~ _1430;
-    assign _2680 = _2625[1:1];
+    assign _2682 = f_lane0_out & _2680;
+    assign _2681 = ~ f_lane0_out;
+    assign _2680 = f_pout[1:1];
     assign _2679 = _311[5:3];
     always @* begin
         case (_2679)
         0:
             _2687 <= _2680;
         1:
-            _2687 <= _1430;
+            _2687 <= f_lane0_out;
         2:
             _2687 <= _2681;
         3:
@@ -4511,27 +4511,27 @@ module spex_core (
         4:
             _2687 <= _2684;
         5:
-            _2687 <= _1588;
+            _2687 <= f_lane1_out;
         6:
             _2687 <= _2685;
         default:
             _2687 <= _2686;
         endcase
     end
-    assign _2677 = _1588 & _2671;
-    assign _2676 = ~ _1588;
-    assign _2674 = ~ _1430;
+    assign _2677 = f_lane1_out & _2671;
+    assign _2676 = ~ f_lane1_out;
+    assign _2674 = ~ f_lane0_out;
     assign _2675 = _2674 & _2671;
-    assign _2673 = _1430 & _2671;
-    assign _2672 = ~ _1430;
-    assign _2671 = _2625[2:2];
+    assign _2673 = f_lane0_out & _2671;
+    assign _2672 = ~ f_lane0_out;
+    assign _2671 = f_pout[2:2];
     assign _2670 = _311[8:6];
     always @* begin
         case (_2670)
         0:
             _2678 <= _2671;
         1:
-            _2678 <= _1430;
+            _2678 <= f_lane0_out;
         2:
             _2678 <= _2672;
         3:
@@ -4539,27 +4539,27 @@ module spex_core (
         4:
             _2678 <= _2675;
         5:
-            _2678 <= _1588;
+            _2678 <= f_lane1_out;
         6:
             _2678 <= _2676;
         default:
             _2678 <= _2677;
         endcase
     end
-    assign _2668 = _1588 & _2662;
-    assign _2667 = ~ _1588;
-    assign _2665 = ~ _1430;
+    assign _2668 = f_lane1_out & _2662;
+    assign _2667 = ~ f_lane1_out;
+    assign _2665 = ~ f_lane0_out;
     assign _2666 = _2665 & _2662;
-    assign _2664 = _1430 & _2662;
-    assign _2663 = ~ _1430;
-    assign _2662 = _2625[3:3];
+    assign _2664 = f_lane0_out & _2662;
+    assign _2663 = ~ f_lane0_out;
+    assign _2662 = f_pout[3:3];
     assign _2661 = _311[11:9];
     always @* begin
         case (_2661)
         0:
             _2669 <= _2662;
         1:
-            _2669 <= _1430;
+            _2669 <= f_lane0_out;
         2:
             _2669 <= _2663;
         3:
@@ -4567,27 +4567,27 @@ module spex_core (
         4:
             _2669 <= _2666;
         5:
-            _2669 <= _1588;
+            _2669 <= f_lane1_out;
         6:
             _2669 <= _2667;
         default:
             _2669 <= _2668;
         endcase
     end
-    assign _2659 = _1588 & _2653;
-    assign _2658 = ~ _1588;
-    assign _2656 = ~ _1430;
+    assign _2659 = f_lane1_out & _2653;
+    assign _2658 = ~ f_lane1_out;
+    assign _2656 = ~ f_lane0_out;
     assign _2657 = _2656 & _2653;
-    assign _2655 = _1430 & _2653;
-    assign _2654 = ~ _1430;
-    assign _2653 = _2625[4:4];
+    assign _2655 = f_lane0_out & _2653;
+    assign _2654 = ~ f_lane0_out;
+    assign _2653 = f_pout[4:4];
     assign _2652 = _311[14:12];
     always @* begin
         case (_2652)
         0:
             _2660 <= _2653;
         1:
-            _2660 <= _1430;
+            _2660 <= f_lane0_out;
         2:
             _2660 <= _2654;
         3:
@@ -4595,27 +4595,27 @@ module spex_core (
         4:
             _2660 <= _2657;
         5:
-            _2660 <= _1588;
+            _2660 <= f_lane1_out;
         6:
             _2660 <= _2658;
         default:
             _2660 <= _2659;
         endcase
     end
-    assign _2650 = _1588 & _2644;
-    assign _2649 = ~ _1588;
-    assign _2647 = ~ _1430;
+    assign _2650 = f_lane1_out & _2644;
+    assign _2649 = ~ f_lane1_out;
+    assign _2647 = ~ f_lane0_out;
     assign _2648 = _2647 & _2644;
-    assign _2646 = _1430 & _2644;
-    assign _2645 = ~ _1430;
-    assign _2644 = _2625[5:5];
+    assign _2646 = f_lane0_out & _2644;
+    assign _2645 = ~ f_lane0_out;
+    assign _2644 = f_pout[5:5];
     assign _2643 = _311[17:15];
     always @* begin
         case (_2643)
         0:
             _2651 <= _2644;
         1:
-            _2651 <= _1430;
+            _2651 <= f_lane0_out;
         2:
             _2651 <= _2645;
         3:
@@ -4623,27 +4623,27 @@ module spex_core (
         4:
             _2651 <= _2648;
         5:
-            _2651 <= _1588;
+            _2651 <= f_lane1_out;
         6:
             _2651 <= _2649;
         default:
             _2651 <= _2650;
         endcase
     end
-    assign _2641 = _1588 & _2635;
-    assign _2640 = ~ _1588;
-    assign _2638 = ~ _1430;
+    assign _2641 = f_lane1_out & _2635;
+    assign _2640 = ~ f_lane1_out;
+    assign _2638 = ~ f_lane0_out;
     assign _2639 = _2638 & _2635;
-    assign _2637 = _1430 & _2635;
-    assign _2636 = ~ _1430;
-    assign _2635 = _2625[6:6];
+    assign _2637 = f_lane0_out & _2635;
+    assign _2636 = ~ f_lane0_out;
+    assign _2635 = f_pout[6:6];
     assign _2634 = _311[20:18];
     always @* begin
         case (_2634)
         0:
             _2642 <= _2635;
         1:
-            _2642 <= _1430;
+            _2642 <= f_lane0_out;
         2:
             _2642 <= _2636;
         3:
@@ -4651,19 +4651,19 @@ module spex_core (
         4:
             _2642 <= _2639;
         5:
-            _2642 <= _1588;
+            _2642 <= f_lane1_out;
         6:
             _2642 <= _2640;
         default:
             _2642 <= _2641;
         endcase
     end
-    assign _2632 = _1588 & _2626;
-    assign _2631 = ~ _1588;
-    assign _2629 = ~ _1430;
+    assign _2632 = f_lane1_out & _2626;
+    assign _2631 = ~ f_lane1_out;
+    assign _2629 = ~ f_lane0_out;
     assign _2630 = _2629 & _2626;
-    assign _2628 = _1430 & _2626;
-    assign _2627 = ~ _1430;
+    assign _2628 = f_lane0_out & _2626;
+    assign _2627 = ~ f_lane0_out;
     assign _4125 = { _4123,
                      _4122 };
     assign _4122 = _621[0:0];
@@ -4744,14 +4744,14 @@ module spex_core (
     end
     assign _2571 = _1795 ? _2570 : _2569;
     assign _4109 = ~ _2571;
-    assign _4110 = _2625 & _4109;
+    assign _4110 = f_pout & _4109;
     assign _4119 = _4110 | _4118;
     assign _4121 = _4119 & _4120;
     assign _4129 = _4121 | _4128;
     assign _2559 = _672 == _2544;
     assign _2560 = _2559 | _674;
     assign _2561 = _1796 & _2560;
-    assign _4130 = _2561 ? _4129 : _2625;
+    assign _4130 = _2561 ? _4129 : f_pout;
     assign _121 = host_crc_expect;
     assign _4102 = 32'b11111111111111111111111111111111;
     assign _2812 = 32'b11101101101110001000001100100000;
@@ -5712,22 +5712,22 @@ module spex_core (
     end
     assign _2905 = _1612 == _2904;
     assign _2906 = ~ _2905;
-    assign _2908 = _2899 ? _2907 : _2895;
-    assign _2909 = _1709 ? _2908 : _2895;
-    assign _2910 = _1621 ? _2895 : _2909;
-    assign _2911 = _1576 ? _2910 : _2895;
+    assign _2908 = _2899 ? _2907 : g_crc_bad;
+    assign _2909 = _1709 ? _2908 : g_crc_bad;
+    assign _2910 = _1621 ? g_crc_bad : _2909;
+    assign _2911 = _1576 ? _2910 : g_crc_bad;
     assign _2913 = _1475 ? _1096 : _2911;
     assign _146 = _2913;
     always @(posedge _294) begin
         if (_292)
-            _2895 <= _1096;
+            g_crc_bad <= _1096;
         else
-            _2895 <= _146;
+            g_crc_bad <= _146;
     end
-    assign _2907 = _2895 | _2906;
+    assign _2907 = g_crc_bad | _2906;
     assign _2916 = ~ _2907;
     assign _2914 = 6'b000001;
-    assign _2915 = _1738 == _2914;
+    assign _2915 = g_left == _2914;
     assign _2917 = _2915 ? _2916 : _659;
     assign _2918 = _2899 ? _2917 : _659;
     assign _2919 = _1709 ? _2918 : _659;
@@ -5788,21 +5788,21 @@ module spex_core (
     end
     assign _2970 = _1454 == _2969;
     assign _2971 = ~ _2970;
-    assign _2973 = _2964 ? _2972 : _2960;
-    assign _2974 = _1632 ? _2973 : _2960;
-    assign _2975 = _1463 ? _2960 : _2974;
-    assign _2976 = _1418 ? _2975 : _2960;
+    assign _2973 = _2964 ? _2972 : g_crc_bad_0;
+    assign _2974 = _1632 ? _2973 : g_crc_bad_0;
+    assign _2975 = _1463 ? g_crc_bad_0 : _2974;
+    assign _2976 = _1418 ? _2975 : g_crc_bad_0;
     assign _2978 = _1317 ? _1096 : _2976;
     assign _155 = _2978;
     always @(posedge _294) begin
         if (_292)
-            _2960 <= _1096;
+            g_crc_bad_0 <= _1096;
         else
-            _2960 <= _155;
+            g_crc_bad_0 <= _155;
     end
-    assign _2972 = _2960 | _2971;
+    assign _2972 = g_crc_bad_0 | _2971;
     assign _2981 = ~ _2972;
-    assign _2980 = _1661 == _2914;
+    assign _2980 = g_left_0 == _2914;
     assign _2982 = _2980 ? _2981 : _645;
     assign _2983 = _2964 ? _2982 : _645;
     assign _2984 = _1632 ? _2983 : _645;
@@ -5876,19 +5876,19 @@ module spex_core (
     assign _2441 = _2440 & _1757;
     assign _3006 = _2441 ? _1896 : _1708;
     assign _1755 = ~ _1721;
-    assign _1749 = _1718 + _1464;
+    assign _1749 = g_bitpos + _1464;
     assign _1744 = ~ _1606;
-    assign _1743 = _1734 & _1742;
-    assign _1745 = _1743 & _1744;
-    assign _1746 = _1745 & _1714;
+    assign g_tx_bit = _1734 & _1742;
+    assign _1745 = g_tx_bit & _1744;
+    assign _1746 = _1745 & g_data_left;
     assign _1747 = _1715 | _1746;
-    assign _1750 = _1747 ? _1749 : _1718;
+    assign _1750 = _1747 ? _1749 : g_bitpos;
     assign _1752 = _1750 == _1104;
     assign _1753 = ~ _1752;
     assign _1724 = _1723 & _213;
     assign _1754 = _1724 & _1753;
     assign _1756 = _1754 & _1755;
-    assign _1720 = _1718 == _2425;
+    assign _1720 = g_bitpos == _2425;
     assign _1721 = _1715 & _1720;
     assign _1757 = _1721 | _1756;
     assign _1760 = _1708 | _1757;
@@ -5904,19 +5904,19 @@ module spex_core (
     end
     assign _3010 = _1708 | _1757;
     assign _1678 = ~ _1644;
-    assign _1672 = _1641 + _1464;
+    assign _1672 = g_bitpos_0 + _1464;
     assign _1667 = ~ _1448;
-    assign _1666 = _1657 & _1665;
-    assign _1668 = _1666 & _1667;
-    assign _1669 = _1668 & _1637;
+    assign g_tx_bit_0 = _1657 & _1665;
+    assign _1668 = g_tx_bit_0 & _1667;
+    assign _1669 = _1668 & g_data_left_0;
     assign _1670 = _1638 | _1669;
-    assign _1673 = _1670 ? _1672 : _1641;
+    assign _1673 = _1670 ? _1672 : g_bitpos_0;
     assign _1675 = _1673 == _1104;
     assign _1676 = ~ _1675;
     assign _1647 = _1646 & _265;
     assign _1677 = _1647 & _1676;
     assign _1679 = _1677 & _1678;
-    assign _1643 = _1641 == _2425;
+    assign _1643 = g_bitpos_0 == _2425;
     assign _1644 = _1638 & _1643;
     assign _1680 = _1644 | _1679;
     assign _3011 = _1680 | _3010;
@@ -6054,19 +6054,19 @@ module spex_core (
     assign _3412 = _656 | _3411;
     assign _3413 = _3412 | _3402;
     assign _3415 = _3413 ? _1245 : _3409;
-    assign _3396 = _1604 + _1464;
-    assign _3393 = _1604 + _1464;
-    assign _3389 = vdd == _1616;
-    assign _3387 = _1604 == _1104;
+    assign _3396 = g_run + _1464;
+    assign _3393 = g_run + _1464;
+    assign _3389 = vdd == g_last;
+    assign _3387 = g_run == _1104;
     assign _3388 = ~ _3387;
     assign _3390 = _3388 & _3389;
     assign _3394 = _3390 ? _3393 : _1464;
     assign _3385 = _191 == _1245;
     assign _3397 = _3385 ? _3396 : _3394;
     assign _3398 = _3397 == _169;
-    assign _3379 = _1604 + _1464;
-    assign _3375 = gnd == _1616;
-    assign _3373 = _1604 == _1104;
+    assign _3379 = g_run + _1464;
+    assign _3375 = gnd == g_last;
+    assign _3373 = g_run == _1104;
     assign _3374 = ~ _3373;
     assign _3376 = _3374 & _3375;
     assign _3380 = _3376 ? _3379 : _1464;
@@ -6076,12 +6076,12 @@ module spex_core (
     assign _3399 = _1612 ? _3398 : _3383;
     assign _3400 = _1601 & _3399;
     assign _3401 = ~ _3400;
-    assign _3367 = _1738 == _2914;
-    assign _3365 = _1738 == _1227;
+    assign _3367 = g_left == _2914;
+    assign _3365 = g_left == _1227;
     assign _3368 = _2899 ? _3367 : _3365;
-    assign _3360 = _1713 + _4031;
+    assign _3360 = g_cnt + _4031;
     assign _3361 = _3360 == _185;
-    assign _3358 = _1713 == _185;
+    assign _3358 = g_cnt == _185;
     assign _3362 = _1715 ? _3361 : _3358;
     assign _3356 = ~ _1621;
     assign _3357 = _1576 & _3356;
@@ -6092,7 +6092,7 @@ module spex_core (
     assign _3406 = _1621 ? _2544 : _3404;
     assign _3352 = _1742 ? _3350 : _2026;
     assign _3348 = _1502 & _1500;
-    assign _3350 = _3348 ? _1245 : _654;
+    assign _3350 = _3348 ? _1245 : g_mode;
     assign _3353 = _1734 ? _3352 : _3350;
     assign _3128 = _1742 ? _3127 : _3046;
     assign _3129 = _1734 ? _3128 : _3046;
@@ -6104,8 +6104,8 @@ module spex_core (
             _3046 <= _167;
     end
     assign _3278 = ~ _3127;
-    assign _3276 = ~ _1588;
-    assign _3277 = _3127 ? _1588 : _3276;
+    assign _3276 = ~ f_lane1_out;
+    assign _3277 = _3127 ? f_lane1_out : _3276;
     always @* begin
         case (_207)
         0:
@@ -6119,20 +6119,20 @@ module spex_core (
         endcase
     end
     assign _169 = host_lane1_stuff_len;
-    assign _3260 = _1604 + _1464;
+    assign _3260 = g_run + _1464;
     assign _3261 = _1612 ? _3260 : _1104;
-    assign _3256 = _1604 + _1464;
-    assign _3252 = _1612 == _1616;
-    assign _3250 = _1604 == _1104;
+    assign _3256 = g_run + _1464;
+    assign _3252 = _1612 == g_last;
+    assign _3250 = g_run == _1104;
     assign _3251 = ~ _3250;
     assign _3253 = _3251 & _3252;
     assign _3257 = _3253 ? _3256 : _1464;
     assign _3248 = _191 == _1245;
     assign _3262 = _3248 ? _3261 : _3257;
     assign _3263 = _1621 ? _3246 : _3262;
-    assign _3242 = _1604 + _1464;
+    assign _3242 = g_run + _1464;
     assign _3243 = _3127 ? _3242 : _1104;
-    assign _3238 = _1604 + _1464;
+    assign _3238 = g_run + _1464;
     assign _3124 = _3116[7:7];
     assign _3123 = _3116[6:6];
     assign _3122 = _3116[5:5];
@@ -6148,33 +6148,33 @@ module spex_core (
     assign _3109 = _3106[2:2];
     assign _3108 = _3106[1:1];
     assign _3105 = _628 ? _1251 : _3103;
-    assign _2450 = _2447[7:1];
+    assign _2450 = g_byte[7:1];
     assign _2451 = { _1612,
                      _2450 };
-    assign _2448 = _2447[6:0];
+    assign _2448 = g_byte[6:0];
     assign _2449 = { _2448,
                      _1612 };
     assign _2452 = _172 ? _2451 : _2449;
     assign _3134 = _1715 ? _2452 : _3133;
     assign _3135 = _1709 ? _3134 : _3133;
     assign _3136 = _1621 ? _3133 : _3135;
-    assign _3130 = _1714 ? _3106 : _2447;
-    assign _3131 = _1606 ? _2447 : _3130;
-    assign _3132 = _1742 ? _3131 : _2447;
-    assign _3133 = _1734 ? _3132 : _2447;
+    assign _3130 = g_data_left ? _3106 : g_byte;
+    assign _3131 = _1606 ? g_byte : _3130;
+    assign _3132 = _1742 ? _3131 : g_byte;
+    assign _3133 = _1734 ? _3132 : g_byte;
     assign _3137 = _1576 ? _3136 : _3133;
     assign _170 = _3137;
     always @(posedge _294) begin
         if (_292)
-            _2447 <= _1253;
+            g_byte <= _1253;
         else
-            _2447 <= _170;
+            g_byte <= _170;
     end
-    assign _1886 = _1718 == _1104;
+    assign _1886 = g_bitpos == _1104;
     assign _1883 = ~ _1606;
-    assign _1884 = _1883 & _1714;
+    assign _1884 = _1883 & g_data_left;
     assign _1887 = _1884 & _1886;
-    assign _3106 = _1887 ? _3105 : _2447;
+    assign _3106 = _1887 ? _3105 : g_byte;
     assign _3107 = _3106[0:0];
     assign _3115 = { _3107,
                      _3108,
@@ -6187,26 +6187,26 @@ module spex_core (
     assign _172 = host_lane1_lsb_first;
     assign _3116 = _172 ? _3106 : _3115;
     assign _3117 = _3116[0:0];
-    assign _3145 = _1718 + _1464;
+    assign _3145 = g_bitpos + _1464;
     assign _3146 = _1715 ? _3145 : _3143;
     assign _3147 = _1709 ? _3146 : _3143;
     assign _3148 = _1621 ? _3143 : _3147;
-    assign _3139 = _1718 + _1464;
-    assign _3140 = _1714 ? _3139 : _1718;
-    assign _3141 = _1606 ? _1718 : _3140;
-    assign _3142 = _1742 ? _3141 : _1718;
-    assign _3143 = _1734 ? _3142 : _1718;
+    assign _3139 = g_bitpos + _1464;
+    assign _3140 = g_data_left ? _3139 : g_bitpos;
+    assign _3141 = _1606 ? g_bitpos : _3140;
+    assign _3142 = _1742 ? _3141 : g_bitpos;
+    assign _3143 = _1734 ? _3142 : g_bitpos;
     assign _3149 = _1576 ? _3148 : _3143;
     assign _3151 = _1475 ? _1104 : _3149;
     assign _173 = _3151;
     always @(posedge _294) begin
         if (_292)
-            _1718 <= _1104;
+            g_bitpos <= _1104;
         else
-            _1718 <= _173;
+            g_bitpos <= _173;
     end
     always @* begin
-        case (_1718)
+        case (g_bitpos)
         0:
             _3125 <= _3117;
         1:
@@ -6227,40 +6227,40 @@ module spex_core (
     end
     assign _175 = host_lane1_crc_inv;
     assign _177 = host_lane1_init;
-    assign _3193 = _2902[30:0];
+    assign _3193 = g_crc[30:0];
     assign _3195 = { _3193,
                      _1096 };
-    assign _3187 = _2902[31:31];
+    assign _3187 = g_crc[31:31];
     assign _3188 = _1612 ^ _3187;
     assign _3190 = _3188 ? _182 : _2057;
-    assign _3184 = _2902[30:0];
+    assign _3184 = g_crc[30:0];
     assign _3186 = { _3184,
                      _1096 };
     assign _3191 = _3186 ^ _3190;
     assign _3192 = _1715 ? _3191 : _3183;
     assign _179 = host_lane1_crc_width;
-    assign _3161 = _1738 - _2914;
+    assign _3161 = g_left - _2914;
     assign _3162 = _2899 ? _3161 : _3159;
     assign _3163 = _1709 ? _3162 : _3159;
     assign _3164 = _1621 ? _3159 : _3163;
-    assign _3155 = _1738 - _2914;
-    assign _3156 = _1714 ? _1738 : _3155;
-    assign _3157 = _1606 ? _1738 : _3156;
-    assign _3158 = _1742 ? _3157 : _1738;
-    assign _3159 = _1734 ? _3158 : _1738;
+    assign _3155 = g_left - _2914;
+    assign _3156 = g_data_left ? g_left : _3155;
+    assign _3157 = _1606 ? g_left : _3156;
+    assign _3158 = _1742 ? _3157 : g_left;
+    assign _3159 = _1734 ? _3158 : g_left;
     assign _3165 = _1576 ? _3164 : _3159;
     assign _3166 = _3153 ? _179 : _3165;
     assign _3168 = _1475 ? _1227 : _3166;
     assign _180 = _3168;
     always @(posedge _294) begin
         if (_292)
-            _1738 <= _1227;
+            g_left <= _1227;
         else
-            _1738 <= _180;
+            g_left <= _180;
     end
-    assign _1740 = _1738 == _1227;
+    assign _1740 = g_left == _1227;
     assign _1741 = ~ _1740;
-    assign _2897 = ~ _1714;
+    assign _2897 = ~ g_data_left;
     assign _2896 = _1576 & _1709;
     assign _2898 = _2896 & _2897;
     assign _2899 = _2898 & _1741;
@@ -6268,116 +6268,116 @@ module spex_core (
     assign _3197 = _1709 ? _3196 : _3183;
     assign _3198 = _1621 ? _3183 : _3197;
     assign _182 = host_lane1_poly;
-    assign _3175 = _2902[31:31];
+    assign _3175 = g_crc[31:31];
     assign _3176 = _3127 ^ _3175;
     assign _3178 = _3176 ? _182 : _2057;
-    assign _3172 = _2902[30:0];
+    assign _3172 = g_crc[30:0];
     assign _3174 = { _3172,
                      _1096 };
     assign _3179 = _3174 ^ _3178;
-    assign _3169 = _2902[30:0];
+    assign _3169 = g_crc[30:0];
     assign _3171 = { _3169,
                      _1096 };
-    assign _3180 = _1714 ? _3179 : _3171;
-    assign _3181 = _1606 ? _2902 : _3180;
-    assign _3182 = _1742 ? _3181 : _2902;
-    assign _3183 = _1734 ? _3182 : _2902;
+    assign _3180 = g_data_left ? _3179 : _3171;
+    assign _3181 = _1606 ? g_crc : _3180;
+    assign _3182 = _1742 ? _3181 : g_crc;
+    assign _3183 = _1734 ? _3182 : g_crc;
     assign _3199 = _1576 ? _3198 : _3183;
     assign _3200 = _1475 ? _177 : _3199;
     assign _3202 = _1473 ? _2057 : _3200;
     assign _183 = _3202;
     always @(posedge _294) begin
         if (_292)
-            _2902 <= _2057;
+            g_crc <= _2057;
         else
-            _2902 <= _183;
+            g_crc <= _183;
     end
-    assign _2903 = _2902[31:31];
+    assign _2903 = g_crc[31:31];
     assign _2904 = _2903 ^ _175;
     assign _185 = host_lane1_frame_bits;
-    assign _3222 = _1713 + _4031;
+    assign _3222 = g_cnt + _4031;
     assign _1710 = _1576 & _1709;
-    assign _1715 = _1710 & _1714;
+    assign _1715 = _1710 & g_data_left;
     assign _3223 = _1715 ? _3222 : _3220;
     assign _1709 = ~ _1606;
     assign _3224 = _1709 ? _3223 : _3220;
     assign _3205 = _1621 ? _3204 : _1612;
-    assign _3203 = _1742 ? _3127 : _1616;
-    assign _3204 = _1734 ? _3203 : _1616;
+    assign _3203 = _1742 ? _3127 : g_last;
+    assign _3204 = _1734 ? _3203 : g_last;
     assign _3206 = _1576 ? _3205 : _3204;
     assign _3208 = _1475 ? _1896 : _3206;
     assign _186 = _3208;
     always @(posedge _294) begin
         if (_292)
-            _1616 <= vdd;
+            g_last <= vdd;
         else
-            _1616 <= _186;
+            g_last <= _186;
     end
-    assign _1617 = ~ _1616;
+    assign _1617 = ~ g_last;
     assign _1614 = _191 == _1244;
     assign _1618 = _1614 ? _1617 : gnd;
     assign _3210 = _207 == _1244;
-    assign _3211 = _3210 ? _1487 : _1610;
-    assign _3212 = _1576 ? _3211 : _1610;
+    assign _3211 = _3210 ? _1487 : g_prev;
+    assign _3212 = _1576 ? _3211 : g_prev;
     assign _3214 = _1475 ? _1896 : _3212;
     assign _187 = _3214;
     always @(posedge _294) begin
         if (_292)
-            _1610 <= vdd;
+            g_prev <= vdd;
         else
-            _1610 <= _187;
+            g_prev <= _187;
     end
-    assign _1611 = _1487 == _1610;
+    assign _1611 = _1487 == g_prev;
     assign _1608 = _207 == _1244;
     assign _1612 = _1608 ? _1611 : _1487;
     assign _1619 = _1612 == _1618;
     assign _1620 = ~ _1619;
     assign _1621 = _1606 & _1620;
     assign _3225 = _1621 ? _3220 : _3224;
-    assign _3216 = _1713 + _4031;
-    assign _3217 = _1714 ? _3216 : _1713;
-    assign _3218 = _1606 ? _1713 : _3217;
-    assign _3219 = _1742 ? _3218 : _1713;
-    assign _3220 = _1734 ? _3219 : _1713;
+    assign _3216 = g_cnt + _4031;
+    assign _3217 = g_data_left ? _3216 : g_cnt;
+    assign _3218 = _1606 ? g_cnt : _3217;
+    assign _3219 = _1742 ? _3218 : g_cnt;
+    assign _3220 = _1734 ? _3219 : g_cnt;
     assign _3226 = _1576 ? _3225 : _3220;
     assign _3228 = _1475 ? _1203 : _3226;
     assign _188 = _3228;
     always @(posedge _294) begin
         if (_292)
-            _1713 <= _1203;
+            g_cnt <= _1203;
         else
-            _1713 <= _188;
+            g_cnt <= _188;
     end
-    assign _1714 = _1713 < _185;
-    assign _3126 = _1714 ? _3125 : _2904;
+    assign g_data_left = g_cnt < _185;
+    assign _3126 = g_data_left ? _3125 : _2904;
     assign _3127 = _1606 ? _1618 : _3126;
-    assign _3234 = _3127 == _1616;
-    assign _3232 = _1604 == _1104;
+    assign _3234 = _3127 == g_last;
+    assign _3232 = g_run == _1104;
     assign _3233 = ~ _3232;
     assign _3235 = _3233 & _3234;
     assign _3239 = _3235 ? _3238 : _1464;
     assign _3230 = _191 == _1245;
     assign _3244 = _3230 ? _3243 : _3239;
-    assign _3245 = _1742 ? _3244 : _1604;
-    assign _3246 = _1734 ? _3245 : _1604;
+    assign _3245 = _1742 ? _3244 : g_run;
+    assign _3246 = _1734 ? _3245 : g_run;
     assign _3264 = _1576 ? _3263 : _3246;
     assign _3266 = _1475 ? _1104 : _3264;
     assign _189 = _3266;
     always @(posedge _294) begin
         if (_292)
-            _1604 <= _1104;
+            g_run <= _1104;
         else
-            _1604 <= _189;
+            g_run <= _189;
     end
-    assign _1605 = _1604 == _169;
+    assign _1605 = g_run == _169;
     assign _191 = host_lane1_stuff;
     assign _1600 = _191 == _2544;
     assign _1601 = ~ _1600;
     assign _1606 = _1601 & _1605;
-    assign _1735 = _1606 | _1714;
+    assign _1735 = _1606 | g_data_left;
     assign _1742 = _1735 | _1741;
     assign _3280 = _1742 ? _3279 : _1896;
-    assign _3281 = _1734 ? _3280 : _1588;
+    assign _3281 = _1734 ? _3280 : f_lane1_out;
     assign _1730 = _1546 == _1203;
     assign _1728 = _1511 == _1203;
     assign _1731 = _1539 ? _1730 : _1728;
@@ -6398,11 +6398,11 @@ module spex_core (
     assign _192 = _3290;
     always @(posedge _294) begin
         if (_292)
-            _1588 <= vdd;
+            f_lane1_out <= vdd;
         else
-            _1588 <= _192;
+            f_lane1_out <= _192;
     end
-    assign _1589 = _1487 == _1588;
+    assign _1589 = _1487 == f_lane1_out;
     assign _1590 = ~ _1589;
     assign _1583 = _207 == _1245;
     assign _1584 = ~ _1583;
@@ -6587,7 +6587,7 @@ module spex_core (
     assign _3344 = _3322 ? _1203 : _3342;
     assign _3294 = ~ _211;
     assign _3292 = _1502 & _1500;
-    assign _656 = _654 == _2026;
+    assign _656 = g_mode == _2026;
     assign _3291 = _1477 | _656;
     assign _3293 = _3291 | _3292;
     assign _3295 = _3293 & _3294;
@@ -6610,7 +6610,7 @@ module spex_core (
     assign _207 = host_lane1_code;
     assign _1504 = _207 == _1245;
     assign _1505 = ~ _1504;
-    assign _1502 = _654 == _1244;
+    assign _1502 = g_mode == _1244;
     assign _1506 = _1502 | _1505;
     assign _1499 = ~ _211;
     assign _1495 = _355[7:7];
@@ -6693,11 +6693,11 @@ module spex_core (
     assign _214 = _3424;
     always @(posedge _294) begin
         if (_292)
-            _654 <= _2544;
+            g_mode <= _2544;
         else
-            _654 <= _214;
+            g_mode <= _214;
     end
-    assign _1477 = _654 == _1245;
+    assign _1477 = g_mode == _1245;
     assign _1726 = _1477 & _1725;
     assign _1734 = _1726 & _1733;
     assign _1888 = _1734 & _1887;
@@ -6712,19 +6712,19 @@ module spex_core (
     assign _3748 = _642 | _3747;
     assign _3749 = _3748 | _3738;
     assign _3751 = _3749 ? _1245 : _3745;
-    assign _3732 = _1446 + _1464;
-    assign _3729 = _1446 + _1464;
-    assign _3725 = vdd == _1458;
-    assign _3723 = _1446 == _1104;
+    assign _3732 = g_run_0 + _1464;
+    assign _3729 = g_run_0 + _1464;
+    assign _3725 = vdd == g_last_0;
+    assign _3723 = g_run_0 == _1104;
     assign _3724 = ~ _3723;
     assign _3726 = _3724 & _3725;
     assign _3730 = _3726 ? _3729 : _1464;
     assign _3721 = _243 == _1245;
     assign _3733 = _3721 ? _3732 : _3730;
     assign _3734 = _3733 == _217;
-    assign _3715 = _1446 + _1464;
-    assign _3711 = gnd == _1458;
-    assign _3709 = _1446 == _1104;
+    assign _3715 = g_run_0 + _1464;
+    assign _3711 = gnd == g_last_0;
+    assign _3709 = g_run_0 == _1104;
     assign _3710 = ~ _3709;
     assign _3712 = _3710 & _3711;
     assign _3716 = _3712 ? _3715 : _1464;
@@ -6734,12 +6734,12 @@ module spex_core (
     assign _3735 = _1454 ? _3734 : _3719;
     assign _3736 = _1443 & _3735;
     assign _3737 = ~ _3736;
-    assign _3703 = _1661 == _2914;
-    assign _3701 = _1661 == _1227;
+    assign _3703 = g_left_0 == _2914;
+    assign _3701 = g_left_0 == _1227;
     assign _3704 = _2964 ? _3703 : _3701;
-    assign _3696 = _1636 + _4031;
+    assign _3696 = g_cnt_0 + _4031;
     assign _3697 = _3696 == _237;
-    assign _3694 = _1636 == _237;
+    assign _3694 = g_cnt_0 == _237;
     assign _3698 = _1638 ? _3697 : _3694;
     assign _3692 = ~ _1463;
     assign _3693 = _1418 & _3692;
@@ -6750,7 +6750,7 @@ module spex_core (
     assign _3742 = _1463 ? _2544 : _3740;
     assign _3688 = _1665 ? _3686 : _2026;
     assign _3684 = _1344 & _1342;
-    assign _3686 = _3684 ? _1245 : _640;
+    assign _3686 = _3684 ? _1245 : g_mode_0;
     assign _3689 = _1657 ? _3688 : _3686;
     assign _3452 = _1665 ? _3451 : _3427;
     assign _3453 = _1657 ? _3452 : _3427;
@@ -6762,8 +6762,8 @@ module spex_core (
             _3427 <= _215;
     end
     assign _3610 = ~ _3451;
-    assign _3608 = ~ _1430;
-    assign _3609 = _3451 ? _1430 : _3608;
+    assign _3608 = ~ f_lane0_out;
+    assign _3609 = _3451 ? f_lane0_out : _3608;
     always @* begin
         case (_259)
         0:
@@ -6777,20 +6777,20 @@ module spex_core (
         endcase
     end
     assign _217 = host_lane0_stuff_len;
-    assign _3592 = _1446 + _1464;
+    assign _3592 = g_run_0 + _1464;
     assign _3593 = _1454 ? _3592 : _1104;
-    assign _3588 = _1446 + _1464;
-    assign _3584 = _1454 == _1458;
-    assign _3582 = _1446 == _1104;
+    assign _3588 = g_run_0 + _1464;
+    assign _3584 = _1454 == g_last_0;
+    assign _3582 = g_run_0 == _1104;
     assign _3583 = ~ _3582;
     assign _3585 = _3583 & _3584;
     assign _3589 = _3585 ? _3588 : _1464;
     assign _3580 = _243 == _1245;
     assign _3594 = _3580 ? _3593 : _3589;
     assign _3595 = _1463 ? _3578 : _3594;
-    assign _3574 = _1446 + _1464;
+    assign _3574 = g_run_0 + _1464;
     assign _3575 = _3451 ? _3574 : _1104;
-    assign _3570 = _1446 + _1464;
+    assign _3570 = g_run_0 + _1464;
     assign _3448 = _3440[7:7];
     assign _3447 = _3440[6:6];
     assign _3446 = _3440[5:5];
@@ -6917,33 +6917,33 @@ module spex_core (
         endcase
     end
     assign _3429 = _628 ? _1251 : _3103;
-    assign _2476 = _2473[7:1];
+    assign _2476 = g_byte_0[7:1];
     assign _2477 = { _1454,
                      _2476 };
-    assign _2474 = _2473[6:0];
+    assign _2474 = g_byte_0[6:0];
     assign _2475 = { _2474,
                      _1454 };
     assign _2478 = _224 ? _2477 : _2475;
     assign _3466 = _1638 ? _2478 : _3465;
     assign _3467 = _1632 ? _3466 : _3465;
     assign _3468 = _1463 ? _3465 : _3467;
-    assign _3462 = _1637 ? _3430 : _2473;
-    assign _3463 = _1448 ? _2473 : _3462;
-    assign _3464 = _1665 ? _3463 : _2473;
-    assign _3465 = _1657 ? _3464 : _2473;
+    assign _3462 = g_data_left_0 ? _3430 : g_byte_0;
+    assign _3463 = _1448 ? g_byte_0 : _3462;
+    assign _3464 = _1665 ? _3463 : g_byte_0;
+    assign _3465 = _1657 ? _3464 : g_byte_0;
     assign _3469 = _1418 ? _3468 : _3465;
     assign _222 = _3469;
     always @(posedge _294) begin
         if (_292)
-            _2473 <= _1253;
+            g_byte_0 <= _1253;
         else
-            _2473 <= _222;
+            g_byte_0 <= _222;
     end
-    assign _1878 = _1641 == _1104;
+    assign _1878 = g_bitpos_0 == _1104;
     assign _1875 = ~ _1448;
-    assign _1876 = _1875 & _1637;
+    assign _1876 = _1875 & g_data_left_0;
     assign _1879 = _1876 & _1878;
-    assign _3430 = _1879 ? _3429 : _2473;
+    assign _3430 = _1879 ? _3429 : g_byte_0;
     assign _3431 = _3430[0:0];
     assign _3439 = { _3431,
                      _3432,
@@ -6956,26 +6956,26 @@ module spex_core (
     assign _224 = host_lane0_lsb_first;
     assign _3440 = _224 ? _3430 : _3439;
     assign _3441 = _3440[0:0];
-    assign _3477 = _1641 + _1464;
+    assign _3477 = g_bitpos_0 + _1464;
     assign _3478 = _1638 ? _3477 : _3475;
     assign _3479 = _1632 ? _3478 : _3475;
     assign _3480 = _1463 ? _3475 : _3479;
-    assign _3471 = _1641 + _1464;
-    assign _3472 = _1637 ? _3471 : _1641;
-    assign _3473 = _1448 ? _1641 : _3472;
-    assign _3474 = _1665 ? _3473 : _1641;
-    assign _3475 = _1657 ? _3474 : _1641;
+    assign _3471 = g_bitpos_0 + _1464;
+    assign _3472 = g_data_left_0 ? _3471 : g_bitpos_0;
+    assign _3473 = _1448 ? g_bitpos_0 : _3472;
+    assign _3474 = _1665 ? _3473 : g_bitpos_0;
+    assign _3475 = _1657 ? _3474 : g_bitpos_0;
     assign _3481 = _1418 ? _3480 : _3475;
     assign _3483 = _1317 ? _1104 : _3481;
     assign _225 = _3483;
     always @(posedge _294) begin
         if (_292)
-            _1641 <= _1104;
+            g_bitpos_0 <= _1104;
         else
-            _1641 <= _225;
+            g_bitpos_0 <= _225;
     end
     always @* begin
-        case (_1641)
+        case (g_bitpos_0)
         0:
             _3449 <= _3441;
         1:
@@ -6996,40 +6996,40 @@ module spex_core (
     end
     assign _227 = host_lane0_crc_inv;
     assign _229 = host_lane0_init;
-    assign _3525 = _2967[30:0];
+    assign _3525 = g_crc_0[30:0];
     assign _3527 = { _3525,
                      _1096 };
-    assign _3519 = _2967[31:31];
+    assign _3519 = g_crc_0[31:31];
     assign _3520 = _1454 ^ _3519;
     assign _3522 = _3520 ? _234 : _2057;
-    assign _3516 = _2967[30:0];
+    assign _3516 = g_crc_0[30:0];
     assign _3518 = { _3516,
                      _1096 };
     assign _3523 = _3518 ^ _3522;
     assign _3524 = _1638 ? _3523 : _3515;
     assign _231 = host_lane0_crc_width;
-    assign _3493 = _1661 - _2914;
+    assign _3493 = g_left_0 - _2914;
     assign _3494 = _2964 ? _3493 : _3491;
     assign _3495 = _1632 ? _3494 : _3491;
     assign _3496 = _1463 ? _3491 : _3495;
-    assign _3487 = _1661 - _2914;
-    assign _3488 = _1637 ? _1661 : _3487;
-    assign _3489 = _1448 ? _1661 : _3488;
-    assign _3490 = _1665 ? _3489 : _1661;
-    assign _3491 = _1657 ? _3490 : _1661;
+    assign _3487 = g_left_0 - _2914;
+    assign _3488 = g_data_left_0 ? g_left_0 : _3487;
+    assign _3489 = _1448 ? g_left_0 : _3488;
+    assign _3490 = _1665 ? _3489 : g_left_0;
+    assign _3491 = _1657 ? _3490 : g_left_0;
     assign _3497 = _1418 ? _3496 : _3491;
     assign _3498 = _3485 ? _231 : _3497;
     assign _3500 = _1317 ? _1227 : _3498;
     assign _232 = _3500;
     always @(posedge _294) begin
         if (_292)
-            _1661 <= _1227;
+            g_left_0 <= _1227;
         else
-            _1661 <= _232;
+            g_left_0 <= _232;
     end
-    assign _1663 = _1661 == _1227;
+    assign _1663 = g_left_0 == _1227;
     assign _1664 = ~ _1663;
-    assign _2962 = ~ _1637;
+    assign _2962 = ~ g_data_left_0;
     assign _2961 = _1418 & _1632;
     assign _2963 = _2961 & _2962;
     assign _2964 = _2963 & _1664;
@@ -7037,116 +7037,116 @@ module spex_core (
     assign _3529 = _1632 ? _3528 : _3515;
     assign _3530 = _1463 ? _3515 : _3529;
     assign _234 = host_lane0_poly;
-    assign _3507 = _2967[31:31];
+    assign _3507 = g_crc_0[31:31];
     assign _3508 = _3451 ^ _3507;
     assign _3510 = _3508 ? _234 : _2057;
-    assign _3504 = _2967[30:0];
+    assign _3504 = g_crc_0[30:0];
     assign _3506 = { _3504,
                      _1096 };
     assign _3511 = _3506 ^ _3510;
-    assign _3501 = _2967[30:0];
+    assign _3501 = g_crc_0[30:0];
     assign _3503 = { _3501,
                      _1096 };
-    assign _3512 = _1637 ? _3511 : _3503;
-    assign _3513 = _1448 ? _2967 : _3512;
-    assign _3514 = _1665 ? _3513 : _2967;
-    assign _3515 = _1657 ? _3514 : _2967;
+    assign _3512 = g_data_left_0 ? _3511 : _3503;
+    assign _3513 = _1448 ? g_crc_0 : _3512;
+    assign _3514 = _1665 ? _3513 : g_crc_0;
+    assign _3515 = _1657 ? _3514 : g_crc_0;
     assign _3531 = _1418 ? _3530 : _3515;
     assign _3532 = _1317 ? _229 : _3531;
     assign _3534 = _1315 ? _2057 : _3532;
     assign _235 = _3534;
     always @(posedge _294) begin
         if (_292)
-            _2967 <= _2057;
+            g_crc_0 <= _2057;
         else
-            _2967 <= _235;
+            g_crc_0 <= _235;
     end
-    assign _2968 = _2967[31:31];
+    assign _2968 = g_crc_0[31:31];
     assign _2969 = _2968 ^ _227;
     assign _237 = host_lane0_frame_bits;
-    assign _3554 = _1636 + _4031;
+    assign _3554 = g_cnt_0 + _4031;
     assign _1633 = _1418 & _1632;
-    assign _1638 = _1633 & _1637;
+    assign _1638 = _1633 & g_data_left_0;
     assign _3555 = _1638 ? _3554 : _3552;
     assign _1632 = ~ _1448;
     assign _3556 = _1632 ? _3555 : _3552;
     assign _3537 = _1463 ? _3536 : _1454;
-    assign _3535 = _1665 ? _3451 : _1458;
-    assign _3536 = _1657 ? _3535 : _1458;
+    assign _3535 = _1665 ? _3451 : g_last_0;
+    assign _3536 = _1657 ? _3535 : g_last_0;
     assign _3538 = _1418 ? _3537 : _3536;
     assign _3540 = _1317 ? _1896 : _3538;
     assign _238 = _3540;
     always @(posedge _294) begin
         if (_292)
-            _1458 <= vdd;
+            g_last_0 <= vdd;
         else
-            _1458 <= _238;
+            g_last_0 <= _238;
     end
-    assign _1459 = ~ _1458;
+    assign _1459 = ~ g_last_0;
     assign _1456 = _243 == _1244;
     assign _1460 = _1456 ? _1459 : gnd;
     assign _3542 = _259 == _1244;
-    assign _3543 = _3542 ? _1329 : _1452;
-    assign _3544 = _1418 ? _3543 : _1452;
+    assign _3543 = _3542 ? _1329 : g_prev_0;
+    assign _3544 = _1418 ? _3543 : g_prev_0;
     assign _3546 = _1317 ? _1896 : _3544;
     assign _239 = _3546;
     always @(posedge _294) begin
         if (_292)
-            _1452 <= vdd;
+            g_prev_0 <= vdd;
         else
-            _1452 <= _239;
+            g_prev_0 <= _239;
     end
-    assign _1453 = _1329 == _1452;
+    assign _1453 = _1329 == g_prev_0;
     assign _1450 = _259 == _1244;
     assign _1454 = _1450 ? _1453 : _1329;
     assign _1461 = _1454 == _1460;
     assign _1462 = ~ _1461;
     assign _1463 = _1448 & _1462;
     assign _3557 = _1463 ? _3552 : _3556;
-    assign _3548 = _1636 + _4031;
-    assign _3549 = _1637 ? _3548 : _1636;
-    assign _3550 = _1448 ? _1636 : _3549;
-    assign _3551 = _1665 ? _3550 : _1636;
-    assign _3552 = _1657 ? _3551 : _1636;
+    assign _3548 = g_cnt_0 + _4031;
+    assign _3549 = g_data_left_0 ? _3548 : g_cnt_0;
+    assign _3550 = _1448 ? g_cnt_0 : _3549;
+    assign _3551 = _1665 ? _3550 : g_cnt_0;
+    assign _3552 = _1657 ? _3551 : g_cnt_0;
     assign _3558 = _1418 ? _3557 : _3552;
     assign _3560 = _1317 ? _1203 : _3558;
     assign _240 = _3560;
     always @(posedge _294) begin
         if (_292)
-            _1636 <= _1203;
+            g_cnt_0 <= _1203;
         else
-            _1636 <= _240;
+            g_cnt_0 <= _240;
     end
-    assign _1637 = _1636 < _237;
-    assign _3450 = _1637 ? _3449 : _2969;
+    assign g_data_left_0 = g_cnt_0 < _237;
+    assign _3450 = g_data_left_0 ? _3449 : _2969;
     assign _3451 = _1448 ? _1460 : _3450;
-    assign _3566 = _3451 == _1458;
-    assign _3564 = _1446 == _1104;
+    assign _3566 = _3451 == g_last_0;
+    assign _3564 = g_run_0 == _1104;
     assign _3565 = ~ _3564;
     assign _3567 = _3565 & _3566;
     assign _3571 = _3567 ? _3570 : _1464;
     assign _3562 = _243 == _1245;
     assign _3576 = _3562 ? _3575 : _3571;
-    assign _3577 = _1665 ? _3576 : _1446;
-    assign _3578 = _1657 ? _3577 : _1446;
+    assign _3577 = _1665 ? _3576 : g_run_0;
+    assign _3578 = _1657 ? _3577 : g_run_0;
     assign _3596 = _1418 ? _3595 : _3578;
     assign _3598 = _1317 ? _1104 : _3596;
     assign _241 = _3598;
     always @(posedge _294) begin
         if (_292)
-            _1446 <= _1104;
+            g_run_0 <= _1104;
         else
-            _1446 <= _241;
+            g_run_0 <= _241;
     end
-    assign _1447 = _1446 == _217;
+    assign _1447 = g_run_0 == _217;
     assign _243 = host_lane0_stuff;
     assign _1442 = _243 == _2544;
     assign _1443 = ~ _1442;
     assign _1448 = _1443 & _1447;
-    assign _1658 = _1448 | _1637;
+    assign _1658 = _1448 | g_data_left_0;
     assign _1665 = _1658 | _1664;
     assign _3612 = _1665 ? _3611 : _1896;
-    assign _3613 = _1657 ? _3612 : _1430;
+    assign _3613 = _1657 ? _3612 : f_lane0_out;
     assign _1653 = _1388 == _1203;
     assign _1651 = _1353 == _1203;
     assign _1654 = _1381 ? _1653 : _1651;
@@ -7167,11 +7167,11 @@ module spex_core (
     assign _244 = _3622;
     always @(posedge _294) begin
         if (_292)
-            _1430 <= vdd;
+            f_lane0_out <= vdd;
         else
-            _1430 <= _244;
+            f_lane0_out <= _244;
     end
-    assign _1431 = _1329 == _1430;
+    assign _1431 = _1329 == f_lane0_out;
     assign _1432 = ~ _1431;
     assign _1425 = _259 == _1245;
     assign _1426 = ~ _1425;
@@ -7355,7 +7355,7 @@ module spex_core (
     assign _3676 = _3654 ? _1203 : _3674;
     assign _3626 = ~ _263;
     assign _3624 = _1344 & _1342;
-    assign _642 = _640 == _2026;
+    assign _642 = g_mode_0 == _2026;
     assign _3623 = _1319 | _642;
     assign _3625 = _3623 | _3624;
     assign _3627 = _3625 & _3626;
@@ -7378,7 +7378,7 @@ module spex_core (
     assign _259 = host_lane0_code;
     assign _1346 = _259 == _1245;
     assign _1347 = ~ _1346;
-    assign _1344 = _640 == _1244;
+    assign _1344 = g_mode_0 == _1244;
     assign _1348 = _1344 | _1347;
     assign _1341 = ~ _263;
     assign _1337 = _355[7:7];
@@ -7497,11 +7497,11 @@ module spex_core (
     assign _267 = _3760;
     always @(posedge _294) begin
         if (_292)
-            _640 <= _2544;
+            g_mode_0 <= _2544;
         else
-            _640 <= _267;
+            g_mode_0 <= _267;
     end
-    assign _1319 = _640 == _1245;
+    assign _1319 = g_mode_0 == _1245;
     assign _1649 = _1319 & _1648;
     assign _1657 = _1649 & _1656;
     assign _1880 = _1657 & _1879;
@@ -8307,11 +8307,11 @@ module spex_core (
     assign _309 = _4132;
     always @(posedge _294) begin
         if (_292)
-            _2625 <= _1253;
+            f_pout <= _1253;
         else
-            _2625 <= _309;
+            f_pout <= _309;
     end
-    assign _2626 = _2625[7:7];
+    assign _2626 = f_pout[7:7];
     assign _311 = host_pin_src;
     assign _2622 = _311[23:21];
     always @* begin
@@ -8319,7 +8319,7 @@ module spex_core (
         0:
             _2633 <= _2626;
         1:
-            _2633 <= _1430;
+            _2633 <= f_lane0_out;
         2:
             _2633 <= _2627;
         3:
@@ -8327,7 +8327,7 @@ module spex_core (
         4:
             _2633 <= _2630;
         5:
-            _2633 <= _1588;
+            _2633 <= f_lane1_out;
         6:
             _2633 <= _2631;
         default:

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """Non-vacuity check for the formal properties: each property must FAIL on at least
-one RTL mutant. Applies a mutant from mutation/mutate.py to src/engine.ml, generates
-Verilog into formal/mut/, and runs formal/prove.sh on it.
+one RTL mutant. Applies a mutant from mutation/mutate.py to src/engine.ml or src/lane.ml,
+generates Verilog into formal/mut/, and runs formal/prove.sh (core) or
+formal/prove_lanes.sh (bit lane, L1-L3) on it.
 
 usage: python3 formal/vacuity.py      (from the repo root, with opam env loaded)
 """
 import subprocess, pathlib, sys, re
 sys.path.insert(0, "mutation")
-from mutate import MUTANTS
+from mutate import MUTANTS, LANE_MUTANTS
 
 SRC = pathlib.Path("src/engine.ml")
+LANE = pathlib.Path("src/lane.ml")
 # mutant name -> property it should break
 TARGETS = {
     "edge priority: edge 1 beats edge 0": "P1 (lowest true edge wins)",
@@ -25,10 +27,21 @@ TARGETS = {
     "start allowed while the image is invalid": "P10 (never leaves IDLE while the image is invalid)",
     "AMBIGUOUS only when no edge fires": "P7 (ambiguous input never selects an edge)",
     "AMBIGUOUS: chg_mask left out of the relevant mask": "P7 (ambiguous input never selects an edge)",
+    "pin source select read from the next pin's field": "L4 (a lane drives only the pins selected for it)",
+    "pin source 'lane 1 AND engine' reads lane 0": "L4 (a lane drives only the pins selected for it)",
+}
+# bit-lane mutants (src/lane.ml) -> property
+LANE_TARGETS = {
+    "stuff bit not complemented": "L1 (no stuff_len + 1 equal bits on the line)",
+    "RX MSB-first shift takes the wrong end": "L2 (TX -> RX loopback returns the bytes)",
+    "NRZI decode inverted": "L2 (TX -> RX loopback returns the bytes)",
+    "CRC inversion ignored": "L3 (the CRC field is the CRC of the data sent)",
+    "CRC feedback ignores the bit": "L3 (the CRC field is the CRC of the data sent)",
 }
 
 def main():
     original = SRC.read_text()
+    lane_original = LANE.read_text()
     out = pathlib.Path("formal/mut"); out.mkdir(exist_ok=True)
     rows = []
     try:
@@ -38,13 +51,28 @@ def main():
             g = subprocess.run(f"dune exec bin/gen.exe -- {out}", shell=True, capture_output=True, text=True)
             if g.returncode != 0:
                 rows.append((name, TARGETS[name], "BUILD FAILED")); continue
-            group = re.match(r"(P\d+)", TARGETS[name]).group(1)
+            group = re.match(r"([PL]\d+)", TARGETS[name]).group(1)
             group = "CHECK_ROLE" if group == "P2" else group
             p = subprocess.run(f"PROPS={group} formal/prove.sh {out.resolve()}/spex_core.v", shell=True, capture_output=True, text=True)
             res = p.stdout.strip().replace("\n", "; ")
             rows.append((name, TARGETS[name], res))
+        SRC.write_text(original)
+        lane_original = LANE.read_text()
+        for name, old, new in LANE_MUTANTS:
+            if name not in LANE_TARGETS: continue
+            LANE.write_text(lane_original.replace(old, new))
+            g = subprocess.run(f"dune exec bin/gen.exe -- {out}", shell=True, capture_output=True, text=True)
+            LANE.write_text(lane_original)
+            if g.returncode != 0:
+                rows.append((name, LANE_TARGETS[name], "BUILD FAILED")); continue
+            group = re.match(r"(L\d+)", LANE_TARGETS[name]).group(1)
+            # L2, L3: a BMC counterexample to the property itself (lemmas left out)
+            bmc = "" if group == "L1" else "BMC=40 "
+            p = subprocess.run(f"PROPS={group} {bmc}formal/prove_lanes.sh {out.resolve()}/spex_lane.v", shell=True, capture_output=True, text=True)
+            rows.append((name, LANE_TARGETS[name], p.stdout.strip().replace("\n", "; ")))
     finally:
         SRC.write_text(original)
+        LANE.write_text(lane_original)
     # Verilog-level mutant for P6: the timestamp skips a count when it is odd
     # (the net name of the increment changes with the RTL, so find it: the non-clear
     # branch of ts_reg's always block)

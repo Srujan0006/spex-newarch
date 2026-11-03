@@ -73,6 +73,17 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let sync_hit = rv 1 in
   let error = rv 1 in
   let kind = rv 3 in
+  (* named for the helper lemmas in formal/lane_props.sv *)
+  ignore (cnt.value -- "g_cnt" : Signal.t);
+  ignore (crc.value -- "g_crc" : Signal.t);
+  ignore (run.value -- "g_run" : Signal.t);
+  ignore (last.value -- "g_last" : Signal.t);
+  ignore (bitpos.value -- "g_bitpos" : Signal.t);
+  ignore (byte.value -- "g_byte" : Signal.t);
+  ignore (crc_left.value -- "g_left" : Signal.t);
+  ignore (crc_bad.value -- "g_crc_bad" : Signal.t);
+  ignore (prev.value -- "g_prev" : Signal.t);
+  ignore (mode.value -- "g_mode" : Signal.t);
   let is_rx = c.dir in
   let in_run = mode.value ==:. m_run in
   let in_armed = mode.value ==:. m_armed in
@@ -128,7 +139,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     sll crc.value 1 ^: mux2 fb c.poly (zero 32)
   in
   let crc_bit = crc.value.:(31) ^: c.crc_inv in
-  let data_avail = cnt.value <: c.frame_bits in
+  let data_avail = (cnt.value <: c.frame_bits) -- "g_data_left" in
   let crc_avail = crc_left.value <>:. 0 in
   (* ---- TX: the slot at a bit start ---- *)
   let tx_step = in_run &: ~:is_rx &: start in
@@ -166,8 +177,10 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let stuff_after = stuff_on &: mux2 rbit (run_next vdd ==: c.stuff_len) (run_next gnd ==: c.stuff_len) in
   let rx_finish = rx_step &: ~:rx_stuff_bad &: cnt_done &: left_done &: ~:stuff_after in
   (* END pushes the partial byte (bitpos after this cycle's step) *)
+  (* the cycle a TX slot is sent (out takes it next cycle); read by formal/lane_props.sv *)
+  let tx_bit = (tx_step &: has_slot) -- "g_tx_bit" in
   let bitpos_after =
-    mux2 (rx_take |: (tx_step &: has_slot &: ~:stuff_due &: data_avail)) (bitpos.value +:. 1) bitpos.value
+    mux2 (rx_take |: (tx_bit &: ~:stuff_due &: data_avail)) (bitpos.value +:. 1) bitpos.value
   in
   let byte_after = mux2 rx_take byte_rx byte.value in
   let end_push = i.end_ &: is_rx &: (bitpos_after <>:. 0) &: ~:push in

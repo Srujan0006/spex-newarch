@@ -168,7 +168,7 @@ let%expect_test "a frame aborted mid-byte does not shift the next one" =
     |}]
 ;;
 
-let%expect_test "CAN TX configured and fed through SPI only" =
+let can_tx_over_spi () =
   let n = Test_can.n in
   let t = S.create () in
   let node = Can_node.create ~n () in
@@ -189,7 +189,11 @@ let%expect_test "CAN TX configured and fed through SPI only" =
   S.ticks t (120 * n);
   printf "node received %s, stuff errors %d; lane 0 status %02x; STATUS %02x\n"
     (Sexp.to_string [%sexp (List.rev node.received : Can_node.frame list)])
-    node.stuff_errors (S.lane_status t 0) (S.status t);
+    node.stuff_errors (S.lane_status t 0) (S.status t)
+;;
+
+let%expect_test "CAN TX configured and fed through SPI only" =
+  can_tx_over_spi ();
   [%expect {| node received (((id 1445)(data(202 254)))), stuff errors 0; lane 0 status 80; STATUS 90 |}]
 ;;
 

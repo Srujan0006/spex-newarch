@@ -33,6 +33,8 @@ module spex_props (
     wire f_viol_now, f_host_cov_we; wire [1:0] f_policy;
     wire st_image_valid, st_verify_busy, f_image_valid, f_sweeping, f_sw_last, f_sw_match, f_store_we;
     wire [12:0] f_sw_cnt, \f_sw_cnt.i ;  // the cut, free sweep counter outside P10/P11 (prove.sh)
+    wire f_lane0_out, f_lane1_out;  // lane outputs at the pin stage: free inputs in L4 (prove.sh)
+    wire [7:0] f_pout, f_poe;
     wire f_recover_jump = f_in_eval && fires == 4'd0 && f_viol_now && f_policy == 2'd2;
 
     // internal signals, made ports of spex_core by `expose` in prove.sh
@@ -181,5 +183,23 @@ module spex_props (
 `endif
 `ifdef SANITY
     always @* if (!init) assert (st_timestamp != 32'd5);  // must FAIL: shows the flow sees the asserts
+`endif
+    // L4: a lane drives only the pins whose source select names it. prove.sh frees both lane
+    // outputs, so they take any value; each pin must then equal the ENGINE.md Pins table
+    // entry, which reads only the selected lane (or none), whatever the other lane does.
+`ifdef L4
+    genvar p;
+    for (p = 0; p < 8; p = p + 1) begin : l4
+        wire [2:0] src = host_pin_src[3*p +: 3];
+        wire e = f_pout[p];
+        wire v = src == 3'd0 ? e
+               : src == 3'd1 ? f_lane0_out : src == 3'd2 ? !f_lane0_out
+               : src == 3'd3 ? (f_lane0_out & e) : src == 3'd4 ? (!f_lane0_out & e)
+               : src == 3'd5 ? f_lane1_out : src == 3'd6 ? !f_lane1_out : (f_lane1_out & e);
+        always @* if (!init) begin
+            assert (pins_out[p] == (v & !host_open_drain[p]));
+            assert (pins_oe[p] == (f_poe[p] & !(host_open_drain[p] & v)));
+        end
+    end
 `endif
 endmodule

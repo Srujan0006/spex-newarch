@@ -833,11 +833,14 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   in
   (* open-drain pins drive only 0; a 1 releases the pin *)
   (* pin source select, then the open-drain output stage *)
+  (* named for formal L4 (formal/lane_props.sv): prove.sh cuts the lane outputs there *)
+  let l0 = lane_out 0 -- "f_lane0_out"
+  and l1 = lane_out 1 -- "f_lane1_out"
+  and pout_v = pout.value -- "f_pout" in
+  ignore (poe.value -- "f_poe" : Signal.t);
   let pin_val =
     List.init 8 ~f:(fun p ->
-      let e = pout.value.:(p) in
-      let l0 = lane_out 0
-      and l1 = lane_out 1 in
+      let e = pout_v.:(p) in
       mux
         (select h.pin_src ((3 * p) + 2) (3 * p))
         [ e; l0; ~:l0; l0 &: e; ~:l0 &: e; l1; ~:l1; l1 &: e ])

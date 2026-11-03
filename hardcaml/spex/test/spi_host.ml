@@ -21,6 +21,11 @@ type t =
 let set r v = r := Bits.of_int ~width:(Bits.width !r) v
 let get r = Bits.to_int !r
 
+(* hooks for test/vectors (chip-level vectors): called after the clear cycle of [create]
+   and after every [tick] *)
+let on_create : (t -> unit) ref = ref ignore
+let on_tick : (t -> unit) ref = ref ignore
+
 let create ?(half = 3) ?(internal = false) () =
   let config = if internal then Cyclesim.Config.trace_all else Cyclesim.Config.default in
   let sim = Sim.create ~config (Chip.Sim_top.create (Scope.create ~flatten_design:true ())) in
@@ -30,7 +35,9 @@ let create ?(half = 3) ?(internal = false) () =
   i.clear := Bits.vdd;
   Cyclesim.cycle sim;
   i.clear := Bits.gnd;
-  { sim; i; o; half; cycle = 0; device = Harness.pullups; trace = None }
+  let t = { sim; i; o; half; cycle = 0; device = Harness.pullups; trace = None } in
+  !on_create t;
+  t
 ;;
 
 let tick t =
@@ -38,6 +45,7 @@ let tick t =
   set t.i.pins_in pins;
   Option.iter t.trace ~f:(fun f -> f pins);
   Cyclesim.cycle t.sim;
+  !on_tick t;
   t.cycle <- t.cycle + 1
 ;;
 

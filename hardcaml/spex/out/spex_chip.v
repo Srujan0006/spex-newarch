@@ -189,7 +189,7 @@ module spex_chip (
     wire [7:0] _1439;
     wire [7:0] _1441;
     wire [7:0] _20;
-    reg [7:0] _1384;
+    reg [7:0] f_poe;
     wire [7:0] _1537;
     wire [7:0] _1562;
     wire _1532;
@@ -318,7 +318,7 @@ module spex_chip (
     wire [7:0] _1559;
     wire [7:0] _1561;
     wire [7:0] _22;
-    reg [7:0] _1458;
+    reg [7:0] f_pout;
     wire _1459;
     wire [23:0] _1454;
     wire [2:0] _1455;
@@ -1632,7 +1632,7 @@ module spex_chip (
     wire _3187;
     wire _3189;
     wire _119;
-    reg _3170;
+    reg g_crc_bad;
     wire _3183;
     wire _3192;
     wire [5:0] _3190;
@@ -1730,7 +1730,7 @@ module spex_chip (
     wire _3315;
     wire _3317;
     wire _128;
-    reg _3298;
+    reg g_crc_bad_0;
     wire _3311;
     wire _3320;
     wire _3319;
@@ -1804,7 +1804,7 @@ module spex_chip (
     wire _2035;
     wire [2:0] _2029;
     wire _2024;
-    wire _2023;
+    wire g_tx_bit;
     wire _2025;
     wire _2026;
     wire _2027;
@@ -1827,7 +1827,7 @@ module spex_chip (
     wire _1842;
     wire [2:0] _1836;
     wire _1831;
-    wire _1830;
+    wire g_tx_bit_0;
     wire _1832;
     wire _1833;
     wire _1834;
@@ -1998,7 +1998,7 @@ module spex_chip (
     wire [7:0] _3488;
     wire [7:0] _3492;
     wire [7:0] _139;
-    reg [7:0] _2099;
+    reg [7:0] g_byte;
     wire _2689;
     wire _2686;
     wire _2687;
@@ -2021,7 +2021,7 @@ module spex_chip (
     wire [2:0] _3504;
     wire [2:0] _3506;
     wire [2:0] _140;
-    reg [2:0] _1805;
+    reg [2:0] g_bitpos;
     reg _3480;
     wire _3307;
     wire _3517;
@@ -2113,7 +2113,7 @@ module spex_chip (
     wire [5:0] _3597;
     wire [5:0] _3599;
     wire [5:0] _146;
-    reg [5:0] _1825;
+    reg [5:0] g_left;
     wire _1827;
     wire _1828;
     wire _3300;
@@ -2192,7 +2192,7 @@ module spex_chip (
     wire [31:0] _3693;
     wire [31:0] _3695;
     wire [31:0] _151;
-    reg [31:0] _3305;
+    reg [31:0] g_crc;
     wire _3306;
     wire _3308;
     wire _3703;
@@ -2234,7 +2234,7 @@ module spex_chip (
     wire _3723;
     wire _3725;
     wire _154;
-    reg _2760;
+    reg g_last;
     wire _2761;
     wire _2758;
     wire _2762;
@@ -2243,7 +2243,7 @@ module spex_chip (
     wire _3729;
     wire _3731;
     wire _155;
-    reg _2105;
+    reg g_prev;
     wire _2106;
     wire _2103;
     wire _2107;
@@ -2259,8 +2259,8 @@ module spex_chip (
     wire [15:0] _3743;
     wire [15:0] _3745;
     wire [15:0] _156;
-    reg [15:0] _1793;
-    wire _1801;
+    reg [15:0] g_cnt;
+    wire g_data_left;
     wire _3481;
     wire _3482;
     wire _3751;
@@ -2275,7 +2275,7 @@ module spex_chip (
     wire [2:0] _3781;
     wire [2:0] _3783;
     wire [2:0] _157;
-    reg [2:0] _1785;
+    reg [2:0] g_run;
     wire _1787;
     wire _3791;
     wire _3792;
@@ -2316,7 +2316,7 @@ module spex_chip (
     wire _3817;
     wire _3819;
     wire _159;
-    reg _1461;
+    reg f_lane0_out;
     wire _2747;
     wire _2748;
     wire _2743;
@@ -2652,7 +2652,7 @@ module spex_chip (
     wire [7:0] _3972;
     wire [7:0] _3976;
     wire [7:0] _171;
-    reg [7:0] _2047;
+    reg [7:0] g_byte_0;
     wire _2697;
     wire _2694;
     wire _2695;
@@ -2675,7 +2675,7 @@ module spex_chip (
     wire [2:0] _3988;
     wire [2:0] _3990;
     wire [2:0] _172;
-    reg [2:0] _1998;
+    reg [2:0] g_bitpos_0;
     reg _3952;
     wire _3179;
     wire _4001;
@@ -2762,7 +2762,7 @@ module spex_chip (
     wire [5:0] _4081;
     wire [5:0] _4083;
     wire [5:0] _178;
-    reg [5:0] _2018;
+    reg [5:0] g_left_0;
     wire _2020;
     wire _2021;
     wire _3172;
@@ -2837,7 +2837,7 @@ module spex_chip (
     wire [31:0] _4177;
     wire [31:0] _4179;
     wire [31:0] _183;
-    reg [31:0] _3177;
+    reg [31:0] g_crc_0;
     wire _3178;
     wire _3180;
     wire _4187;
@@ -2877,7 +2877,7 @@ module spex_chip (
     wire _4207;
     wire _4209;
     wire _186;
-    reg _2799;
+    reg g_last_0;
     wire _2800;
     wire _2797;
     wire _2801;
@@ -2886,7 +2886,7 @@ module spex_chip (
     wire _4213;
     wire _4215;
     wire _187;
-    reg _2053;
+    reg g_prev_0;
     wire _2054;
     wire _2051;
     wire _2055;
@@ -2902,8 +2902,8 @@ module spex_chip (
     wire [15:0] _4227;
     wire [15:0] _4229;
     wire [15:0] _188;
-    reg [15:0] _1986;
-    wire _1994;
+    reg [15:0] g_cnt_0;
+    wire g_data_left_0;
     wire _3953;
     wire _3954;
     wire _4235;
@@ -2918,7 +2918,7 @@ module spex_chip (
     wire [2:0] _4265;
     wire [2:0] _4267;
     wire [2:0] _189;
-    reg [2:0] _1978;
+    reg [2:0] g_run_0;
     wire _1980;
     wire _4275;
     wire _4276;
@@ -2961,7 +2961,7 @@ module spex_chip (
     wire _4301;
     wire _4303;
     wire _191;
-    reg _1467;
+    reg f_lane1_out;
     wire _2786;
     wire _2787;
     wire _2782;
@@ -3183,7 +3183,7 @@ module spex_chip (
     wire _2582;
     wire [1:0] _4500;
     wire [1:0] _200;
-    reg [1:0] _608;
+    reg [1:0] g_mode;
     wire _1884;
     wire _2862;
     wire [1:0] _4501;
@@ -3230,7 +3230,7 @@ module spex_chip (
     wire _2550;
     wire [1:0] _4594;
     wire [1:0] _204;
-    reg [1:0] _594;
+    reg [1:0] g_mode_0;
     wire _1657;
     wire _1813;
     wire _1821;
@@ -4280,35 +4280,35 @@ module spex_chip (
     assign _1400 = _1376 ? _1399 : _1398;
     assign _1401 = _1400 & _1391;
     assign _1392 = ~ _1391;
-    assign _1393 = _1384 & _1392;
+    assign _1393 = f_poe & _1392;
     assign _1402 = _1393 | _1401;
     assign _1436 = _1402 | _1435;
-    assign _1437 = _1381 ? _1436 : _1384;
+    assign _1437 = _1381 ? _1436 : f_poe;
     assign _1439 = _1373 ? _1266 : _1437;
     assign _1441 = _1370 ? _1266 : _1439;
     assign _20 = _1441;
     always @(posedge _260) begin
         if (_258)
-            _1384 <= _1266;
+            f_poe <= _1266;
         else
-            _1384 <= _20;
+            f_poe <= _20;
     end
-    assign _1537 = _1384 & _1536;
+    assign _1537 = f_poe & _1536;
     assign _1562 = ~ _1444;
-    assign _1532 = _1467 & _1526;
-    assign _1531 = ~ _1467;
-    assign _1529 = ~ _1461;
+    assign _1532 = f_lane1_out & _1526;
+    assign _1531 = ~ f_lane1_out;
+    assign _1529 = ~ f_lane0_out;
     assign _1530 = _1529 & _1526;
-    assign _1528 = _1461 & _1526;
-    assign _1527 = ~ _1461;
-    assign _1526 = _1458[0:0];
+    assign _1528 = f_lane0_out & _1526;
+    assign _1527 = ~ f_lane0_out;
+    assign _1526 = f_pout[0:0];
     assign _1525 = _1454[2:0];
     always @* begin
         case (_1525)
         0:
             _1533 <= _1526;
         1:
-            _1533 <= _1461;
+            _1533 <= f_lane0_out;
         2:
             _1533 <= _1527;
         3:
@@ -4316,27 +4316,27 @@ module spex_chip (
         4:
             _1533 <= _1530;
         5:
-            _1533 <= _1467;
+            _1533 <= f_lane1_out;
         6:
             _1533 <= _1531;
         default:
             _1533 <= _1532;
         endcase
     end
-    assign _1523 = _1467 & _1517;
-    assign _1522 = ~ _1467;
-    assign _1520 = ~ _1461;
+    assign _1523 = f_lane1_out & _1517;
+    assign _1522 = ~ f_lane1_out;
+    assign _1520 = ~ f_lane0_out;
     assign _1521 = _1520 & _1517;
-    assign _1519 = _1461 & _1517;
-    assign _1518 = ~ _1461;
-    assign _1517 = _1458[1:1];
+    assign _1519 = f_lane0_out & _1517;
+    assign _1518 = ~ f_lane0_out;
+    assign _1517 = f_pout[1:1];
     assign _1516 = _1454[5:3];
     always @* begin
         case (_1516)
         0:
             _1524 <= _1517;
         1:
-            _1524 <= _1461;
+            _1524 <= f_lane0_out;
         2:
             _1524 <= _1518;
         3:
@@ -4344,27 +4344,27 @@ module spex_chip (
         4:
             _1524 <= _1521;
         5:
-            _1524 <= _1467;
+            _1524 <= f_lane1_out;
         6:
             _1524 <= _1522;
         default:
             _1524 <= _1523;
         endcase
     end
-    assign _1514 = _1467 & _1508;
-    assign _1513 = ~ _1467;
-    assign _1511 = ~ _1461;
+    assign _1514 = f_lane1_out & _1508;
+    assign _1513 = ~ f_lane1_out;
+    assign _1511 = ~ f_lane0_out;
     assign _1512 = _1511 & _1508;
-    assign _1510 = _1461 & _1508;
-    assign _1509 = ~ _1461;
-    assign _1508 = _1458[2:2];
+    assign _1510 = f_lane0_out & _1508;
+    assign _1509 = ~ f_lane0_out;
+    assign _1508 = f_pout[2:2];
     assign _1507 = _1454[8:6];
     always @* begin
         case (_1507)
         0:
             _1515 <= _1508;
         1:
-            _1515 <= _1461;
+            _1515 <= f_lane0_out;
         2:
             _1515 <= _1509;
         3:
@@ -4372,27 +4372,27 @@ module spex_chip (
         4:
             _1515 <= _1512;
         5:
-            _1515 <= _1467;
+            _1515 <= f_lane1_out;
         6:
             _1515 <= _1513;
         default:
             _1515 <= _1514;
         endcase
     end
-    assign _1505 = _1467 & _1499;
-    assign _1504 = ~ _1467;
-    assign _1502 = ~ _1461;
+    assign _1505 = f_lane1_out & _1499;
+    assign _1504 = ~ f_lane1_out;
+    assign _1502 = ~ f_lane0_out;
     assign _1503 = _1502 & _1499;
-    assign _1501 = _1461 & _1499;
-    assign _1500 = ~ _1461;
-    assign _1499 = _1458[3:3];
+    assign _1501 = f_lane0_out & _1499;
+    assign _1500 = ~ f_lane0_out;
+    assign _1499 = f_pout[3:3];
     assign _1498 = _1454[11:9];
     always @* begin
         case (_1498)
         0:
             _1506 <= _1499;
         1:
-            _1506 <= _1461;
+            _1506 <= f_lane0_out;
         2:
             _1506 <= _1500;
         3:
@@ -4400,27 +4400,27 @@ module spex_chip (
         4:
             _1506 <= _1503;
         5:
-            _1506 <= _1467;
+            _1506 <= f_lane1_out;
         6:
             _1506 <= _1504;
         default:
             _1506 <= _1505;
         endcase
     end
-    assign _1496 = _1467 & _1490;
-    assign _1495 = ~ _1467;
-    assign _1493 = ~ _1461;
+    assign _1496 = f_lane1_out & _1490;
+    assign _1495 = ~ f_lane1_out;
+    assign _1493 = ~ f_lane0_out;
     assign _1494 = _1493 & _1490;
-    assign _1492 = _1461 & _1490;
-    assign _1491 = ~ _1461;
-    assign _1490 = _1458[4:4];
+    assign _1492 = f_lane0_out & _1490;
+    assign _1491 = ~ f_lane0_out;
+    assign _1490 = f_pout[4:4];
     assign _1489 = _1454[14:12];
     always @* begin
         case (_1489)
         0:
             _1497 <= _1490;
         1:
-            _1497 <= _1461;
+            _1497 <= f_lane0_out;
         2:
             _1497 <= _1491;
         3:
@@ -4428,27 +4428,27 @@ module spex_chip (
         4:
             _1497 <= _1494;
         5:
-            _1497 <= _1467;
+            _1497 <= f_lane1_out;
         6:
             _1497 <= _1495;
         default:
             _1497 <= _1496;
         endcase
     end
-    assign _1487 = _1467 & _1481;
-    assign _1486 = ~ _1467;
-    assign _1484 = ~ _1461;
+    assign _1487 = f_lane1_out & _1481;
+    assign _1486 = ~ f_lane1_out;
+    assign _1484 = ~ f_lane0_out;
     assign _1485 = _1484 & _1481;
-    assign _1483 = _1461 & _1481;
-    assign _1482 = ~ _1461;
-    assign _1481 = _1458[5:5];
+    assign _1483 = f_lane0_out & _1481;
+    assign _1482 = ~ f_lane0_out;
+    assign _1481 = f_pout[5:5];
     assign _1480 = _1454[17:15];
     always @* begin
         case (_1480)
         0:
             _1488 <= _1481;
         1:
-            _1488 <= _1461;
+            _1488 <= f_lane0_out;
         2:
             _1488 <= _1482;
         3:
@@ -4456,27 +4456,27 @@ module spex_chip (
         4:
             _1488 <= _1485;
         5:
-            _1488 <= _1467;
+            _1488 <= f_lane1_out;
         6:
             _1488 <= _1486;
         default:
             _1488 <= _1487;
         endcase
     end
-    assign _1478 = _1467 & _1472;
-    assign _1477 = ~ _1467;
-    assign _1475 = ~ _1461;
+    assign _1478 = f_lane1_out & _1472;
+    assign _1477 = ~ f_lane1_out;
+    assign _1475 = ~ f_lane0_out;
     assign _1476 = _1475 & _1472;
-    assign _1474 = _1461 & _1472;
-    assign _1473 = ~ _1461;
-    assign _1472 = _1458[6:6];
+    assign _1474 = f_lane0_out & _1472;
+    assign _1473 = ~ f_lane0_out;
+    assign _1472 = f_pout[6:6];
     assign _1471 = _1454[20:18];
     always @* begin
         case (_1471)
         0:
             _1479 <= _1472;
         1:
-            _1479 <= _1461;
+            _1479 <= f_lane0_out;
         2:
             _1479 <= _1473;
         3:
@@ -4484,19 +4484,19 @@ module spex_chip (
         4:
             _1479 <= _1476;
         5:
-            _1479 <= _1467;
+            _1479 <= f_lane1_out;
         6:
             _1479 <= _1477;
         default:
             _1479 <= _1478;
         endcase
     end
-    assign _1469 = _1467 & _1459;
-    assign _1468 = ~ _1467;
-    assign _1464 = ~ _1461;
+    assign _1469 = f_lane1_out & _1459;
+    assign _1468 = ~ f_lane1_out;
+    assign _1464 = ~ f_lane0_out;
     assign _1465 = _1464 & _1459;
-    assign _1463 = _1461 & _1459;
-    assign _1462 = ~ _1461;
+    assign _1463 = f_lane0_out & _1459;
+    assign _1462 = ~ f_lane0_out;
     assign _1554 = { _1552,
                      _1551 };
     assign _1551 = _572[0:0];
@@ -4577,7 +4577,7 @@ module spex_chip (
     end
     assign _1391 = _1376 ? _1390 : _1389;
     assign _1538 = ~ _1391;
-    assign _1539 = _1458 & _1538;
+    assign _1539 = f_pout & _1538;
     assign _1548 = _1539 | _1547;
     assign _1550 = _1548 & _1549;
     assign _1558 = _1550 | _1557;
@@ -4585,16 +4585,16 @@ module spex_chip (
     assign _1379 = _626 == _1378;
     assign _1380 = _1379 | _628;
     assign _1381 = _1377 & _1380;
-    assign _1559 = _1381 ? _1558 : _1458;
+    assign _1559 = _1381 ? _1558 : f_pout;
     assign _1561 = _1370 ? _1266 : _1559;
     assign _22 = _1561;
     always @(posedge _260) begin
         if (_258)
-            _1458 <= _1266;
+            f_pout <= _1266;
         else
-            _1458 <= _22;
+            f_pout <= _22;
     end
-    assign _1459 = _1458[7:7];
+    assign _1459 = f_pout[7:7];
     assign _1454 = { _1447,
                      _1450,
                      _1453 };
@@ -4604,7 +4604,7 @@ module spex_chip (
         0:
             _1470 <= _1459;
         1:
-            _1470 <= _1461;
+            _1470 <= f_lane0_out;
         2:
             _1470 <= _1462;
         3:
@@ -4612,7 +4612,7 @@ module spex_chip (
         4:
             _1470 <= _1465;
         5:
-            _1470 <= _1467;
+            _1470 <= f_lane1_out;
         6:
             _1470 <= _1468;
         default:
@@ -4766,7 +4766,7 @@ module spex_chip (
     end
     assign _2131 = _1652 == _1058;
     assign _2132 = _1649 & _2131;
-    assign _2112 = _1802 ? _2111 : _2099;
+    assign _2112 = _1802 ? _2111 : g_byte;
     assign _2113 = _1808 ? _2111 : _2112;
     assign _2064 = _2063 ? _2061 : _2044;
     assign _2062 = _2041 ? _2061 : _2044;
@@ -4778,7 +4778,7 @@ module spex_chip (
         else
             _2044 <= _29;
     end
-    assign _2060 = _1995 ? _2059 : _2047;
+    assign _2060 = _1995 ? _2059 : g_byte_0;
     assign _2061 = _2001 ? _2059 : _2060;
     assign _2095 = _1848 ? _2044 : _2061;
     assign _2092 = _2091 ? _576 : _2089;
@@ -5512,7 +5512,7 @@ module spex_chip (
     end
     assign _5213 = _66[15:8];
     assign _2767 = _2765 ? _2136 : _2756;
-    assign _2755 = _1461 ? _1343 : _2142;
+    assign _2755 = f_lane0_out ? _1343 : _2142;
     assign _2756 = _2749 ? _2755 : _2752;
     assign _2768 = _1775 ? _2767 : _2756;
     assign _2770 = _2735 ? _1058 : _2768;
@@ -5531,7 +5531,7 @@ module spex_chip (
                      gnd,
                      _2752 };
     assign _2806 = _2804 ? _2136 : _2795;
-    assign _2794 = _1467 ? _1343 : _2142;
+    assign _2794 = f_lane1_out ? _1343 : _2142;
     assign _2795 = _2788 ? _2794 : _2791;
     assign _2807 = _1968 ? _2806 : _2795;
     assign _2809 = _2774 ? _1058 : _2807;
@@ -6787,22 +6787,22 @@ module spex_chip (
     end
     assign _3181 = _2055 == _3180;
     assign _3182 = ~ _3181;
-    assign _3184 = _3174 ? _3183 : _3170;
-    assign _3185 = _1982 ? _3184 : _3170;
-    assign _3186 = _2804 ? _3170 : _3185;
-    assign _3187 = _1968 ? _3186 : _3170;
+    assign _3184 = _3174 ? _3183 : g_crc_bad;
+    assign _3185 = _1982 ? _3184 : g_crc_bad;
+    assign _3186 = _2804 ? g_crc_bad : _3185;
+    assign _3187 = _1968 ? _3186 : g_crc_bad;
     assign _3189 = _2774 ? _1050 : _3187;
     assign _119 = _3189;
     always @(posedge _260) begin
         if (_258)
-            _3170 <= _1050;
+            g_crc_bad <= _1050;
         else
-            _3170 <= _119;
+            g_crc_bad <= _119;
     end
-    assign _3183 = _3170 | _3182;
+    assign _3183 = g_crc_bad | _3182;
     assign _3192 = ~ _3183;
     assign _3190 = 6'b000001;
-    assign _3191 = _2018 == _3190;
+    assign _3191 = g_left_0 == _3190;
     assign _3193 = _3191 ? _3192 : _613;
     assign _3194 = _3174 ? _3193 : _613;
     assign _3195 = _1982 ? _3194 : _613;
@@ -6933,21 +6933,21 @@ module spex_chip (
     end
     assign _3309 = _2107 == _3308;
     assign _3310 = ~ _3309;
-    assign _3312 = _3302 ? _3311 : _3298;
-    assign _3313 = _1789 ? _3312 : _3298;
-    assign _3314 = _2765 ? _3298 : _3313;
-    assign _3315 = _1775 ? _3314 : _3298;
+    assign _3312 = _3302 ? _3311 : g_crc_bad_0;
+    assign _3313 = _1789 ? _3312 : g_crc_bad_0;
+    assign _3314 = _2765 ? g_crc_bad_0 : _3313;
+    assign _3315 = _1775 ? _3314 : g_crc_bad_0;
     assign _3317 = _2735 ? _1050 : _3315;
     assign _128 = _3317;
     always @(posedge _260) begin
         if (_258)
-            _3298 <= _1050;
+            g_crc_bad_0 <= _1050;
         else
-            _3298 <= _128;
+            g_crc_bad_0 <= _128;
     end
-    assign _3311 = _3298 | _3310;
+    assign _3311 = g_crc_bad_0 | _3310;
     assign _3320 = ~ _3311;
-    assign _3319 = _1825 == _3190;
+    assign _3319 = g_left == _3190;
     assign _3321 = _3319 ? _3320 : _599;
     assign _3322 = _3302 ? _3321 : _599;
     assign _3323 = _1789 ? _3322 : _599;
@@ -7042,19 +7042,19 @@ module spex_chip (
     assign _2041 = _2040 & _2037;
     assign _3355 = _2041 ? _2707 : _1848;
     assign _2035 = ~ _2001;
-    assign _2029 = _1998 + _2136;
+    assign _2029 = g_bitpos_0 + _2136;
     assign _2024 = ~ _1981;
-    assign _2023 = _2014 & _2022;
-    assign _2025 = _2023 & _2024;
-    assign _2026 = _2025 & _1994;
+    assign g_tx_bit = _2014 & _2022;
+    assign _2025 = g_tx_bit & _2024;
+    assign _2026 = _2025 & g_data_left_0;
     assign _2027 = _1995 | _2026;
-    assign _2030 = _2027 ? _2029 : _1998;
+    assign _2030 = _2027 ? _2029 : g_bitpos_0;
     assign _2032 = _2030 == _1058;
     assign _2033 = ~ _2032;
     assign _2004 = _2003 & _1854;
     assign _2034 = _2004 & _2033;
     assign _2036 = _2034 & _2035;
-    assign _2000 = _1998 == _2172;
+    assign _2000 = g_bitpos_0 == _2172;
     assign _2001 = _1995 & _2000;
     assign _2037 = _2001 | _2036;
     assign _2038 = _1848 | _2037;
@@ -7070,19 +7070,19 @@ module spex_chip (
     end
     assign _3359 = _1848 | _2037;
     assign _1842 = ~ _1808;
-    assign _1836 = _1805 + _2136;
+    assign _1836 = g_bitpos + _2136;
     assign _1831 = ~ _1788;
-    assign _1830 = _1821 & _1829;
-    assign _1832 = _1830 & _1831;
-    assign _1833 = _1832 & _1801;
+    assign g_tx_bit_0 = _1821 & _1829;
+    assign _1832 = g_tx_bit_0 & _1831;
+    assign _1833 = _1832 & g_data_left;
     assign _1834 = _1802 | _1833;
-    assign _1837 = _1834 ? _1836 : _1805;
+    assign _1837 = _1834 ? _1836 : g_bitpos;
     assign _1839 = _1837 == _1058;
     assign _1840 = ~ _1839;
     assign _1811 = _1810 & _1661;
     assign _1841 = _1811 & _1840;
     assign _1843 = _1841 & _1842;
-    assign _1807 = _1805 == _2172;
+    assign _1807 = g_bitpos == _2172;
     assign _1808 = _1802 & _1807;
     assign _1844 = _1808 | _1843;
     assign _3360 = _1844 | _3359;
@@ -7223,19 +7223,19 @@ module spex_chip (
     assign _4582 = _596 | _4581;
     assign _4583 = _4582 | _4572;
     assign _4585 = _4583 ? _1258 : _4579;
-    assign _4566 = _1785 + _2136;
-    assign _4563 = _1785 + _2136;
-    assign _4559 = vdd == _2760;
-    assign _4557 = _1785 == _1058;
+    assign _4566 = g_run + _2136;
+    assign _4563 = g_run + _2136;
+    assign _4559 = vdd == g_last;
+    assign _4557 = g_run == _1058;
     assign _4558 = ~ _4557;
     assign _4560 = _4558 & _4559;
     assign _4564 = _4560 ? _4563 : _2136;
     assign _4555 = _1779 == _1258;
     assign _4567 = _4555 ? _4566 : _4564;
     assign _4568 = _4567 == _1786;
-    assign _4549 = _1785 + _2136;
-    assign _4545 = gnd == _2760;
-    assign _4543 = _1785 == _1058;
+    assign _4549 = g_run + _2136;
+    assign _4545 = gnd == g_last;
+    assign _4543 = g_run == _1058;
     assign _4544 = ~ _4543;
     assign _4546 = _4544 & _4545;
     assign _4550 = _4546 ? _4549 : _2136;
@@ -7245,12 +7245,12 @@ module spex_chip (
     assign _4569 = _2107 ? _4568 : _4553;
     assign _4570 = _1782 & _4569;
     assign _4571 = ~ _4570;
-    assign _4537 = _1825 == _3190;
-    assign _4535 = _1825 == _1185;
+    assign _4537 = g_left == _3190;
+    assign _4535 = g_left == _1185;
     assign _4538 = _3302 ? _4537 : _4535;
-    assign _4530 = _1793 + _4868;
+    assign _4530 = g_cnt + _4868;
     assign _4531 = _4530 == _1800;
-    assign _4528 = _1793 == _1800;
+    assign _4528 = g_cnt == _1800;
     assign _4532 = _1802 ? _4531 : _4528;
     assign _4526 = ~ _2765;
     assign _4527 = _1775 & _4526;
@@ -7261,7 +7261,7 @@ module spex_chip (
     assign _4576 = _2765 ? _1378 : _4574;
     assign _4522 = _1829 ? _4520 : _1316;
     assign _4518 = _1691 & _1689;
-    assign _4520 = _4518 ? _1258 : _594;
+    assign _4520 = _4518 ? _1258 : g_mode_0;
     assign _4523 = _1821 ? _4522 : _4520;
     assign _3483 = _1829 ? _3482 : _3395;
     assign _3484 = _1821 ? _3483 : _3395;
@@ -7273,8 +7273,8 @@ module spex_chip (
             _3395 <= _138;
     end
     assign _3807 = ~ _3482;
-    assign _3805 = ~ _1461;
-    assign _3806 = _3482 ? _1461 : _3805;
+    assign _3805 = ~ f_lane0_out;
+    assign _3806 = _3482 ? f_lane0_out : _3805;
     always @* begin
         case (_1692)
         0:
@@ -7288,20 +7288,20 @@ module spex_chip (
         endcase
     end
     assign _1786 = _1778[4:2];
-    assign _3777 = _1785 + _2136;
+    assign _3777 = g_run + _2136;
     assign _3778 = _2107 ? _3777 : _1058;
-    assign _3773 = _1785 + _2136;
-    assign _3769 = _2107 == _2760;
-    assign _3767 = _1785 == _1058;
+    assign _3773 = g_run + _2136;
+    assign _3769 = _2107 == g_last;
+    assign _3767 = g_run == _1058;
     assign _3768 = ~ _3767;
     assign _3770 = _3768 & _3769;
     assign _3774 = _3770 ? _3773 : _2136;
     assign _3765 = _1779 == _1258;
     assign _3779 = _3765 ? _3778 : _3774;
     assign _3780 = _2765 ? _3763 : _3779;
-    assign _3759 = _1785 + _2136;
+    assign _3759 = g_run + _2136;
     assign _3760 = _3482 ? _3759 : _1058;
-    assign _3755 = _1785 + _2136;
+    assign _3755 = g_run + _2136;
     assign _3479 = _3471[7:7];
     assign _3478 = _3471[6:6];
     assign _3477 = _3471[5:5];
@@ -7317,33 +7317,33 @@ module spex_chip (
     assign _3464 = _3461[2:2];
     assign _3463 = _3461[1:1];
     assign _3460 = _579 ? _1264 : _3458;
-    assign _2109 = _2099[7:1];
+    assign _2109 = g_byte[7:1];
     assign _2110 = { _2107,
                      _2109 };
-    assign _2101 = _2099[6:0];
+    assign _2101 = g_byte[6:0];
     assign _2108 = { _2101,
                      _2107 };
     assign _2111 = _2100 ? _2110 : _2108;
     assign _3489 = _1802 ? _2111 : _3488;
     assign _3490 = _1789 ? _3489 : _3488;
     assign _3491 = _2765 ? _3488 : _3490;
-    assign _3485 = _1801 ? _3461 : _2099;
-    assign _3486 = _1788 ? _2099 : _3485;
-    assign _3487 = _1829 ? _3486 : _2099;
-    assign _3488 = _1821 ? _3487 : _2099;
+    assign _3485 = g_data_left ? _3461 : g_byte;
+    assign _3486 = _1788 ? g_byte : _3485;
+    assign _3487 = _1829 ? _3486 : g_byte;
+    assign _3488 = _1821 ? _3487 : g_byte;
     assign _3492 = _1775 ? _3491 : _3488;
     assign _139 = _3492;
     always @(posedge _260) begin
         if (_258)
-            _2099 <= _1266;
+            g_byte <= _1266;
         else
-            _2099 <= _139;
+            g_byte <= _139;
     end
-    assign _2689 = _1805 == _1058;
+    assign _2689 = g_bitpos == _1058;
     assign _2686 = ~ _1788;
-    assign _2687 = _2686 & _1801;
+    assign _2687 = _2686 & g_data_left;
     assign _2690 = _2687 & _2689;
-    assign _3461 = _2690 ? _3460 : _2099;
+    assign _3461 = _2690 ? _3460 : g_byte;
     assign _3462 = _3461[0:0];
     assign _3470 = { _3462,
                      _3463,
@@ -7356,26 +7356,26 @@ module spex_chip (
     assign _2100 = _1660[5:5];
     assign _3471 = _2100 ? _3461 : _3470;
     assign _3472 = _3471[0:0];
-    assign _3500 = _1805 + _2136;
+    assign _3500 = g_bitpos + _2136;
     assign _3501 = _1802 ? _3500 : _3498;
     assign _3502 = _1789 ? _3501 : _3498;
     assign _3503 = _2765 ? _3498 : _3502;
-    assign _3494 = _1805 + _2136;
-    assign _3495 = _1801 ? _3494 : _1805;
-    assign _3496 = _1788 ? _1805 : _3495;
-    assign _3497 = _1829 ? _3496 : _1805;
-    assign _3498 = _1821 ? _3497 : _1805;
+    assign _3494 = g_bitpos + _2136;
+    assign _3495 = g_data_left ? _3494 : g_bitpos;
+    assign _3496 = _1788 ? g_bitpos : _3495;
+    assign _3497 = _1829 ? _3496 : g_bitpos;
+    assign _3498 = _1821 ? _3497 : g_bitpos;
     assign _3504 = _1775 ? _3503 : _3498;
     assign _3506 = _2735 ? _1058 : _3504;
     assign _140 = _3506;
     always @(posedge _260) begin
         if (_258)
-            _1805 <= _1058;
+            g_bitpos <= _1058;
         else
-            _1805 <= _140;
+            g_bitpos <= _140;
     end
     always @* begin
-        case (_1805)
+        case (g_bitpos)
         0:
             _3480 <= _3472;
         1:
@@ -7471,13 +7471,13 @@ module spex_chip (
                      _3539,
                      _3524,
                      _3509 };
-    assign _3685 = _3305[30:0];
+    assign _3685 = g_crc[30:0];
     assign _3687 = { _3685,
                      _1050 };
-    assign _3679 = _3305[31:31];
+    assign _3679 = g_crc[31:31];
     assign _3680 = _2107 ^ _3679;
     assign _3682 = _3680 ? _3669 : _1233;
-    assign _3676 = _3305[30:0];
+    assign _3676 = g_crc[30:0];
     assign _3678 = { _3676,
                      _1050 };
     assign _3683 = _3678 ^ _3682;
@@ -7501,28 +7501,28 @@ module spex_chip (
             _3569 <= _145;
     end
     assign _3596 = _3569[5:0];
-    assign _3591 = _1825 - _3190;
+    assign _3591 = g_left - _3190;
     assign _3592 = _3302 ? _3591 : _3589;
     assign _3593 = _1789 ? _3592 : _3589;
     assign _3594 = _2765 ? _3589 : _3593;
-    assign _3585 = _1825 - _3190;
-    assign _3586 = _1801 ? _1825 : _3585;
-    assign _3587 = _1788 ? _1825 : _3586;
-    assign _3588 = _1829 ? _3587 : _1825;
-    assign _3589 = _1821 ? _3588 : _1825;
+    assign _3585 = g_left - _3190;
+    assign _3586 = g_data_left ? g_left : _3585;
+    assign _3587 = _1788 ? g_left : _3586;
+    assign _3588 = _1829 ? _3587 : g_left;
+    assign _3589 = _1821 ? _3588 : g_left;
     assign _3595 = _1775 ? _3594 : _3589;
     assign _3597 = _3583 ? _3596 : _3595;
     assign _3599 = _2735 ? _1185 : _3597;
     assign _146 = _3599;
     always @(posedge _260) begin
         if (_258)
-            _1825 <= _1185;
+            g_left <= _1185;
         else
-            _1825 <= _146;
+            g_left <= _146;
     end
-    assign _1827 = _1825 == _1185;
+    assign _1827 = g_left == _1185;
     assign _1828 = ~ _1827;
-    assign _3300 = ~ _1801;
+    assign _3300 = ~ g_data_left;
     assign _3299 = _1775 & _1789;
     assign _3301 = _3299 & _3300;
     assign _3302 = _3301 & _1828;
@@ -7605,31 +7605,31 @@ module spex_chip (
                      _3632,
                      _3617,
                      _3602 };
-    assign _3666 = _3305[31:31];
+    assign _3666 = g_crc[31:31];
     assign _3667 = _3482 ^ _3666;
     assign _3670 = _3667 ? _3669 : _1233;
-    assign _3663 = _3305[30:0];
+    assign _3663 = g_crc[30:0];
     assign _3665 = { _3663,
                      _1050 };
     assign _3671 = _3665 ^ _3670;
-    assign _3660 = _3305[30:0];
+    assign _3660 = g_crc[30:0];
     assign _3662 = { _3660,
                      _1050 };
-    assign _3672 = _1801 ? _3671 : _3662;
-    assign _3673 = _1788 ? _3305 : _3672;
-    assign _3674 = _1829 ? _3673 : _3305;
-    assign _3675 = _1821 ? _3674 : _3305;
+    assign _3672 = g_data_left ? _3671 : _3662;
+    assign _3673 = _1788 ? g_crc : _3672;
+    assign _3674 = _1829 ? _3673 : g_crc;
+    assign _3675 = _1821 ? _3674 : g_crc;
     assign _3691 = _1775 ? _3690 : _3675;
     assign _3693 = _2735 ? _3692 : _3691;
     assign _3695 = _2550 ? _1233 : _3693;
     assign _151 = _3695;
     always @(posedge _260) begin
         if (_258)
-            _3305 <= _1233;
+            g_crc <= _1233;
         else
-            _3305 <= _151;
+            g_crc <= _151;
     end
-    assign _3306 = _3305[31:31];
+    assign _3306 = g_crc[31:31];
     assign _3308 = _3306 ^ _3307;
     assign _3703 = _201[0:0];
     assign _3704 = ~ _3703;
@@ -7669,81 +7669,81 @@ module spex_chip (
     end
     assign _1800 = { _1796,
                      _1799 };
-    assign _3739 = _1793 + _4868;
+    assign _3739 = g_cnt + _4868;
     assign _1790 = _1775 & _1789;
-    assign _1802 = _1790 & _1801;
+    assign _1802 = _1790 & g_data_left;
     assign _3740 = _1802 ? _3739 : _3737;
     assign _1789 = ~ _1788;
     assign _3741 = _1789 ? _3740 : _3737;
     assign _3722 = _2765 ? _3721 : _2107;
-    assign _3720 = _1829 ? _3482 : _2760;
-    assign _3721 = _1821 ? _3720 : _2760;
+    assign _3720 = _1829 ? _3482 : g_last;
+    assign _3721 = _1821 ? _3720 : g_last;
     assign _3723 = _1775 ? _3722 : _3721;
     assign _3725 = _2735 ? _2707 : _3723;
     assign _154 = _3725;
     always @(posedge _260) begin
         if (_258)
-            _2760 <= vdd;
+            g_last <= vdd;
         else
-            _2760 <= _154;
+            g_last <= _154;
     end
-    assign _2761 = ~ _2760;
+    assign _2761 = ~ g_last;
     assign _2758 = _1779 == _1257;
     assign _2762 = _2758 ? _2761 : gnd;
     assign _3727 = _1692 == _1257;
-    assign _3728 = _3727 ? _1676 : _2105;
-    assign _3729 = _1775 ? _3728 : _2105;
+    assign _3728 = _3727 ? _1676 : g_prev;
+    assign _3729 = _1775 ? _3728 : g_prev;
     assign _3731 = _2735 ? _2707 : _3729;
     assign _155 = _3731;
     always @(posedge _260) begin
         if (_258)
-            _2105 <= vdd;
+            g_prev <= vdd;
         else
-            _2105 <= _155;
+            g_prev <= _155;
     end
-    assign _2106 = _1676 == _2105;
+    assign _2106 = _1676 == g_prev;
     assign _2103 = _1692 == _1257;
     assign _2107 = _2103 ? _2106 : _1676;
     assign _2763 = _2107 == _2762;
     assign _2764 = ~ _2763;
     assign _2765 = _1788 & _2764;
     assign _3742 = _2765 ? _3737 : _3741;
-    assign _3733 = _1793 + _4868;
-    assign _3734 = _1801 ? _3733 : _1793;
-    assign _3735 = _1788 ? _1793 : _3734;
-    assign _3736 = _1829 ? _3735 : _1793;
-    assign _3737 = _1821 ? _3736 : _1793;
+    assign _3733 = g_cnt + _4868;
+    assign _3734 = g_data_left ? _3733 : g_cnt;
+    assign _3735 = _1788 ? g_cnt : _3734;
+    assign _3736 = _1829 ? _3735 : g_cnt;
+    assign _3737 = _1821 ? _3736 : g_cnt;
     assign _3743 = _1775 ? _3742 : _3737;
     assign _3745 = _2735 ? _1157 : _3743;
     assign _156 = _3745;
     always @(posedge _260) begin
         if (_258)
-            _1793 <= _1157;
+            g_cnt <= _1157;
         else
-            _1793 <= _156;
+            g_cnt <= _156;
     end
-    assign _1801 = _1793 < _1800;
-    assign _3481 = _1801 ? _3480 : _3308;
+    assign g_data_left = g_cnt < _1800;
+    assign _3481 = g_data_left ? _3480 : _3308;
     assign _3482 = _1788 ? _2762 : _3481;
-    assign _3751 = _3482 == _2760;
-    assign _3749 = _1785 == _1058;
+    assign _3751 = _3482 == g_last;
+    assign _3749 = g_run == _1058;
     assign _3750 = ~ _3749;
     assign _3752 = _3750 & _3751;
     assign _3756 = _3752 ? _3755 : _2136;
     assign _3747 = _1779 == _1258;
     assign _3761 = _3747 ? _3760 : _3756;
-    assign _3762 = _1829 ? _3761 : _1785;
-    assign _3763 = _1821 ? _3762 : _1785;
+    assign _3762 = _1829 ? _3761 : g_run;
+    assign _3763 = _1821 ? _3762 : g_run;
     assign _3781 = _1775 ? _3780 : _3763;
     assign _3783 = _2735 ? _1058 : _3781;
     assign _157 = _3783;
     always @(posedge _260) begin
         if (_258)
-            _1785 <= _1058;
+            g_run <= _1058;
         else
-            _1785 <= _157;
+            g_run <= _157;
     end
-    assign _1787 = _1785 == _1786;
+    assign _1787 = g_run == _1786;
     assign _3791 = _201[0:0];
     assign _3792 = ~ _3791;
     assign _3788 = 5'b00101;
@@ -7766,10 +7766,10 @@ module spex_chip (
     assign _1781 = _1779 == _1378;
     assign _1782 = ~ _1781;
     assign _1788 = _1782 & _1787;
-    assign _1822 = _1788 | _1801;
+    assign _1822 = _1788 | g_data_left;
     assign _1829 = _1822 | _1828;
     assign _3809 = _1829 ? _3808 : _2707;
-    assign _3810 = _1821 ? _3809 : _1461;
+    assign _3810 = _1821 ? _3809 : f_lane0_out;
     assign _1817 = _1743 == _1157;
     assign _1815 = _1701 == _1157;
     assign _1818 = _1736 ? _1817 : _1815;
@@ -7790,11 +7790,11 @@ module spex_chip (
     assign _159 = _3819;
     always @(posedge _260) begin
         if (_258)
-            _1461 <= vdd;
+            f_lane0_out <= vdd;
         else
-            _1461 <= _159;
+            f_lane0_out <= _159;
     end
-    assign _2747 = _1676 == _1461;
+    assign _2747 = _1676 == f_lane0_out;
     assign _2748 = ~ _2747;
     assign _2743 = _1692 == _1258;
     assign _2744 = ~ _2743;
@@ -8032,7 +8032,7 @@ module spex_chip (
     assign _3912 = _3890 ? _1157 : _3910;
     assign _3862 = ~ _1663;
     assign _3860 = _1691 & _1689;
-    assign _596 = _594 == _1316;
+    assign _596 = g_mode_0 == _1316;
     assign _3859 = _1657 | _596;
     assign _3861 = _3859 | _3860;
     assign _3863 = _3861 & _3862;
@@ -8139,7 +8139,7 @@ module spex_chip (
     assign _1748 = _1697 ? _1747 : _1745;
     assign _1663 = _1660[1:1];
     assign _1774 = _1663 ? _1773 : _1748;
-    assign _1691 = _594 == _1257;
+    assign _1691 = g_mode_0 == _1257;
     assign _2859 = _1691 | _1657;
     assign _4493 = ~ _1856;
     assign _4494 = _1854 & _4493;
@@ -8149,19 +8149,19 @@ module spex_chip (
     assign _4488 = _610 | _4487;
     assign _4489 = _4488 | _4478;
     assign _4491 = _4489 ? _1258 : _4485;
-    assign _4472 = _1978 + _2136;
-    assign _4469 = _1978 + _2136;
-    assign _4465 = vdd == _2799;
-    assign _4463 = _1978 == _1058;
+    assign _4472 = g_run_0 + _2136;
+    assign _4469 = g_run_0 + _2136;
+    assign _4465 = vdd == g_last_0;
+    assign _4463 = g_run_0 == _1058;
     assign _4464 = ~ _4463;
     assign _4466 = _4464 & _4465;
     assign _4470 = _4466 ? _4469 : _2136;
     assign _4461 = _1972 == _1258;
     assign _4473 = _4461 ? _4472 : _4470;
     assign _4474 = _4473 == _1979;
-    assign _4455 = _1978 + _2136;
-    assign _4451 = gnd == _2799;
-    assign _4449 = _1978 == _1058;
+    assign _4455 = g_run_0 + _2136;
+    assign _4451 = gnd == g_last_0;
+    assign _4449 = g_run_0 == _1058;
     assign _4450 = ~ _4449;
     assign _4452 = _4450 & _4451;
     assign _4456 = _4452 ? _4455 : _2136;
@@ -8171,12 +8171,12 @@ module spex_chip (
     assign _4475 = _2055 ? _4474 : _4459;
     assign _4476 = _1975 & _4475;
     assign _4477 = ~ _4476;
-    assign _4443 = _2018 == _3190;
-    assign _4441 = _2018 == _1185;
+    assign _4443 = g_left_0 == _3190;
+    assign _4441 = g_left_0 == _1185;
     assign _4444 = _3174 ? _4443 : _4441;
-    assign _4436 = _1986 + _4868;
+    assign _4436 = g_cnt_0 + _4868;
     assign _4437 = _4436 == _1993;
-    assign _4434 = _1986 == _1993;
+    assign _4434 = g_cnt_0 == _1993;
     assign _4438 = _1995 ? _4437 : _4434;
     assign _4432 = ~ _2804;
     assign _4433 = _1968 & _4432;
@@ -8187,7 +8187,7 @@ module spex_chip (
     assign _4482 = _2804 ? _1378 : _4480;
     assign _4428 = _2022 ? _4426 : _1316;
     assign _4424 = _1884 & _1882;
-    assign _4426 = _4424 ? _1258 : _608;
+    assign _4426 = _4424 ? _1258 : g_mode;
     assign _4429 = _2014 ? _4428 : _4426;
     assign _3955 = _2022 ? _3954 : _3930;
     assign _3956 = _2014 ? _3955 : _3930;
@@ -8199,8 +8199,8 @@ module spex_chip (
             _3930 <= _167;
     end
     assign _4291 = ~ _3954;
-    assign _4289 = ~ _1467;
-    assign _4290 = _3954 ? _1467 : _4289;
+    assign _4289 = ~ f_lane1_out;
+    assign _4290 = _3954 ? f_lane1_out : _4289;
     always @* begin
         case (_1885)
         0:
@@ -8214,20 +8214,20 @@ module spex_chip (
         endcase
     end
     assign _1979 = _1971[4:2];
-    assign _4261 = _1978 + _2136;
+    assign _4261 = g_run_0 + _2136;
     assign _4262 = _2055 ? _4261 : _1058;
-    assign _4257 = _1978 + _2136;
-    assign _4253 = _2055 == _2799;
-    assign _4251 = _1978 == _1058;
+    assign _4257 = g_run_0 + _2136;
+    assign _4253 = _2055 == g_last_0;
+    assign _4251 = g_run_0 == _1058;
     assign _4252 = ~ _4251;
     assign _4254 = _4252 & _4253;
     assign _4258 = _4254 ? _4257 : _2136;
     assign _4249 = _1972 == _1258;
     assign _4263 = _4249 ? _4262 : _4258;
     assign _4264 = _2804 ? _4247 : _4263;
-    assign _4243 = _1978 + _2136;
+    assign _4243 = g_run_0 + _2136;
     assign _4244 = _3954 ? _4243 : _1058;
-    assign _4239 = _1978 + _2136;
+    assign _4239 = g_run_0 + _2136;
     assign _3951 = _3943[7:7];
     assign _3950 = _3943[6:6];
     assign _3949 = _3943[5:5];
@@ -8361,33 +8361,33 @@ module spex_chip (
         endcase
     end
     assign _3932 = _579 ? _1264 : _3458;
-    assign _2057 = _2047[7:1];
+    assign _2057 = g_byte_0[7:1];
     assign _2058 = { _2055,
                      _2057 };
-    assign _2049 = _2047[6:0];
+    assign _2049 = g_byte_0[6:0];
     assign _2056 = { _2049,
                      _2055 };
     assign _2059 = _2048 ? _2058 : _2056;
     assign _3973 = _1995 ? _2059 : _3972;
     assign _3974 = _1982 ? _3973 : _3972;
     assign _3975 = _2804 ? _3972 : _3974;
-    assign _3969 = _1994 ? _3933 : _2047;
-    assign _3970 = _1981 ? _2047 : _3969;
-    assign _3971 = _2022 ? _3970 : _2047;
-    assign _3972 = _2014 ? _3971 : _2047;
+    assign _3969 = g_data_left_0 ? _3933 : g_byte_0;
+    assign _3970 = _1981 ? g_byte_0 : _3969;
+    assign _3971 = _2022 ? _3970 : g_byte_0;
+    assign _3972 = _2014 ? _3971 : g_byte_0;
     assign _3976 = _1968 ? _3975 : _3972;
     assign _171 = _3976;
     always @(posedge _260) begin
         if (_258)
-            _2047 <= _1266;
+            g_byte_0 <= _1266;
         else
-            _2047 <= _171;
+            g_byte_0 <= _171;
     end
-    assign _2697 = _1998 == _1058;
+    assign _2697 = g_bitpos_0 == _1058;
     assign _2694 = ~ _1981;
-    assign _2695 = _2694 & _1994;
+    assign _2695 = _2694 & g_data_left_0;
     assign _2698 = _2695 & _2697;
-    assign _3933 = _2698 ? _3932 : _2047;
+    assign _3933 = _2698 ? _3932 : g_byte_0;
     assign _3934 = _3933[0:0];
     assign _3942 = { _3934,
                      _3935,
@@ -8400,26 +8400,26 @@ module spex_chip (
     assign _2048 = _1853[5:5];
     assign _3943 = _2048 ? _3933 : _3942;
     assign _3944 = _3943[0:0];
-    assign _3984 = _1998 + _2136;
+    assign _3984 = g_bitpos_0 + _2136;
     assign _3985 = _1995 ? _3984 : _3982;
     assign _3986 = _1982 ? _3985 : _3982;
     assign _3987 = _2804 ? _3982 : _3986;
-    assign _3978 = _1998 + _2136;
-    assign _3979 = _1994 ? _3978 : _1998;
-    assign _3980 = _1981 ? _1998 : _3979;
-    assign _3981 = _2022 ? _3980 : _1998;
-    assign _3982 = _2014 ? _3981 : _1998;
+    assign _3978 = g_bitpos_0 + _2136;
+    assign _3979 = g_data_left_0 ? _3978 : g_bitpos_0;
+    assign _3980 = _1981 ? g_bitpos_0 : _3979;
+    assign _3981 = _2022 ? _3980 : g_bitpos_0;
+    assign _3982 = _2014 ? _3981 : g_bitpos_0;
     assign _3988 = _1968 ? _3987 : _3982;
     assign _3990 = _2774 ? _1058 : _3988;
     assign _172 = _3990;
     always @(posedge _260) begin
         if (_258)
-            _1998 <= _1058;
+            g_bitpos_0 <= _1058;
         else
-            _1998 <= _172;
+            g_bitpos_0 <= _172;
     end
     always @* begin
-        case (_1998)
+        case (g_bitpos_0)
         0:
             _3952 <= _3944;
         1:
@@ -8511,13 +8511,13 @@ module spex_chip (
                      _4023,
                      _4008,
                      _3993 };
-    assign _4169 = _3177[30:0];
+    assign _4169 = g_crc_0[30:0];
     assign _4171 = { _4169,
                      _1050 };
-    assign _4163 = _3177[31:31];
+    assign _4163 = g_crc_0[31:31];
     assign _4164 = _2055 ^ _4163;
     assign _4166 = _4164 ? _4153 : _1233;
-    assign _4160 = _3177[30:0];
+    assign _4160 = g_crc_0[30:0];
     assign _4162 = { _4160,
                      _1050 };
     assign _4167 = _4162 ^ _4166;
@@ -8540,28 +8540,28 @@ module spex_chip (
             _4053 <= _177;
     end
     assign _4080 = _4053[5:0];
-    assign _4075 = _2018 - _3190;
+    assign _4075 = g_left_0 - _3190;
     assign _4076 = _3174 ? _4075 : _4073;
     assign _4077 = _1982 ? _4076 : _4073;
     assign _4078 = _2804 ? _4073 : _4077;
-    assign _4069 = _2018 - _3190;
-    assign _4070 = _1994 ? _2018 : _4069;
-    assign _4071 = _1981 ? _2018 : _4070;
-    assign _4072 = _2022 ? _4071 : _2018;
-    assign _4073 = _2014 ? _4072 : _2018;
+    assign _4069 = g_left_0 - _3190;
+    assign _4070 = g_data_left_0 ? g_left_0 : _4069;
+    assign _4071 = _1981 ? g_left_0 : _4070;
+    assign _4072 = _2022 ? _4071 : g_left_0;
+    assign _4073 = _2014 ? _4072 : g_left_0;
     assign _4079 = _1968 ? _4078 : _4073;
     assign _4081 = _4067 ? _4080 : _4079;
     assign _4083 = _2774 ? _1185 : _4081;
     assign _178 = _4083;
     always @(posedge _260) begin
         if (_258)
-            _2018 <= _1185;
+            g_left_0 <= _1185;
         else
-            _2018 <= _178;
+            g_left_0 <= _178;
     end
-    assign _2020 = _2018 == _1185;
+    assign _2020 = g_left_0 == _1185;
     assign _2021 = ~ _2020;
-    assign _3172 = ~ _1994;
+    assign _3172 = ~ g_data_left_0;
     assign _3171 = _1968 & _1982;
     assign _3173 = _3171 & _3172;
     assign _3174 = _3173 & _2021;
@@ -8640,31 +8640,31 @@ module spex_chip (
                      _4116,
                      _4101,
                      _4086 };
-    assign _4150 = _3177[31:31];
+    assign _4150 = g_crc_0[31:31];
     assign _4151 = _3954 ^ _4150;
     assign _4154 = _4151 ? _4153 : _1233;
-    assign _4147 = _3177[30:0];
+    assign _4147 = g_crc_0[30:0];
     assign _4149 = { _4147,
                      _1050 };
     assign _4155 = _4149 ^ _4154;
-    assign _4144 = _3177[30:0];
+    assign _4144 = g_crc_0[30:0];
     assign _4146 = { _4144,
                      _1050 };
-    assign _4156 = _1994 ? _4155 : _4146;
-    assign _4157 = _1981 ? _3177 : _4156;
-    assign _4158 = _2022 ? _4157 : _3177;
-    assign _4159 = _2014 ? _4158 : _3177;
+    assign _4156 = g_data_left_0 ? _4155 : _4146;
+    assign _4157 = _1981 ? g_crc_0 : _4156;
+    assign _4158 = _2022 ? _4157 : g_crc_0;
+    assign _4159 = _2014 ? _4158 : g_crc_0;
     assign _4175 = _1968 ? _4174 : _4159;
     assign _4177 = _2774 ? _4176 : _4175;
     assign _4179 = _2582 ? _1233 : _4177;
     assign _183 = _4179;
     always @(posedge _260) begin
         if (_258)
-            _3177 <= _1233;
+            g_crc_0 <= _1233;
         else
-            _3177 <= _183;
+            g_crc_0 <= _183;
     end
-    assign _3178 = _3177[31:31];
+    assign _3178 = g_crc_0[31:31];
     assign _3180 = _3178 ^ _3179;
     assign _4187 = _201[1:1];
     assign _4188 = ~ _4187;
@@ -8702,81 +8702,81 @@ module spex_chip (
     end
     assign _1993 = { _1989,
                      _1992 };
-    assign _4223 = _1986 + _4868;
+    assign _4223 = g_cnt_0 + _4868;
     assign _1983 = _1968 & _1982;
-    assign _1995 = _1983 & _1994;
+    assign _1995 = _1983 & g_data_left_0;
     assign _4224 = _1995 ? _4223 : _4221;
     assign _1982 = ~ _1981;
     assign _4225 = _1982 ? _4224 : _4221;
     assign _4206 = _2804 ? _4205 : _2055;
-    assign _4204 = _2022 ? _3954 : _2799;
-    assign _4205 = _2014 ? _4204 : _2799;
+    assign _4204 = _2022 ? _3954 : g_last_0;
+    assign _4205 = _2014 ? _4204 : g_last_0;
     assign _4207 = _1968 ? _4206 : _4205;
     assign _4209 = _2774 ? _2707 : _4207;
     assign _186 = _4209;
     always @(posedge _260) begin
         if (_258)
-            _2799 <= vdd;
+            g_last_0 <= vdd;
         else
-            _2799 <= _186;
+            g_last_0 <= _186;
     end
-    assign _2800 = ~ _2799;
+    assign _2800 = ~ g_last_0;
     assign _2797 = _1972 == _1257;
     assign _2801 = _2797 ? _2800 : gnd;
     assign _4211 = _1885 == _1257;
-    assign _4212 = _4211 ? _1869 : _2053;
-    assign _4213 = _1968 ? _4212 : _2053;
+    assign _4212 = _4211 ? _1869 : g_prev_0;
+    assign _4213 = _1968 ? _4212 : g_prev_0;
     assign _4215 = _2774 ? _2707 : _4213;
     assign _187 = _4215;
     always @(posedge _260) begin
         if (_258)
-            _2053 <= vdd;
+            g_prev_0 <= vdd;
         else
-            _2053 <= _187;
+            g_prev_0 <= _187;
     end
-    assign _2054 = _1869 == _2053;
+    assign _2054 = _1869 == g_prev_0;
     assign _2051 = _1885 == _1257;
     assign _2055 = _2051 ? _2054 : _1869;
     assign _2802 = _2055 == _2801;
     assign _2803 = ~ _2802;
     assign _2804 = _1981 & _2803;
     assign _4226 = _2804 ? _4221 : _4225;
-    assign _4217 = _1986 + _4868;
-    assign _4218 = _1994 ? _4217 : _1986;
-    assign _4219 = _1981 ? _1986 : _4218;
-    assign _4220 = _2022 ? _4219 : _1986;
-    assign _4221 = _2014 ? _4220 : _1986;
+    assign _4217 = g_cnt_0 + _4868;
+    assign _4218 = g_data_left_0 ? _4217 : g_cnt_0;
+    assign _4219 = _1981 ? g_cnt_0 : _4218;
+    assign _4220 = _2022 ? _4219 : g_cnt_0;
+    assign _4221 = _2014 ? _4220 : g_cnt_0;
     assign _4227 = _1968 ? _4226 : _4221;
     assign _4229 = _2774 ? _1157 : _4227;
     assign _188 = _4229;
     always @(posedge _260) begin
         if (_258)
-            _1986 <= _1157;
+            g_cnt_0 <= _1157;
         else
-            _1986 <= _188;
+            g_cnt_0 <= _188;
     end
-    assign _1994 = _1986 < _1993;
-    assign _3953 = _1994 ? _3952 : _3180;
+    assign g_data_left_0 = g_cnt_0 < _1993;
+    assign _3953 = g_data_left_0 ? _3952 : _3180;
     assign _3954 = _1981 ? _2801 : _3953;
-    assign _4235 = _3954 == _2799;
-    assign _4233 = _1978 == _1058;
+    assign _4235 = _3954 == g_last_0;
+    assign _4233 = g_run_0 == _1058;
     assign _4234 = ~ _4233;
     assign _4236 = _4234 & _4235;
     assign _4240 = _4236 ? _4239 : _2136;
     assign _4231 = _1972 == _1258;
     assign _4245 = _4231 ? _4244 : _4240;
-    assign _4246 = _2022 ? _4245 : _1978;
-    assign _4247 = _2014 ? _4246 : _1978;
+    assign _4246 = _2022 ? _4245 : g_run_0;
+    assign _4247 = _2014 ? _4246 : g_run_0;
     assign _4265 = _1968 ? _4264 : _4247;
     assign _4267 = _2774 ? _1058 : _4265;
     assign _189 = _4267;
     always @(posedge _260) begin
         if (_258)
-            _1978 <= _1058;
+            g_run_0 <= _1058;
         else
-            _1978 <= _189;
+            g_run_0 <= _189;
     end
-    assign _1980 = _1978 == _1979;
+    assign _1980 = g_run_0 == _1979;
     assign _4275 = _201[1:1];
     assign _4276 = ~ _4275;
     assign _4271 = _1314[4:0];
@@ -8798,13 +8798,13 @@ module spex_chip (
     assign _1974 = _1972 == _1378;
     assign _1975 = ~ _1974;
     assign _1981 = _1975 & _1980;
-    assign _2015 = _1981 | _1994;
+    assign _2015 = _1981 | g_data_left_0;
     assign _2022 = _2015 | _2021;
     assign _4293 = _2022 ? _4292 : _2707;
     assign _2005 = ~ _1854;
     assign _2006 = _1850 & _2005;
     assign _2014 = _2006 & _2013;
-    assign _4294 = _2014 ? _4293 : _1467;
+    assign _4294 = _2014 ? _4293 : f_lane1_out;
     assign _2010 = _1936 == _1157;
     assign _2008 = _1894 == _1157;
     assign _2011 = _1929 ? _2010 : _2008;
@@ -8825,11 +8825,11 @@ module spex_chip (
     assign _191 = _4303;
     always @(posedge _260) begin
         if (_258)
-            _1467 <= vdd;
+            f_lane1_out <= vdd;
         else
-            _1467 <= _191;
+            f_lane1_out <= _191;
     end
-    assign _2786 = _1869 == _1467;
+    assign _2786 = _1869 == f_lane1_out;
     assign _2787 = ~ _2786;
     assign _2782 = _1885 == _1258;
     assign _2783 = ~ _2782;
@@ -9064,7 +9064,7 @@ module spex_chip (
     assign _4396 = _4374 ? _1157 : _4394;
     assign _4346 = ~ _1856;
     assign _4344 = _1884 & _1882;
-    assign _610 = _608 == _1316;
+    assign _610 = g_mode == _1316;
     assign _4343 = _1850 | _610;
     assign _4345 = _4343 | _4344;
     assign _4347 = _4345 & _4346;
@@ -9189,7 +9189,7 @@ module spex_chip (
             _1853 <= _199;
     end
     assign _1854 = _1853[0:0];
-    assign _1850 = _608 == _1258;
+    assign _1850 = g_mode == _1258;
     assign _1855 = _1850 & _1854;
     assign _1968 = _1855 & _1967;
     assign _4483 = _1968 ? _4482 : _4431;
@@ -9205,11 +9205,11 @@ module spex_chip (
     assign _200 = _4500;
     always @(posedge _260) begin
         if (_258)
-            _608 <= _1378;
+            g_mode <= _1378;
         else
-            _608 <= _200;
+            g_mode <= _200;
     end
-    assign _1884 = _608 == _1257;
+    assign _1884 = g_mode == _1257;
     assign _2862 = _1884 | _1850;
     assign _4501 = { _2862,
                      _2859 };
@@ -9285,11 +9285,11 @@ module spex_chip (
     assign _204 = _4594;
     always @(posedge _260) begin
         if (_258)
-            _594 <= _1378;
+            g_mode_0 <= _1378;
         else
-            _594 <= _204;
+            g_mode_0 <= _204;
     end
-    assign _1657 = _594 == _1258;
+    assign _1657 = g_mode_0 == _1258;
     assign _1813 = _1657 & _1812;
     assign _1821 = _1813 & _1820;
     assign _2691 = _1821 & _2690;
