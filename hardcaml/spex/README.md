@@ -29,6 +29,11 @@ python3 formal/vacuity.py                  # each property must fail on a mutant
    $SRAM/RM_IHPSG13_1P_256x64_c2_bm_bist.v $SRAM/RM_IHPSG13_1P_256x32_c2_bm_bist.v \
    $SRAM/RM_IHPSG13_1P_core_behavioral_bm_bist.v && vvp -n simv_chip)
 #   SRAM=<IHP-Open-PDK 2bbec755>/ihp-sg13g2/libs.ref/sg13g2_sram/verilog
+# gate level: tt_submission/tt_um_srujan0006_newarch.v (harden artifact) in place of
+# project.v + spex_chip.v, plus sg13cmos5l_udp.v and the functional cell copy
+# (Icarus 12 leaves the cells' timing-check delayed_* nets undriven):
+python3 synth/gl_cells.py $CELLS/sg13cmos5l_stdcell.v cells_fn.v
+#   CELLS=<IHP-Open-PDK 2bbec755>/ihp-sg13cmos5l/libs.ref/sg13cmos5l_stdcell/verilog
 ```
 
 `out/` holds the generated Verilog (`spex_core.v`, `spex_sim_top.v`) from this run.
