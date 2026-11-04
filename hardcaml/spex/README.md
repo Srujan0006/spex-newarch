@@ -20,7 +20,7 @@ dune exec bin/gen.exe -- out               # generated Verilog
 ./_build/default/test/vectors/vectors.exe $PWD/out && (cd out && iverilog -g2012 -o simv tb.v spex_sim_top.v && vvp -n simv)
 python3 mutation/mutate.py                 # mutation test of the RTL
 formal/prove.sh                            # formal proofs (Yosys + ABC PDR) on out/spex_core.v
-formal/prove_lanes.sh                      # bit-lane proofs L1-L3 on out/spex_lane.v
+formal/prove_lanes.sh                      # bit-lane proofs L1-L3, L5 on out/spex_lane.v
 python3 formal/vacuity.py                  # each property must fail on a mutant
 # chip-level replay through the pins (vectors.exe writes out/tb_chip.v), with the IHP SRAM
 # models; for the gate-level replay replace spex_chip.v and project.v by the routed netlist

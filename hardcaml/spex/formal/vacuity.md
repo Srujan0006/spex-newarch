@@ -19,12 +19,23 @@ proved by k-induction with helper lemmas (k = 6 and 12); their mutants are check
 properties alone (`-DNO_LEMMAS`, `BMC=40 formal/prove_lanes.sh`), so a mutant must break the
 property, not just a lemma.
 
+L5 (2026-11-04, `lane_len_props`): one RX lane clocked by a pin, NRZ, no stuffing, with
+`skip`, `len_en`, `len_pos`, `len_max` and `frame_bits` free (host rule `skip > len_pos`
+assumed): a reference written from ENGINE.md counts the data bits, takes the 4-bit field
+ending at `len_pos`, forms `limit = skip + 8 min(field, len_max)` when below `frame_bits`,
+and assembles bytes from bit `skip` on; the lane pushes exactly when the reference does,
+the same byte, and is Done only after `limit` data bits. k-induction, k = 12; its lemmas
+read the lane's `g_lim` (length) and `g_sr` (shift register), named for this. Line coding
+and destuffing are left to L2. "Skipped bits left out of the CRC" is not an L5 mutant
+(L5 says nothing about the CRC; `test_bridge.ml` kills it).
+
 P12 (bridge, 2026-11-03): with `rx_to_tx` held, the RX FIFO takes at most one push more than
 the engine made since the bit was set (one engine byte may already wait in its buffer), so no
 lane byte reaches it.
 
 All 13 core groups prove unbounded on the unmutated core (`formal/prove.sh`, slowest P6 4.5 s);
-L1 (PDR, 13 s), L2 and L3 (k-induction, seconds) prove with `formal/prove_lanes.sh`.
+L1 (PDR, 31 s), L2, L3 and L5 (k-induction, seconds) prove with `formal/prove_lanes.sh`
+(2026-11-04: with `skip` and the length field free on every TX lane).
 
 | Mutant | Expected to break | prove.sh result |
 |---|---|---|
@@ -46,6 +57,10 @@ L1 (PDR, 13 s), L2 and L3 (k-induction, seconds) prove with `formal/prove_lanes.
 | stuff bit not complemented | L1 (no stuff_len + 1 equal bits on the line) | L1          Output 0 of miter "model_L1" was asserted in frame 6.  Time =     0.92 sec |
 | CRC feedback ignores the bit | L3 (the CRC field is the CRC of the data sent) | L3          counterexample: Checking assertions in step 6.. Assert failed in lane_tx_props: lane_props.sv:97.54-97.95 ($assert$lane_props.sv:97$505) Status: FAILED |
 | CRC inversion ignored | L3 (the CRC field is the CRC of the data sent) | L3          counterexample: Checking assertions in step 5.. Assert failed in lane_tx_props: lane_props.sv:97.54-97.95 ($assert$lane_props.sv:97$504) Status: FAILED |
+| skip one bit short (18 for CAN) | L5 (RX skip and length field match the reference) | L5          counterexample: Checking assertions in step 17.. Assert failed in lane_len_props: lane_props.sv:378.32-379.34 ($assert$lane_props.sv:378$712) Status: FAILED (run alone, 2026-11-04) |
+| skip one bit long (20 for CAN) | L5 (RX skip and length field match the reference) | L5          counterexample: Checking assertions in step 17.. Assert failed in lane_len_props: lane_props.sv:379.32-380.34 ($assert$lane_props.sv:379$710) Status: FAILED (run alone, 2026-11-04) |
+| length field read one bit late | L5 (RX skip and length field match the reference) | L5          counterexample: Checking assertions in step 14.. Assert failed in lane_len_props: lane_props.sv:382.19-382.39 ($assert$lane_props.sv:382$714) Status: FAILED (run alone, 2026-11-04) |
+| len_max ignored | L5 (RX skip and length field match the reference) | L5          counterexample: Checking assertions in step 19.. Assert failed in lane_len_props: lane_props.sv:379.32-380.34 ($assert$lane_props.sv:379$709) Status: FAILED (run alone, 2026-11-04) |
 | RX MSB-first shift takes the wrong end | L2 (TX -> RX loopback returns the bytes) | L2          no counterexample to depth 40 in 900 s; rerun with a 3000 s limit: assertion B (`r_push`: same byte, in order) fails in step 17 (20.6 min) |
 | NRZI decode inverted | L2 (TX -> RX loopback returns the bytes) | L2          counterexample: Checking assertions in step 5.. Assert failed in lane_loop_props: lane_props.sv:265.59-266.24 ($assert$lane_props.sv:265$597) Status: FAILED |
 | Verilog: timestamp skips odd values | P6 (timestamp counts) | P6          Output 0 of miter "model" was asserted in frame 3.  Time =     0.02 sec |

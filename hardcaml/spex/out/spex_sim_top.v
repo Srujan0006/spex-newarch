@@ -2139,7 +2139,7 @@ module spex_sim_top (
     wire [7:0] _3277;
     wire [7:0] _3278;
     wire [7:0] _169;
-    reg [7:0] _798;
+    reg [7:0] g_lim;
     wire [15:0] _799;
     wire [15:0] _171;
     wire [14:0] _2858;
@@ -2149,7 +2149,7 @@ module spex_sim_top (
     wire [15:0] _3281;
     wire [15:0] _3283;
     wire [15:0] _172;
-    reg [15:0] _2857;
+    reg [15:0] g_sr;
     wire [3:0] _3269;
     wire [3:0] _174;
     wire _3270;
@@ -2548,7 +2548,7 @@ module spex_sim_top (
     wire [7:0] _3625;
     wire [7:0] _3626;
     wire [7:0] _228;
-    reg [7:0] _698;
+    reg [7:0] g_lim_0;
     wire [15:0] _699;
     wire [15:0] _230;
     wire [14:0] _2918;
@@ -2558,7 +2558,7 @@ module spex_sim_top (
     wire [15:0] _3629;
     wire [15:0] _3631;
     wire [15:0] _231;
-    reg [15:0] _2917;
+    reg [15:0] g_sr_0;
     wire [3:0] _3617;
     wire [3:0] _233;
     wire _3618;
@@ -6537,33 +6537,33 @@ module spex_sim_top (
     end
     assign _2883 = g_crc[31:31];
     assign _2884 = _2883 ^ _160;
-    assign _3277 = _3276 ? _3274 : _798;
-    assign _3278 = g_len_cap ? _3277 : _798;
+    assign _3277 = _3276 ? _3274 : g_lim;
+    assign _3278 = g_len_cap ? _3277 : g_lim;
     assign _169 = _3278;
     always @(posedge _310) begin
         if (_308)
-            _798 <= _773;
+            g_lim <= _773;
         else
-            _798 <= _169;
+            g_lim <= _169;
     end
     assign _799 = { _773,
-                    _798 };
+                    g_lim };
     assign _171 = host_lane1_frame_bits;
-    assign _2858 = _2857[14:0];
+    assign _2858 = g_sr[14:0];
     assign _2859 = { _2858,
                      _645 };
-    assign _3279 = _787 ? _2859 : _2857;
-    assign _3280 = _654 ? _2857 : _3279;
-    assign _3281 = _609 ? _3280 : _2857;
+    assign _3279 = _787 ? _2859 : g_sr;
+    assign _3280 = _654 ? g_sr : _3279;
+    assign _3281 = _609 ? _3280 : g_sr;
     assign _3283 = _505 ? _1695 : _3281;
     assign _172 = _3283;
     always @(posedge _310) begin
         if (_308)
-            _2857 <= _1695;
+            g_sr <= _1695;
         else
-            _2857 <= _172;
+            g_sr <= _172;
     end
-    assign _3269 = _2857[3:0];
+    assign _3269 = g_sr[3:0];
     assign _174 = host_lane1_len_max;
     assign _3270 = _174 < _3269;
     assign _3271 = _3270 ? _174 : _3269;
@@ -7205,33 +7205,33 @@ module spex_sim_top (
     end
     assign _2943 = g_crc_0[31:31];
     assign _2944 = _2943 ^ _219;
-    assign _3625 = _3624 ? _3622 : _698;
-    assign _3626 = g_len_cap_0 ? _3625 : _698;
+    assign _3625 = _3624 ? _3622 : g_lim_0;
+    assign _3626 = g_len_cap_0 ? _3625 : g_lim_0;
     assign _228 = _3626;
     always @(posedge _310) begin
         if (_308)
-            _698 <= _773;
+            g_lim_0 <= _773;
         else
-            _698 <= _228;
+            g_lim_0 <= _228;
     end
     assign _699 = { _773,
-                    _698 };
+                    g_lim_0 };
     assign _230 = host_lane0_frame_bits;
-    assign _2918 = _2917[14:0];
+    assign _2918 = g_sr_0[14:0];
     assign _2919 = { _2918,
                      _483 };
-    assign _3627 = _687 ? _2919 : _2917;
-    assign _3628 = _493 ? _2917 : _3627;
-    assign _3629 = _447 ? _3628 : _2917;
+    assign _3627 = _687 ? _2919 : g_sr_0;
+    assign _3628 = _493 ? g_sr_0 : _3627;
+    assign _3629 = _447 ? _3628 : g_sr_0;
     assign _3631 = _333 ? _1695 : _3629;
     assign _231 = _3631;
     always @(posedge _310) begin
         if (_308)
-            _2917 <= _1695;
+            g_sr_0 <= _1695;
         else
-            _2917 <= _231;
+            g_sr_0 <= _231;
     end
-    assign _3617 = _2917[3:0];
+    assign _3617 = g_sr_0[3:0];
     assign _233 = host_lane0_len_max;
     assign _3618 = _233 < _3617;
     assign _3619 = _3618 ? _233 : _3617;

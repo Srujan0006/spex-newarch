@@ -398,7 +398,7 @@ module spex_lane (
     wire [7:0] _542;
     wire [7:0] _543;
     wire [7:0] _43;
-    reg [7:0] _232;
+    reg [7:0] g_lim;
     wire [15:0] _233;
     wire [15:0] _45;
     wire [14:0] _348;
@@ -408,7 +408,7 @@ module spex_lane (
     wire [15:0] _546;
     wire [15:0] _548;
     wire [15:0] _46;
-    reg [15:0] _347;
+    reg [15:0] g_sr;
     wire [3:0] _534;
     wire [3:0] _48;
     wire _535;
@@ -1082,33 +1082,33 @@ module spex_lane (
     end
     assign _373 = g_crc[31:31];
     assign _374 = _373 ^ _34;
-    assign _542 = _541 ? _539 : _232;
-    assign _543 = g_len_cap ? _542 : _232;
+    assign _542 = _541 ? _539 : g_lim;
+    assign _543 = g_len_cap ? _542 : g_lim;
     assign _43 = _543;
     always @(posedge _74) begin
         if (_72)
-            _232 <= _400;
+            g_lim <= _400;
         else
-            _232 <= _43;
+            g_lim <= _43;
     end
     assign _233 = { _400,
-                    _232 };
+                    g_lim };
     assign _45 = cfg_frame_bits;
-    assign _348 = _347[14:0];
+    assign _348 = g_sr[14:0];
     assign _349 = { _348,
                     _312 };
-    assign _544 = _221 ? _349 : _347;
-    assign _545 = _322 ? _347 : _544;
-    assign _546 = _212 ? _545 : _347;
+    assign _544 = _221 ? _349 : g_sr;
+    assign _545 = _322 ? g_sr : _544;
+    assign _546 = _212 ? _545 : g_sr;
     assign _548 = _96 ? _352 : _546;
     assign _46 = _548;
     always @(posedge _74) begin
         if (_72)
-            _347 <= _352;
+            g_sr <= _352;
         else
-            _347 <= _46;
+            g_sr <= _46;
     end
-    assign _534 = _347[3:0];
+    assign _534 = g_sr[3:0];
     assign _48 = cfg_len_max;
     assign _535 = _48 < _534;
     assign _536 = _535 ? _48 : _534;

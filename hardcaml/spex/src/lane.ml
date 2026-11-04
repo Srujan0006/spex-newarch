@@ -90,6 +90,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   ignore (mode.value -- "g_mode" : Signal.t);
   ignore (len_cap.value -- "g_len_cap" : Signal.t);
   ignore (len_known.value -- "g_len_known" : Signal.t);
+  ignore (lim.value -- "g_lim" : Signal.t);
+  ignore (sr.value -- "g_sr" : Signal.t);
   let is_rx = c.dir in
   let in_run = mode.value ==:. m_run in
   let in_armed = mode.value ==:. m_armed in

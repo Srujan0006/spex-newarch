@@ -38,6 +38,10 @@ LANE_TARGETS = {
     "NRZI decode inverted": "L2 (TX -> RX loopback returns the bytes)",
     "CRC inversion ignored": "L3 (the CRC field is the CRC of the data sent)",
     "CRC feedback ignores the bit": "L3 (the CRC field is the CRC of the data sent)",
+    "skip one bit short (18 for CAN)": "L5 (RX skip and length field match the reference)",
+    "skip one bit long (20 for CAN)": "L5 (RX skip and length field match the reference)",
+    "length field read one bit late": "L5 (RX skip and length field match the reference)",
+    "len_max ignored": "L5 (RX skip and length field match the reference)",
 }
 
 def main():
