@@ -2128,7 +2128,7 @@ module spex_chip (
     wire [7:0] _3626;
     wire [7:0] _3627;
     wire [7:0] _142;
-    reg [7:0] _2253;
+    reg [7:0] g_lim;
     wire [15:0] _2254;
     wire _3635;
     wire _3636;
@@ -2164,7 +2164,7 @@ module spex_chip (
     wire [15:0] _3654;
     wire [15:0] _3656;
     wire [15:0] _145;
-    reg [15:0] _3288;
+    reg [15:0] g_sr;
     wire [3:0] _3618;
     wire _3664;
     wire _3665;
@@ -2945,7 +2945,7 @@ module spex_chip (
     wire [7:0] _4356;
     wire [7:0] _4357;
     wire [7:0] _191;
-    reg [7:0] _2499;
+    reg [7:0] g_lim_0;
     wire [15:0] _2500;
     wire _4365;
     wire _4366;
@@ -2979,7 +2979,7 @@ module spex_chip (
     wire [15:0] _4384;
     wire [15:0] _4386;
     wire [15:0] _194;
-    reg [15:0] _3165;
+    reg [15:0] g_sr_0;
     wire [3:0] _4348;
     wire _4394;
     wire _4395;
@@ -7713,17 +7713,17 @@ module spex_chip (
     assign _3969 = _3965 ? _3968 : _1691;
     assign _3960 = _2225 == _1272;
     assign _3974 = _3960 ? _3973 : _3969;
-    assign _3626 = _3625 ? _3623 : _2253;
-    assign _3627 = g_len_cap ? _3626 : _2253;
+    assign _3626 = _3625 ? _3623 : g_lim;
+    assign _3627 = g_len_cap ? _3626 : g_lim;
     assign _142 = _3627;
     always @(posedge _274) begin
         if (_272)
-            _2253 <= _1280;
+            g_lim <= _1280;
         else
-            _2253 <= _142;
+            g_lim <= _142;
     end
     assign _2254 = { _1280,
-                     _2253 };
+                     g_lim };
     assign _3635 = _215[0:0];
     assign _3636 = ~ _3635;
     assign _3632 = 5'b10100;
@@ -7762,21 +7762,21 @@ module spex_chip (
     end
     assign _2249 = { _2245,
                      _2248 };
-    assign _3289 = _3288[14:0];
+    assign _3289 = g_sr[14:0];
     assign _3290 = { _3289,
                      _2768 };
-    assign _3652 = _2235 ? _3290 : _3288;
-    assign _3653 = _2777 ? _3288 : _3652;
-    assign _3654 = _2221 ? _3653 : _3288;
+    assign _3652 = _2235 ? _3290 : g_sr;
+    assign _3653 = _2777 ? g_sr : _3652;
+    assign _3654 = _2221 ? _3653 : g_sr;
     assign _3656 = _2741 ? _1171 : _3654;
     assign _145 = _3656;
     always @(posedge _274) begin
         if (_272)
-            _3288 <= _1171;
+            g_sr <= _1171;
         else
-            _3288 <= _145;
+            g_sr <= _145;
     end
-    assign _3618 = _3288[3:0];
+    assign _3618 = g_sr[3:0];
     assign _3664 = _215[0:0];
     assign _3665 = ~ _3664;
     assign _3661 = 5'b10111;
@@ -8985,17 +8985,17 @@ module spex_chip (
     end
     assign _3193 = g_crc_0[31:31];
     assign _3195 = _3193 ^ _3194;
-    assign _4356 = _4355 ? _4353 : _2499;
-    assign _4357 = g_len_cap_0 ? _4356 : _2499;
+    assign _4356 = _4355 ? _4353 : g_lim_0;
+    assign _4357 = g_len_cap_0 ? _4356 : g_lim_0;
     assign _191 = _4357;
     always @(posedge _274) begin
         if (_272)
-            _2499 <= _1280;
+            g_lim_0 <= _1280;
         else
-            _2499 <= _191;
+            g_lim_0 <= _191;
     end
     assign _2500 = { _1280,
-                     _2499 };
+                     g_lim_0 };
     assign _4365 = _215[1:1];
     assign _4366 = ~ _4365;
     assign _4361 = _1328[4:0];
@@ -9032,21 +9032,21 @@ module spex_chip (
     end
     assign _2495 = { _2491,
                      _2494 };
-    assign _3166 = _3165[14:0];
+    assign _3166 = g_sr_0[14:0];
     assign _3167 = { _3166,
                      _2813 };
-    assign _4382 = _2481 ? _3167 : _3165;
-    assign _4383 = _2822 ? _3165 : _4382;
-    assign _4384 = _2467 ? _4383 : _3165;
+    assign _4382 = _2481 ? _3167 : g_sr_0;
+    assign _4383 = _2822 ? g_sr_0 : _4382;
+    assign _4384 = _2467 ? _4383 : g_sr_0;
     assign _4386 = _2786 ? _1171 : _4384;
     assign _194 = _4386;
     always @(posedge _274) begin
         if (_272)
-            _3165 <= _1171;
+            g_sr_0 <= _1171;
         else
-            _3165 <= _194;
+            g_sr_0 <= _194;
     end
-    assign _4348 = _3165[3:0];
+    assign _4348 = g_sr_0[3:0];
     assign _4394 = _215[1:1];
     assign _4395 = ~ _4394;
     assign _4390 = _1328[4:0];
