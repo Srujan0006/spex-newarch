@@ -82,14 +82,14 @@ let lane_status t l =
 ;;
 
 (** Run the chip's CAN transmitter with frame [f]; the node may send [other] too. *)
-let chip_tx ?other (f : C.frame) =
+let chip_tx ?(lane = 0) ?other (f : C.frame) =
   let t = H.create () in
-  let spec = Protocols.can_tx ~pin:0 ~n in
+  let spec = Protocols.can_tx ~lane ~pin:0 ~n () in
   H.load t spec;
   let bits = frame_bits f in
-  set_lane t 0 (can_cfg ~dir:0 ~frame_bits:(List.length bits));
+  set_lane t lane (can_cfg ~dir:0 ~frame_bits:(List.length bits));
   H.set t.i.host.open_drain 1;
-  H.set t.i.host.pin_src Pin_src.lane0_and_engine;
+  H.set t.i.host.pin_src (if lane = 0 then Pin_src.lane0_and_engine else Pin_src.lane1_and_engine);
   let node = C.create ~idle_needed:12 ~n () in
   Option.iter other ~f:(C.send node);
   attach t node;
@@ -104,7 +104,7 @@ let chip_tx ?other (f : C.frame) =
     | _ -> path := l :: !path
   done;
   printf "chip sends %s:\n" (Sexp.to_string [%sexp (f : C.frame)]);
-  printf "  chip path: %s; lane 0: %s\n" (String.concat ~sep:" > " (List.rev !path)) (lane_status t 0);
+  printf "  chip path: %s; lane %d: %s\n" (String.concat ~sep:" > " (List.rev !path)) lane (lane_status t lane);
   show_node "" node
 ;;
 
@@ -123,6 +123,17 @@ let%expect_test "CAN TX: the lane stuffs, appends CRC-15; the node decodes and A
     chip sends ((id 2047)(data())):
       chip path: idle > arm > frame > ack > eof > idle; lane 0: done 1 crc_ok 0 error 0 kind -
       node : received (((id 2047)(data()))), sent (), acked (), lost at bit (), stuff errors 0
+    |}]
+;;
+
+(* lane 1 through the pin source "lane 1 AND engine", lane 0 left idle (mutant: that
+   source reads lane 0, and the frame never reaches the bus) *)
+let%expect_test "CAN TX on lane 1, pin source 'lane 1 AND engine'" =
+  chip_tx ~lane:1 { id = 0x123; data = [ 0xDE; 0xAD; 0xBE ] };
+  [%expect {|
+    chip sends ((id 291)(data(222 173 190))):
+      chip path: idle > arm > frame > ack > eof > idle; lane 1: done 1 crc_ok 0 error 0 kind -
+      node : received (((id 291)(data(222 173 190)))), sent (), acked (), lost at bit (), stuff errors 0
     |}]
 ;;
 

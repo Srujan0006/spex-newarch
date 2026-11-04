@@ -99,7 +99,7 @@ MUTANTS += [
     ("engine push into a full RX FIFO not counted", "; buf_drop_of 1 |: (acc2 &: rx_full)", "; buf_drop_of 1"),
     ("RX watermark compared with >", "rx_used >=: uresize", "rx_used >: uresize"),
     ("TX watermark ignores its enable", "(h.tx_wm_en &: (tx_used", "(vdd &: (tx_used"),
-    # lane formal property L4 (formal/spex_props.sv)
+    # lane formal property L4 (formal/spex_props.sv); the second also test_can.ml (CAN TX on lane 1)
     ("pin source select read from the next pin's field", "(select h.pin_src ((3 * p) + 2) (3 * p))",
      "(select h.pin_src ((3 * ((p + 1) % 8)) + 2) (3 * ((p + 1) % 8)))"),
     ("pin source 'lane 1 AND engine' reads lane 0", "~:l1; l1 &: e ]", "~:l1; l0 &: e ]"),

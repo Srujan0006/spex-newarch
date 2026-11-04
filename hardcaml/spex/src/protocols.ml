@@ -214,13 +214,14 @@ let i2c_controller_write ~scl ~sda ~q =
     engine waits for an idle bus, then handles CRC delimiter, ACK slot and end of frame.
     Host setup: lane 0 TX, NRZ, [div] = [n], stuffing 1/5, CRC-15 (0x4599 << 17,
     width 15), readback, [data_pin] = [pin]; pin [pin] open-drain with source "lane 0
-    AND engine", so the engine can pull the bus low too.
+    AND engine", so the engine can pull the bus low too. [lane] (default 0) picks the
+    lane; on lane 1 the pin source is "lane 1 AND engine".
 
     Locations: [idle] (bus idle 11 bits and a frame in the TX FIFO), [arm] (CRC armed
     during the frame), [frame], [ack] (ACK slot sampled in its middle), [eof] (ACK
     delimiter, 7 EOF bits, 3 intermission), [noack], [lost] (arbitration lost or bit
     error; the host reads the lane status). *)
-let can_tx ~pin ~n =
+let can_tx ?lane:(l = 0) ~pin ~n () =
   { name = "can_tx"
   ; locs =
       [ loc
@@ -231,13 +232,13 @@ let can_tx ~pin ~n =
           ; edge
               ~goto:"arm"
               (always |> after ((11 * n) - 1) |> not_flag Flag.tx_empty)
-              (nop |> lane (Lane_cmd.go 0))
+              (nop |> lane (Lane_cmd.go l))
           ]
-      ; loc "arm" [ edge ~goto:"frame" always (nop |> lane (Lane_cmd.crc 0)) ]
+      ; loc "arm" [ edge ~goto:"frame" always (nop |> lane (Lane_cmd.crc l)) ]
       ; loc
           "frame"
-          [ edge ~goto:"lost" (always |> flag (Flag.lane_error 0)) nop
-          ; edge ~goto:"ack" (always |> flag (Flag.lane_done 0)) (nop |> reset 0)
+          [ edge ~goto:"lost" (always |> flag (Flag.lane_error l)) nop
+          ; edge ~goto:"ack" (always |> flag (Flag.lane_done l)) (nop |> reset 0)
           ]
       ; (* the lane is done at the start of the CRC delimiter; the ACK slot is the bit
            after it, sampled in its middle *)

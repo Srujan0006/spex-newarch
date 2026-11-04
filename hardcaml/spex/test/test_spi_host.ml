@@ -183,7 +183,7 @@ let can_tx_over_spi () =
   S.set_lane t 0 (Test_can.can_cfg ~dir:0 ~frame_bits:(List.length bits));
   S.set_pin_src t Layout.Pin_src.lane0_and_engine;
   S.write t ~space:S.Space.csr ~addr:S.csr_open_drain [ 1 ];
-  S.load t (Protocols.can_tx ~pin:0 ~n);
+  S.load t (Protocols.can_tx ~pin:0 ~n ());
   S.push_tx t (Test_can.pack bits);
   S.start t ();
   S.ticks t (120 * n);
@@ -241,7 +241,7 @@ let%expect_test "frame_bits written while lane 0 is Done is used by the next fra
        0xFE lor bus);
   S.set_pin_src t Layout.Pin_src.lane0_and_engine;
   S.write t ~space:S.Space.csr ~addr:S.csr_open_drain [ 1 ];
-  S.load t (Protocols.can_tx ~pin:0 ~n);
+  S.load t (Protocols.can_tx ~pin:0 ~n ());
   let send (f : Can_node.frame) =
     let bits = Test_can.frame_bits f in
     S.set_lane t 0 (Test_can.can_cfg ~dir:0 ~frame_bits:(List.length bits));

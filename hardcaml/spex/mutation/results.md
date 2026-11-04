@@ -44,11 +44,14 @@
 | prescaler /8 counts every cycle | KILLED |
 | send_bit edges also command the lanes | KILLED |
 | lane flags read as 0 | KILLED |
-| tx_collision never set | KILLED (rerun alone after retargeting) |
+| tx_collision never set | KILLED |
 | drop counter wraps instead of saturating | KILLED |
 | engine push into a full RX FIFO not counted | KILLED |
 | RX watermark compared with > | KILLED |
 | TX watermark ignores its enable | KILLED |
+| pin source select read from the next pin's field | KILLED |
+| pin source 'lane 1 AND engine' reads lane 0 | KILLED (rerun alone after adding the lane 1 CAN TX test) |
+| rx_to_tx ignored: lane bytes stay in the RX FIFO | KILLED |
 | stuff bit one bit early | KILLED |
 | stuff bit not complemented | KILLED |
 | CRC feedback ignores the bit | KILLED |
@@ -62,6 +65,11 @@
 | NRZI decode inverted | KILLED |
 | a partial RX byte lost at stop is not counted | KILLED |
 | RX Done before a trailing stuff bit | KILLED |
+| skip one bit short (18 for CAN) | KILLED |
+| skip one bit long (20 for CAN) | KILLED |
+| skipped bits left out of the CRC | KILLED |
+| length field read one bit late | KILLED |
+| len_max ignored | KILLED |
 | SPI samples MOSI on the falling edge | KILLED |
 | SPI address does not auto-increment | KILLED |
 | location store bytes assembled big-endian | KILLED |
@@ -81,4 +89,4 @@
 | compiler: recover jumps nowhere | KILLED |
 | compiler checks an edge's load after its own END | KILLED |
 
-80/80 killed
+88/88 killed
