@@ -1,4 +1,4 @@
-# new_arch (Hardcaml SPEX v0.1) at 6x4: decision option C, 2026-10-24. Hardens hardcaml/spex/harden with the SPEX v1
+# new_arch (Hardcaml SPEX v0.1) at 8x4 (6x4 until the 2026-11-04 freeze): decision option C, 2026-10-24. Hardens hardcaml/spex/harden with the SPEX v1
 # spike's layout-A recipe and reports the routing violation count and per-path timing at every corner; LVS, Magic
 # stream-out and the Tiny Tapeout precheck run too (2026-10-24).
 name: newarch_harden

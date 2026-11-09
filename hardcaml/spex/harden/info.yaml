@@ -1,6 +1,6 @@
 # Tiny Tapeout project information
 project:
-  title:        "SPEX new_arch harden (6x4)"      # Project title
+  title:        "SPEX new_arch harden (8x4)"      # Project title
   author:       "Srujan0006"      # Your name
   discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
   description:  "SPEX protocol engine (Hardcaml new_arch v0.1) with its host SPI port"      # One line description of what your project does
@@ -8,7 +8,7 @@ project:
   clock_hz:     48000000       # Clock frequency in Hz (or 0 if not applicable)
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
-  tiles: "6x4"
+  tiles: "8x4"
 
   # Your top module name must start with "tt_um_". Make it unique by including your github username:
   top_module:  "tt_um_srujan0006_newarch"
