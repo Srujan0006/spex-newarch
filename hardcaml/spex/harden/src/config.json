@@ -6,7 +6,7 @@
       "+OpenROAD.GeneratePDN": "Project.ExtendPowerStripes"
     }
   },
-  "PL_TARGET_DENSITY_PCT": 40,
+  "PL_TARGET_DENSITY_PCT": 55,
   "CLOCK_PERIOD": 20.8,
   "OPENROAD_THREADS": 4,
   "DRT_OPT_ITERS": 30,

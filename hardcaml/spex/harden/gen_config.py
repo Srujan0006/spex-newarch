@@ -52,6 +52,9 @@ def main():
         obs += [f"{layer} {x:.2f} {y0:.2f} {x + w:.2f} {y1:.2f}" for layer in ("Metal2", "Metal3", "Metal4")]
     d["ROUTING_OBSTRUCTIONS"] = obs
     d["PDN_MACRO_CONNECTIONS"] = [f"{i} VPWR VGND {pw} VSS!" for i, *_ in TILES for pw in ("VDD!", "VDDARRAY!")]
+    # 8x4 track A run 1 (2026-11-10): denser placement keeps the logic near the SRAM pins
+    # (at the recipe's 40 % the 8x4 run spread it out: 49.1 MHz slow, slew / cap at u_rec0)
+    d["PL_TARGET_DENSITY_PCT"] = 55
     for k in ("RUN_LVS", "RUN_MAGIC_STREAMOUT", "RUN_MAGIC_WRITE_LEF", "RUN_IRDROP_REPORT"):
         d[k] = True
     d["FP_OBSTRUCTIONS"] = [[486.68, 544.32 + 118.78, 486.68 + SIZE[M64][0], CORE[3]]]
