@@ -48,11 +48,11 @@ let spi_controller ~cpol ~cpha ~hp ~lead bytes =
 
 let pr l = String.concat ~sep:" " (List.map l ~f:(Printf.sprintf "%02x"))
 
-let run ~mode ~hp =
+let run ?setup ~mode ~hp () =
   let cpol = mode / 2
   and cpha = mode % 2 in
   let t = H.create () in
-  let spec = Protocols.spi_target ~cpol ~cpha ~cs ~sck ~mosi ~miso in
+  let spec = Protocols.spi_target ?setup ~cpol ~cpha ~cs ~sck ~mosi ~miso () in
   H.load t spec;
   H.push_tx t [ 0xC3; 0x5A; 0x01; 0x80 ];
   H.start t ();
@@ -69,7 +69,7 @@ let run ~mode ~hp =
 
 let%expect_test "SPI target, modes 0 to 3 at 1 MHz SCK (40 MHz engine)" =
   for mode = 0 to 3 do
-    let ok, rx, got, viol, _ = run ~mode ~hp:20 in
+    let ok, rx, got, viol, _ = run ~mode ~hp:20 () in
     printf "mode %d: target got %s, controller got %s, %d violations, %s\n" mode (pr rx) (pr got)
       (List.length viol) (if ok then "OK" else "FAIL")
   done;
@@ -81,26 +81,38 @@ let%expect_test "SPI target, modes 0 to 3 at 1 MHz SCK (40 MHz engine)" =
     |}]
 ;;
 
-(* Fastest SCK each mode passes at, and what happens one step faster. *)
+(* Fastest SCK each mode passes at, and what happens one step faster: overspeed is
+   UNEXPECTED (the setup check in Protocols.spi_target), not silent corruption.
+   Mutants (run by hand, 2026-11-10; each brings back "controller got c3 da 01 80" with
+   no violation): the setup window removed (in_time = identity); SCK not watched in
+   "xfer". *)
 let%expect_test "SPI target: top speed per mode" =
   for mode = 0 to 3 do
     let rec find hp = if hp > 40 then None else
-        let ok, _, _, viol, _ = run ~mode ~hp in
+        let ok, _, _, viol, _ = run ~mode ~hp () in
         if ok && List.is_empty viol then Some hp else find (hp + 1)
     in
     (* search from fast to slow; the first passing half period is the limit *)
     let h = Option.value (find 2) ~default:0 in
-    let ok, rx, got, viol, _ = run ~mode ~hp:(h - 1) in
-    printf "mode %d: passes at hp=%d (%.2f MHz); hp=%d: %s, target got %s, controller got %s, violations: %s\n"
-      mode h (40.0 /. Float.of_int (2 * h)) (h - 1)
+    (* no false alarm at any slower speed, up to 1 MHz *)
+    let slower_ok =
+      List.for_all (List.range h 21) ~f:(fun hp ->
+        let ok, _, _, viol, _ = run ~mode ~hp () in
+        ok && List.is_empty viol)
+    in
+    let ok, rx, got, viol, _ = run ~mode ~hp:(h - 1) () in
+    printf "mode %d: passes at hp=%d (%.2f MHz) and every hp up to 20: %b; hp=%d: %s, target got %s, controller got %s, violations: %s\n"
+      mode h (40.0 /. Float.of_int (2 * h)) slower_ok (h - 1)
       (if ok then "OK" else "FAIL")
       (pr rx) (pr got)
       (String.concat ~sep:"," (List.map viol ~f:(fun v -> H.kind_name v.kind)))
   done;
   [%expect {|
-    mode 0: passes at hp=9 (2.22 MHz); hp=8: FAIL, target got 9f 00 a5 7e, controller got c3 da 01 80, violations:
-    mode 1: passes at hp=8 (2.50 MHz); hp=7: FAIL, target got 9f 00 a5 7e, controller got c3 da 01 80, violations:
-    mode 2: passes at hp=9 (2.22 MHz); hp=8: FAIL, target got 9f 00 a5 7e, controller got c3 da 01 80, violations:
-    mode 3: passes at hp=8 (2.50 MHz); hp=7: FAIL, target got 9f 00 a5 7e, controller got c3 da 01 80, violations:
+    mode 0: passes at hp=9 (2.22 MHz) and every hp up to 20: true; hp=8: FAIL, target got 9f, controller got c3 80 00 00, violations: UNEXPECTED
+    mode 1: passes at hp=8 (2.50 MHz) and every hp up to 20: true; hp=7: FAIL, target got 9f, controller got c3 80 00 00, violations: UNEXPECTED
+    mode 2: passes at hp=9 (2.22 MHz) and every hp up to 20: true; hp=8: FAIL, target got 9f, controller got c3 80 00 00, violations: UNEXPECTED
+    mode 3: passes at hp=8 (2.50 MHz) and every hp up to 20: true; hp=7: FAIL, target got 9f, controller got c3 80 00 00, violations: UNEXPECTED
     |}]
 ;;
+
+

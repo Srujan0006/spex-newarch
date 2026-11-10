@@ -44,7 +44,7 @@ let () =
   Test_onewire.run ~present:true;
   Test_i2c_target.run ~q:25 ~addr:0x50 (Test_i2c_target.write 0x50 [ 0xDE; 0xAD ]);
   for mode = 0 to 3 do
-    ignore (Test_spi_target.run ~mode ~hp:20)
+    ignore (Test_spi_target.run ~mode ~hp:20 ())
   done;
   ignore (Test_roles.bit_widths ~role:Layout.Role.stress ~stress:Layout.Stress.random : string);
   for seed = 1 to 40 do

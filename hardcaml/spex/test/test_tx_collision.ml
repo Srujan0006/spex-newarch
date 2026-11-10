@@ -86,7 +86,7 @@ let%expect_test "compiler: engine TX loads while a TX lane may be active are rej
     ; i2c_controller_write ~scl:0 ~sda:1 ~q:8
     ; can_tx ~pin:0 ~n:8 ()
     ; can_rx ~pin:0 ~n:8
-    ; spi_target ~cpol:0 ~cpha:0 ~cs:0 ~sck:1 ~mosi:2 ~miso:3
+    ; spi_target ~cpol:0 ~cpha:0 ~cs:0 ~sck:1 ~mosi:2 ~miso:3 ()
     ; i2c_target ~scl:0 ~sda:1
     ; i2c_controller_read ~scl:0 ~sda:1 ~q:8
     ; onewire_controller ~pin:0 ~u:8

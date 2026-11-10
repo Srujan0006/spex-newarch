@@ -44,8 +44,9 @@ Example specs in this entry (`src/protocols.ml`): UART TX and RX 8N1 (with jitte
 Stress), SPI controller mode 0, **SPI target modes 0 to 3** (up to 2.22 MHz SCK in
 modes 0 and 2, 2.50 MHz in modes 1 and 3, from a 40 MHz engine), I2C controller write with
 clock stretching and NACK recovery, and an **I2C target** (write, read, NACK, STOP in the
-middle of a byte) at 100 and 400 kHz. An **I2C controller read** spec (ACK all but the last byte, NACK, STOP) passes at 100 and 400 kHz. A **1-Wire controller** (no clock line; every bit is a timing window) was added as an example of a protocol the architecture wasn't designed around. **CAN 2.0A** on the bit lanes: a transmitter (stuffing, CRC-15, arbitration by readback, ACK slot, EOF) and a receiver that ACKs good frames, tested against an independent software CAN node: frames decode both ways, arbitration is lost and won at the right bit, a wrong CRC is not ACKed. TODO: flag SPI target
-overspeed as a violation (today it corrupts MISO silently above the limit).
+middle of a byte) at 100 and 400 kHz. An **I2C controller read** spec (ACK all but the last byte, NACK, STOP) passes at 100 and 400 kHz. A **1-Wire controller** (no clock line; every bit is a timing window) was added as an example of a protocol the architecture wasn't designed around. **CAN 2.0A** on the bit lanes: a transmitter (stuffing, CRC-15, arbitration by readback, ACK slot, EOF) and a receiver that ACKs good frames, tested against an independent software CAN node: frames decode both ways, arbitration is lost and won at the right bit, a wrong CRC is not ACKed. SPI target
+overspeed is a violation: one cycle above the top speed gives UNEXPECTED in all four modes, instead of
+silently corrupting MISO.
 
 ## 4. Results
 

@@ -375,21 +375,30 @@ let can_uart_bridge ~can_pin ~uart_pin ~n ~baud =
   }
 ;;
 
+(* SPI target: cycles from a MISO change to the controller's sampling edge (as the
+   engine sees it), set by [Test_spi_target]'s sweep *)
+let spi_target_setup = 2
+
 (** SPI target, any mode ([cpol], [cpha] in 0/1), MSB first. Follows the controller's
     SCK edges: each byte received on MOSI goes to the RX FIFO, and each byte sent on
     MISO comes from the TX FIFO (0xFF when it is empty). MISO is released while CS is
     high. Inside a byte every SCK edge is a self-loop (no entry cost); between bytes
     the spec passes through one or two other locations (about 6 to 11 cycles), which
-    sets the top SCK speed. Those locations watch SCK, so an SCK edge that arrives
-    too early is UNEXPECTED (and the engine halts) instead of a silently lost bit.
+    sets the top SCK speed. Overspeed is a violation, not silent corruption: each MISO
+    change resets clock 1, and the controller's sampling edge (leading for CPHA 0,
+    trailing for CPHA 1) must come at least [setup] cycles later, judged when the edge
+    arrived (ENGINE.md: windows use the change's age). An edge that comes earlier, or
+    that waited through a FETCH between bytes, matches no edge of the watched "xfer"
+    location and is UNEXPECTED (the engine halts). The other locations watch SCK too.
     A partial byte when CS rises is dropped. *)
-let spi_target ~cpol ~cpha ~cs ~sck ~mosi ~miso =
+let spi_target ?(setup = spi_target_setup) ~cpol ~cpha ~cs ~sck ~mosi ~miso () =
   let lead g = if cpol = 0 then rises sck g else falls sck g in
   let trail g = if cpol = 0 then falls sck g else rises sck g in
   let sck_idle g = if cpol = 0 then pin_lo sck g else pin_hi sck g in
   let deselect = edge ~goto:"idle" (always |> rises cs) (nop |> release miso) in
   let sample g = g |> rx ~pin:mosi Rx_op.shift_msb in
-  let shift_out g = g |> send_bit miso |> tx Tx_op.shift in
+  let shift_out g = g |> send_bit miso |> tx Tx_op.shift |> reset 1 in
+  let in_time g = g |> after ~clk:1 setup in
   let name = Printf.sprintf "spi_target_mode%d" ((2 * cpol) + cpha) in
   if cpha = 0
   then
@@ -407,8 +416,9 @@ let spi_target ~cpol ~cpha ~cs ~sck ~mosi ~miso =
             [ deselect; edge ~goto:"xfer" (always |> sck_idle) (nop |> shift_out) ]
         ; loc
             "xfer"
+            ~watch:(bit sck)
             [ deselect
-            ; edge ~goto:"xfer" (always |> lead) (nop |> sample |> cnt Cnt_op.dec)
+            ; edge ~goto:"xfer" (always |> lead |> in_time) (nop |> sample |> cnt Cnt_op.dec)
             ; edge
                 ~goto:"next"
                 (always |> trail |> flag Flag.cnt_zero)
@@ -432,13 +442,14 @@ let spi_target ~cpol ~cpha ~cs ~sck ~mosi ~miso =
             [ edge ~goto:"xfer" (always |> falls cs) (nop |> tx Tx_op.load_rev |> cnt Cnt_op.load7) ]
         ; loc
             "xfer"
+            ~watch:(bit sck)
             [ deselect
             ; edge ~goto:"xfer" (always |> lead) (nop |> shift_out)
             ; edge
                 ~goto:"next"
-                (always |> trail |> flag Flag.cnt_zero)
+                (always |> trail |> in_time |> flag Flag.cnt_zero)
                 (nop |> sample |> tx Tx_op.load_rev |> cnt Cnt_op.load7)
-            ; edge ~goto:"xfer" (always |> trail) (nop |> sample |> cnt Cnt_op.dec)
+            ; edge ~goto:"xfer" (always |> trail |> in_time) (nop |> sample |> cnt Cnt_op.dec)
             ]
         ; loc
             "next"

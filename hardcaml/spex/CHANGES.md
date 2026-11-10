@@ -74,6 +74,10 @@ commit 50b0353 on `new-arch` (no entry-time fix, no real SPI host port). Merge i
   instead of being UNEXPECTED. Fix options: a per-location "edge seen during FETCH is a
   violation" bit (header has 2 spare bits), or a TX prefetch so no second location is
   needed. GUIDE step 9's "violation, not silent corruption" acceptance is **not met yet**.
+  **Met on 2026-11-10, spec only (frozen RTL):** each MISO change resets clock 1, the sampling
+  edge needs `after ~clk:1 2` (judged at the edge's arrival, the entry-time fix) and "xfer"
+  watches SCK, so one cycle above top speed is UNEXPECTED in all four modes; top speed is
+  unchanged (`test/test_spi_target.ml`).
 - **I2C target** (`Protocols.i2c_target`, `test/test_i2c_target.ml`): write, read
   (until NACK), address mismatch (NACK, ignored), STOP in the middle of a data byte
   (clean recovery: the partial byte is dropped, the next transaction works). Passes at
