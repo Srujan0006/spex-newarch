@@ -19,6 +19,8 @@ dune build && dune test                    # all expect tests, all in lockstep w
 dune exec bin/gen.exe -- out               # generated Verilog
 ./_build/default/test/vectors/vectors.exe $PWD/out && (cd out && iverilog -g2012 -o simv tb.v spex_sim_top.v && vvp -n simv)
 python3 mutation/mutate.py                 # mutation test of the RTL
+# host loader: Loader.of_spec (image: header, store zero-filled to 64 locations, CRC-32),
+# Loader.load transport image (checks, SPI frames, verify, image_valid), Loader.start (src/loader.ml)
 formal/prove.sh                            # formal proofs (Yosys + ABC PDR) on out/spex_core.v
 formal/prove_lanes.sh                      # bit-lane proofs L1-L3, L5 on out/spex_lane.v
 python3 formal/vacuity.py                  # each property must fail on a mutant

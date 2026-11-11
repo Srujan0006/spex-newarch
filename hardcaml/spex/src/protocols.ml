@@ -384,10 +384,12 @@ let spi_target_setup = 2
     MISO comes from the TX FIFO (0xFF when it is empty). MISO is released while CS is
     high. Inside a byte every SCK edge is a self-loop (no entry cost); between bytes
     the spec passes through one or two other locations (about 6 to 11 cycles), which
-    sets the top SCK speed. Overspeed is a violation, not silent corruption: each MISO
-    change resets clock 1, and the controller's sampling edge (leading for CPHA 0,
-    trailing for CPHA 1) must come at least [setup] cycles later, judged when the edge
-    arrived (ENGINE.md: windows use the change's age). An edge that comes earlier, or
+    sets the top SCK speed. Overspeed is a violation, not silent corruption.
+    **Rule: the controller's sampling SCK edge (leading for CPHA 0, trailing for CPHA 1)
+    must arrive at least [setup] = 2 engine cycles after MISO changes.** Each MISO change
+    resets clock 1 and the sampling edge's guard is [after ~clk:1 setup], judged when the
+    edge arrived (ENGINE.md: windows use the change's age). 2 is the largest value that
+    keeps the top speed (2.22 MHz CPHA 0, 2.50 MHz CPHA 1 at 40 MHz). An edge that comes earlier, or
     that waited through a FETCH between bytes, matches no edge of the watched "xfer"
     location and is UNEXPECTED (the engine halts). The other locations watch SCK too.
     A partial byte when CS rises is dropped. *)
@@ -667,4 +669,72 @@ let onewire_controller ~pin ~u =
           ]
       ]
   }
+;;
+
+(** USB low-speed (1.5 Mb/s) packet transmitter on bit lane [lane]: SYNC, PID, data and
+    CRC-16 all go through the lane, so NRZI and the stuffing run stay continuous; the
+    engine adds the end of packet. Host setup (Test_usb.lane_cfg): lane TX, NRZI, USB
+    stuffing after 6 ones, LSB first, CRC-16 (poly 0x8005, inverted), [init] =
+    [usb_crc16_init ~pid] (the register SYNC and PID bring to all ones, so the CRC
+    covers only the data, as USB's does), [frame_bits] = 8 (2 + data bytes); pin [dm] (D-) source
+    "lane AND engine", [dp] (D+) "NOT lane AND engine" (low speed: J = D- high, which is
+    the lane's idle 1). The TX FIFO holds SYNC (0x80), the PID and the data.
+    Locations: [idle] (J; a packet in the TX FIFO starts it), [arm] (CRC armed during the
+    frame), [frame] (a self-loop on the lane's done flag: the cycle it sets, both lines
+    are driven low), [eop] (SE0 for 2 bit times, then J), [gap] (J for one bit time).
+    [bit] = cycles per bit (32 at 48 MHz). *)
+let usb_ls_tx ?lane:(l = 0) ~dm ~dp ~bit () =
+  { name = "usb_ls_tx"
+  ; locs =
+      [ loc
+          "idle"
+          ~entry:(nop |> set dm true |> set dp true)
+          ~accepting:true
+          [ edge ~goto:"arm" (always |> not_flag Flag.tx_empty) (nop |> lane (Lane_cmd.go l)) ]
+      ; loc "arm" [ edge ~goto:"frame" always (nop |> lane (Lane_cmd.crc l)) ]
+      ; loc
+          "frame"
+          [ edge
+              ~goto:"eop"
+              (always |> flag (Flag.lane_done l))
+              (nop |> set dm false |> set dp false |> reset 0)
+          ]
+      ; loc
+          "eop"
+          [ edge ~goto:"gap" (always |> at ((2 * bit) - 1)) (nop |> set dm true |> set dp true |> reset 0) ]
+      ; loc "gap" [ edge ~goto:"idle" (always |> at (bit - 1)) (nop |> reset 0) ]
+      ]
+  }
+;;
+
+(** The lane's CRC register (ENGINE.md: [fb = b xor crc[31]], shift left) after the bits
+    of [bytes] sent LSB first, from [init] (32 bits, left-aligned). Host-side helper. *)
+let lane_crc_after ~poly ~init bytes =
+  List.fold bytes ~init ~f:(fun c byte ->
+    List.fold (List.init 8 ~f:(fun i -> (byte lsr i) land 1)) ~init:c ~f:(fun c b ->
+      let fb = b lxor ((c lsr 31) land 1) in
+      ((c lsl 1) land 0xFFFF_FFFF) lxor if fb = 1 then poly else 0))
+;;
+
+let usb_crc16_poly = 0x8005 lsl 16
+let usb_sync = 0x80
+
+(** The register [init] from which the bits of [bytes] (LSB first) bring a [width]-bit
+    lane CRC to [target]: the CRC step run backwards. A step is
+    [c' = (c << 1) xor (fb ? poly : 0)] with [fb = b xor c[31]]; the CRC's lowest bit
+    (bit [32 - width]) of [c << 1] is 0 and [poly] has it set, so [fb] is that bit of
+    [c'], and [c = ((c' xor (fb ? poly : 0)) >> 1) | ((fb xor b) << 31)]. *)
+let lane_crc_before ~poly ~width ~target bytes =
+  let low = 32 - width in
+  let bits = List.concat_map bytes ~f:(fun byte -> List.init 8 ~f:(fun i -> (byte lsr i) land 1)) in
+  List.fold (List.rev bits) ~init:target ~f:(fun c' b ->
+    let fb = (c' lsr low) land 1 in
+    let t = c' lxor if fb = 1 then poly else 0 in
+    (t lsr 1) lor ((fb lxor b) lsl 31))
+;;
+
+(** [init] for a data packet with PID [pid]: the register that SYNC and the PID bring to
+    all ones, where CRC-16/USB starts on the data. *)
+let usb_crc16_init ~pid =
+  lane_crc_before ~poly:usb_crc16_poly ~width:16 ~target:(0xFFFF lsl 16) [ usb_sync; pid ]
 ;;

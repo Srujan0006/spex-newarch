@@ -46,6 +46,10 @@ let () =
   for mode = 0 to 3 do
     ignore (Test_spi_target.run ~mode ~hp:20 ())
   done;
+  (* USB low speed: one packet ending on a K bit, one on a J bit, one topping up the FIFO *)
+  Test_usb.send ~pid:Test_usb.data0 [];
+  Test_usb.send ~pid:Test_usb.data0 [ 0x01 ];
+  Test_usb.send ~pid:Test_usb.data1 [ 0x80; 0x06; 0x00; 0x01; 0x00; 0x00; 0x40; 0x00 ];
   ignore (Test_roles.bit_widths ~role:Layout.Role.stress ~stress:Layout.Stress.random : string);
   for seed = 1 to 40 do
     ignore (Test_lockstep.run_one ~seed ~cycles:2000 : H.t)
