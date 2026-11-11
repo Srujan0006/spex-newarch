@@ -168,5 +168,6 @@
   "RUN_LVS": true,
   "RUN_MAGIC_STREAMOUT": true,
   "RUN_MAGIC_WRITE_LEF": true,
-  "RUN_IRDROP_REPORT": true
+  "RUN_IRDROP_REPORT": true,
+  "PL_MAX_DISPLACEMENT_Y": 200
 }
