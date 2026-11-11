@@ -67,6 +67,11 @@ def main():
     # core top inside the corridor above u_rec1 and no free row was within 500 um across / 100 um down. Allow 200 um
     # down, enough to reach the rows below u_rec1 (163 um)
     d["PL_MAX_DISPLACEMENT_Y"] = 200
+    # run 4, review T2 (2026-11-11): run 3c's worst slow path (+1.463 ns) is a lane register-to-register path with about
+    # 80 buf / wire / fanout stages. Repair timing again after global routing (off by default), and raise the signal
+    # fanout limit from the flow default of 10 (resolved config, run 43032574358) to 16 so fewer buffer trees are built
+    d["RUN_POST_GRT_RESIZER_TIMING"] = True
+    d["MAX_FANOUT_CONSTRAINT"] = 16
     for k in ("RUN_LVS", "RUN_MAGIC_STREAMOUT", "RUN_MAGIC_WRITE_LEF", "RUN_IRDROP_REPORT"):
         d[k] = True
     d["FP_OBSTRUCTIONS"] = [[486.68, 544.32 + 118.78, 486.68 + SIZE[M64][0], CORE[3]],   # corridor above u_rec1

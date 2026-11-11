@@ -146,7 +146,7 @@
   "MAGIC_DEF_LABELS": 0,
   "MAGIC_WRITE_LEF_PINONLY": 1,
   "RUN_POST_GRT_DESIGN_REPAIR": true,
-  "RUN_POST_GRT_RESIZER_TIMING": false,
+  "RUN_POST_GRT_RESIZER_TIMING": true,
   "//2spike": "v2 floorplan (2026-10-22): the 64x64 pair faces one 200 um logic channel (A_DOUT along the whole long edge, address at its middle, LEF 2bbec755); location-word macro left of the channel; density 45; post-GRT repair as PRISM.",
   "FP_OBSTRUCTIONS": [
     [
@@ -169,5 +169,6 @@
   "RUN_MAGIC_STREAMOUT": true,
   "RUN_MAGIC_WRITE_LEF": true,
   "RUN_IRDROP_REPORT": true,
-  "PL_MAX_DISPLACEMENT_Y": 200
+  "PL_MAX_DISPLACEMENT_Y": 200,
+  "MAX_FANOUT_CONSTRAINT": 16
 }
