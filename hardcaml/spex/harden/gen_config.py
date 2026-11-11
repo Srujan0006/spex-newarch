@@ -24,7 +24,9 @@ BASE = os.path.join(HERE, "..", "..", "..", "experiments", "rtl_spike", "layouts
 P = "pdk_dir::libs.ref/sg13cmos5l_sram"
 M64, M32 = "RM_IHPSG13_1P_256x64_c2_bm_bist", "RM_IHPSG13_1P_256x32_c2_bm_bist"
 SIZE = {M64: (784.48, 118.78), M32: (416.64, 118.78)}            # LEF, IHP-Open-PDK 2bbec755
-TILES = [("u_rec0", M64, 486.68, 3.78, "FS"), ("u_rec1", M64, 486.68, 544.32, "N"), ("u_cov", M32, 3.36, 3.78, "FS")]
+# 8x4 track A run 2 (2026-11-11): the record macros moved inward (were y 3.78 and 544.32, on the die edges), so
+# their facing pins are 202 um apart instead of 422 and the logic sits between them; y on the 3.78 um row grid
+TILES = [("u_rec0", M64, 486.68, 113.40, "FS"), ("u_rec1", M64, 486.68, 434.70, "N"), ("u_cov", M32, 3.36, 3.78, "FS")]
 CORE = (2.88, 3.78, 1721.28, 706.86)                                # 8x4 die 1724.16 x 710.64 (6x4: x1 1286.40)
 PIN_GAP = 2.6
 
@@ -57,12 +59,13 @@ def main():
     d["PL_TARGET_DENSITY_PCT"] = 55
     for k in ("RUN_LVS", "RUN_MAGIC_STREAMOUT", "RUN_MAGIC_WRITE_LEF", "RUN_IRDROP_REPORT"):
         d[k] = True
-    d["FP_OBSTRUCTIONS"] = [[486.68, 544.32 + 118.78, 486.68 + SIZE[M64][0], CORE[3]]]
+    # no placement corridor: it only blocked the thin strip between u_rec1 and the die edge (run 2 moved u_rec1 inward)
+    d.pop("FP_OBSTRUCTIONS", None)
     os.makedirs(os.path.join(HERE, "src"), exist_ok=True)
     with open(os.path.join(HERE, "src", "config.json"), "w") as f:
         json.dump(d, f, indent=2)
         f.write("\n")
-    print({i: (x, y, o) for i, _m, x, y, o in TILES}, "corridor", d["FP_OBSTRUCTIONS"])
+    print({i: (x, y, o) for i, _m, x, y, o in TILES})
 
 
 if __name__ == "__main__":
