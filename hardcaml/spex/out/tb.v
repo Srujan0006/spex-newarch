@@ -146,7 +146,7 @@ module tb;
   task tick; begin #5 clock = 1; #5 clock = 0; end endtask
   initial begin
     errors = 0; cyc = 0;
-    fd = $fopen("/home/lenovo/spex/hardcaml/spex/out/vectors.txt", "r");
+    fd = $fopen("/home/lenovo/JaneStreet/SPEX/hardcaml/spex/out/vectors.txt", "r");
     while (!$feof(fd)) begin
       r = $fscanf(fd, "%h", flag);
       if (r == 1) begin

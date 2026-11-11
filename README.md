@@ -22,18 +22,19 @@ The specs are model-checked at design time with TChecker. The hardware is meant 
 
 ## Layout
 
+This repo lives at `~/JaneStreet/SPEX`, next to the earlier PIO-style entry (DTC) in `~/JaneStreet/PIO`.
+
 ```
+hardcaml/spex/           new_arch engine (Hardcaml): RTL, model, tests, formal, harden (current design)
+v1/                      SPEX v1 Python work: spex/ (dsl, compiler, decoder, refsim, tchecker, host),
+                         spec/, tests/ (model/, oracles/), scripts/, tb/, formal/, pyproject.toml
 docs/                    SEMANTICS, DECISIONS, CLAIMS, BUGS, HELDOUT, notes/
-spec/                    protocol specs in the SPEX DSL
-spex/                    Python package: dsl/ compiler/ decoder/ refsim/ tchecker/ host/
-tests/                   model/ (pytest on the reference model)   oracles/ (standards-derived, independent)
-src/ test/ info.yaml     Tiny Tapeout harness (imported from ttihp-verilog-template@cmos5l in step 0)
-tb/                      cocotb lockstep: RTL against spex.refsim
-formal/                  SymbiYosys proofs
-experiments/             area_probe/ (Yosys sketches)   macro_floorplan/ (week-1 dummy harden)
-legacy/dtc/              previous PIO-based design, read-only
-scripts/                 setup and check scripts
+experiments/             area_probe/ (Yosys sketches), macro_floorplan/, rtl_spike/
+src/ test/ info.yaml     Tiny Tapeout harness (ttihp-verilog-template@cmos5l)
+.github/                 CI: newarch_harden (hardcaml/spex/harden), model and tchecker (v1/)
 ```
+
+v1 tests: `cd v1 && python3 -B -m pytest -q`. new_arch: `hardcaml/spex/README.md`.
 
 ## Licence
 

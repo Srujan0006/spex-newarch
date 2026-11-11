@@ -1,14 +1,17 @@
 name: model
-# runs only when the Python model or its tests change (pytest + mutation run take 30-50 min of Actions time)
+# SPEX v1 Python model (v1/); runs only when the Python model or its tests change (pytest + mutation run take 30-50 min of Actions time)
 on:
   push:
-    paths: ["spex/**", "spec/**", "tests/**", "scripts/**", "pyproject.toml", ".github/workflows/model.yaml"]
+    paths: ["v1/**", ".github/workflows/model.yaml"]
   pull_request:
-    paths: ["spex/**", "spec/**", "tests/**", "scripts/**", "pyproject.toml", ".github/workflows/model.yaml"]
+    paths: ["v1/**", ".github/workflows/model.yaml"]
   workflow_dispatch:
 jobs:
   pytest:
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: v1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

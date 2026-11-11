@@ -24,7 +24,7 @@ module tb_chip;
   task tick; begin #5 clk = 1; #5 clk = 0; end endtask
   initial begin
     errors = 0; cyc = 0;
-    fd = $fopen("/home/lenovo/spex/hardcaml/spex/out/vectors_chip.txt", "r");
+    fd = $fopen("/home/lenovo/JaneStreet/SPEX/hardcaml/spex/out/vectors_chip.txt", "r");
     while (!$feof(fd)) begin
       r = $fscanf(fd, "%h %h %h %h %h %h %h %h %h %h %h %h", flag, cs_n, sck, mosi, uio_in,
                   e_miso, e_irq, e_viol, e_entry, e_dbg, e_out, e_oe);

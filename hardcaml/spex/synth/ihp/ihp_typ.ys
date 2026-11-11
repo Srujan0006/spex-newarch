@@ -1,6 +1,6 @@
-read_verilog /home/lenovo/spex/hardcaml/spex/out/spex_core.v
+read_verilog /home/lenovo/JaneStreet/SPEX/hardcaml/spex/out/spex_core.v
 synth -top spex_core -flatten
-dfflibmap -liberty /home/lenovo/spex/experiments/area_probe/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib
-abc -liberty /home/lenovo/spex/experiments/area_probe/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib
+dfflibmap -liberty /home/lenovo/JaneStreet/SPEX/experiments/area_probe/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib
+abc -liberty /home/lenovo/JaneStreet/SPEX/experiments/area_probe/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib
 opt_clean
-stat -liberty /home/lenovo/spex/experiments/area_probe/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib
+stat -liberty /home/lenovo/JaneStreet/SPEX/experiments/area_probe/lib/sg13cmos5l_stdcell_typ_1p20V_25C.lib

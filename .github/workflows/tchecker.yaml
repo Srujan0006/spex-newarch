@@ -2,15 +2,18 @@ name: tchecker
 on:
   push:
     paths:
-      - "spex/**"
-      - "spec/**"
-      - "scripts/*tchecker*"
+      - "v1/spex/**"
+      - "v1/spec/**"
+      - "v1/scripts/*tchecker*"
       - ".github/workflows/tchecker.yaml"
   workflow_dispatch:
 
 jobs:
   reach:
     runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: v1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,8 +22,8 @@ jobs:
         id: cache
         uses: actions/cache@v4
         with:
-          path: tchecker/install
-          key: tchecker-${{ hashFiles('scripts/build_tchecker.sh') }}
+          path: v1/tchecker/install
+          key: tchecker-${{ hashFiles('v1/scripts/build_tchecker.sh') }}
       - name: Install TChecker
         if: steps.cache.outputs.cache-hit != 'true'
         run: ./scripts/build_tchecker.sh "$PWD/tchecker/install"
@@ -28,4 +31,4 @@ jobs:
         run: python3 -B scripts/export_tchecker.py tck_out --tck-reach "$PWD/tchecker/install/bin/tck-reach"
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: tchecker-models, path: tck_out }
+        with: { name: tchecker-models, path: v1/tck_out }
