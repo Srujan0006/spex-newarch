@@ -27,9 +27,12 @@ SIZE = {M64: (784.48, 118.78), M32: (416.64, 118.78)}            # LEF, IHP-Open
 # 8x4 track A: run 2 (2026-11-11) moved the record macros inward (y 113.40 / 434.70): global routing failed with
 # congestion (2494 overflow; two 784 um macro walls across the die). Run 3 is back on the edges, as run 1.
 TILES = [("u_rec0", M64, 486.68, 3.78, "FS"), ("u_rec1", M64, 486.68, 544.32, "N"), ("u_cov", M32, 3.36, 3.78, "FS")]
-# run 3: a placement fence, the core logic kept to the 6x4 core width (x <= FENCE_X); the 8x4 die right of it
-# holds no standard cells
-FENCE_X = 1286.40
+# run 3: a placement fence, the core logic kept to about the 6x4 core width; the 8x4 die right of it holds no
+# standard cells. Run 3 put it at x 1286.40 (the 6x4 core edge): 56.3 MHz slow, but precheck DRC failed (372, all at
+# x 1279.7): the obstruction also drops the tile stripes, and pdngen's repair stripes for the rows between the last
+# stripe (x 1273.53) and the fence (x 1278.72 and 1280.64, 2.1 um wide) sit 0.08 um apart. Run 3b: the fence at
+# the record macros' right edge, so no row lies beyond the last stripe.
+FENCE_X = 486.68 + SIZE[M64][0]   # 1271.16
 CORE = (2.88, 3.78, 1721.28, 706.86)                                # 8x4 die 1724.16 x 710.64 (6x4: x1 1286.40)
 PIN_GAP = 2.6
 
