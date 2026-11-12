@@ -72,6 +72,11 @@ def main():
     # fanout limit from the flow default of 10 (resolved config, run 43032574358) to 16 so fewer buffer trees are built
     d["RUN_POST_GRT_RESIZER_TIMING"] = True
     d["MAX_FANOUT_CONSTRAINT"] = 16
+    # run 5 (2026-11-12): run 4's post-GRT repair_timing reported "No setup violations found" because the flow's clock
+    # target is met with +1.49 ns slow, so it never worked the lane path. Ask both setup repairs (post-CTS, post-GRT) for
+    # 3 ns of slack beyond the target (defaults 0.05 / 0.025): 55 MHz needs +2.61 ns on the current constraints
+    d["PL_RESIZER_SETUP_SLACK_MARGIN"] = 3.0
+    d["GRT_RESIZER_SETUP_SLACK_MARGIN"] = 3.0
     for k in ("RUN_LVS", "RUN_MAGIC_STREAMOUT", "RUN_MAGIC_WRITE_LEF", "RUN_IRDROP_REPORT"):
         d[k] = True
     d["FP_OBSTRUCTIONS"] = [[486.68, 544.32 + 118.78, 486.68 + SIZE[M64][0], CORE[3]],   # corridor above u_rec1
