@@ -42,6 +42,8 @@ LANE_TARGETS = {
     "skip one bit long (20 for CAN)": "L5 (RX skip and length field match the reference)",
     "length field read one bit late": "L5 (RX skip and length field match the reference)",
     "len_max ignored": "L5 (RX skip and length field match the reference)",
+    "data pin register one cycle late (fed from pins_s)": "L5 (RX skip and length field match the reference)",
+    "cq fed from cs's input (no clock edge ever seen)": "L5 (RX skip and length field match the reference)",
 }
 
 def main():

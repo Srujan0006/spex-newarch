@@ -17,8 +17,7 @@ module I = struct
     ; end_ : 'a
     ; crc_cmd : 'a
     ; reset : 'a
-    ; pins_s : 'a [@bits 8]
-    ; pins_q : 'a [@bits 8]
+    ; sync1 : 'a [@bits 8] (** the pin synchroniser's first flop (engine) *)
     ; tx_head : 'a [@bits 8]
     ; tx_empty : 'a
     }
@@ -97,11 +96,18 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let in_armed = mode.value ==:. m_armed in
   let in_done = mode.value ==:. m_done in
   let pin sel v = mux sel (bits_lsb v) in
-  let d = pin c.data_pin i.pins_s in
-  let dq = pin c.data_pin i.pins_q in
+  (* lane-private pin registers (review T1): select the data and clock pins from the
+     synchroniser's first flop and register them here, so the 8:1 mux and the fanout of
+     the shared pin bus sit before a flop instead of on the bit-timing path. d and cs
+     equal pins_s[data_pin] / pins_s[clk_pin], dq and cq equal the same bits of pins_q,
+     whenever data_pin and clk_pin did not change in the last 2 cycles; the CSR rule
+     (ENGINE.md: CSRs change only while Idle and not in the cycle before GO) makes that
+     hold from the cycle after GO, and an Idle lane reads no pin *)
+  let d = reg spec (pin c.data_pin i.sync1) in
+  let dq = reg spec d in
   let dedge = d ^: dq in
-  let cs = pin c.clk_pin i.pins_s in
-  let cq = pin c.clk_pin i.pins_q in
+  let cs = reg spec (pin c.clk_pin i.sync1) in
+  let cq = reg spec cs in
   let cedge = mux2 c.clk_edge (cq &: ~:cs) (cs &: ~:cq) in
   (* ---- bit timing ---- *)
   let edge_rx = is_rx &: dedge &: ~:(c.clk_pin_en) in

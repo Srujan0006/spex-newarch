@@ -151,8 +151,8 @@ module tb;
       r = $fscanf(fd, "%h", flag);
       if (r == 1) begin
         if (flag == 1) begin
-          for (k = 0; k < 256; k = k + 1) dut._2098[k] = 0;
-          for (k = 0; k < 256; k = k + 1) dut._4121[k] = 0;
+          for (k = 0; k < 256; k = k + 1) dut._2086[k] = 0;
+          for (k = 0; k < 256; k = k + 1) dut._4109[k] = 0;
           clear = 1; tick; clear = 0;
         end
         r = $fscanf(fd, "%h", pins_in);

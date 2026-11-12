@@ -133,6 +133,11 @@ LANE_MUTANTS = [
      "[ crc <-- mux2 past_skip (crc_next rbit) crc.value\n                    ; cnt <-- cnt.value +:. 1"),
     ("length field read one bit late", "(select cnt.value 5 0 ==: c.len_pos))", "(select cnt.value 5 0 ==: c.len_pos +:. 1))"),
     ("len_max ignored", "let n = mux2 (f >: c.len_max) c.len_max f in", "let n = f in"),
+    # lane-private pin registers (review T1)
+    ("data pin register one cycle late (fed from pins_s)", "let d = reg spec (pin c.data_pin i.sync1) in",
+     "let d = reg spec (reg spec (pin c.data_pin i.sync1)) in"),
+    ("dq fed from d's input (no data edge ever seen)", "let dq = reg spec d in", "let dq = d in"),
+    ("cq fed from cs's input (no clock edge ever seen)", "let cq = reg spec cs in", "let cq = cs in"),
 ]
 
 # host SPI port (test/test_spi_host.ml drives it through its pins only)

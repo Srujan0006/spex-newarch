@@ -246,8 +246,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
         ; end_ = cmd_is (Lane_cmd.end_ l)
         ; crc_cmd = cmd_is (Lane_cmd.crc l)
         ; reset = cmd_is Lane_cmd.reset |: h.stop
-        ; pins_s
-        ; pins_q
+        ; sync1
         ; tx_head = tx_q
         ; tx_empty
         })

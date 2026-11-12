@@ -17,6 +17,8 @@ type lane =
   ; fifo : int Queue.t
   ; rx : int Queue.t
   ; mutable cycle : int
+  ; mutable ps : int (** pins_s: the pins one cycle ago, as the model sees them *)
+  ; mutable pq : int (** pins_q: two cycles ago *)
   }
 
 let set r v = r := Bits.of_int ~width:(Bits.width !r) v
@@ -31,16 +33,21 @@ let create (cfg : int Lane_cfg.t) =
   Cyclesim.cycle sim;
   i.clear := Bits.gnd;
   Lane_cfg.iter2 i.cfg cfg ~f:set;
-  { sim; i; o; model = Lane_model.create (); fifo = Queue.create (); rx = Queue.create (); cycle = 0 }
+  { sim; i; o; model = Lane_model.create (); fifo = Queue.create (); rx = Queue.create (); cycle = 0; ps = 0; pq = 0 }
 ;;
 
 let cfg_of l = Lane_cfg.map l.i.cfg ~f:get
 
-(** One cycle with pins [pins_s] (this cycle) and [pins_q] (last cycle) and command [k]. *)
-let cycle l ~pins_s ~pins_q (k : Lane_model.cmd) =
+(** One cycle with command [k]. [pins] go into the synchroniser's first flop (the RTL's
+    [sync1]); the model sees them a cycle later as [pins_s] and two cycles later as
+    [pins_q], as in the chip. Both start at 0, the RTL pin registers' reset value. *)
+let cycle l ~pins (k : Lane_model.cmd) =
   let head = Queue.peek l.fifo in
-  set l.i.pins_s pins_s;
-  set l.i.pins_q pins_q;
+  let pins_s = l.ps
+  and pins_q = l.pq in
+  l.pq <- l.ps;
+  l.ps <- pins;
+  set l.i.sync1 pins;
   set l.i.tx_head (Option.value head ~default:0);
   set l.i.tx_empty (Bool.to_int (Option.is_none head));
   set l.i.go (Bool.to_int k.go);
@@ -131,12 +138,10 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
     for _ = 1 to 20 do
       Queue.enqueue l.fifo (int 256)
     done;
-    let pins = ref (int 256)
-    and q = ref 0 in
+    let pins = ref (int 256) in
     let seen_done = ref false
     and seen_len = ref false in
     for _ = 1 to 3000 do
-      let prev = !pins in
       (* the data pin follows the lane's own output half the time, like a bus *)
       if int 6 = 0 then pins := !pins lxor (1 lsl int 8);
       if int 2 = 0
@@ -151,10 +156,7 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
         | 4 when int 4 = 0 -> { Lane_model.no_cmd with reset = true }
         | _ -> Lane_model.no_cmd
       in
-      cycle l ~pins_s:!pins ~pins_q:!q k;
-      q := prev;
-      ignore q;
-      q := !pins;
+      cycle l ~pins:!pins k;
       if l.model.error then Int.incr errors;
       if l.model.crc_ok then Int.incr crc_oks;
       if Lane_model.equal_mode l.model.mode Done then seen_done := true;
@@ -169,7 +171,7 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
     "pushes %d, pops %d, configurations reaching Done %d, cycles with error %d, with crc_ok %d, \
      with a length from the field %d\n"
     !pushes !pops !dones !errors !crc_oks !len_set;
-  [%expect {| pushes 1290, pops 3665, configurations reaching Done 31, cycles with error 24830, with crc_ok 0, with a length from the field 3 |}]
+  [%expect {| pushes 1299, pops 3663, configurations reaching Done 30, cycles with error 28462, with crc_ok 0, with a length from the field 3 |}]
 ;;
 
 (* ---- TX -> RX loopback ---- *)
@@ -207,19 +209,22 @@ let loopback ~code ~stuff ~stuff_len ~div_int ~div_frac bytes =
   List.iter bytes ~f:(Queue.enqueue tx.fifo);
   (* the wire: TX out on pin 0, delayed 2 cycles (a synchroniser) onto pin 1 *)
   let d1 = ref 1
-  and d2 = ref 1
-  and q = ref 0xFF in
+  and d2 = ref 1 in
   let go = { Lane_model.no_cmd with go = true }
   and crc = { Lane_model.no_cmd with crc = true } in
   let pins () = 0xFC lor !d2 lsl 1 lor tx.model.out in
   let step ktx krx =
     let p = pins () in
-    cycle tx ~pins_s:p ~pins_q:!q ktx;
-    cycle rx ~pins_s:p ~pins_q:!q krx;
-    q := p;
+    cycle tx ~pins:p ktx;
+    cycle rx ~pins:p krx;
     d2 := !d1;
     d1 := tx.model.out
   in
+  (* let the idle-high line reach the lanes' pin registers (reset 0) before GO, or the
+     armed RX lane takes the 0 -> 1 as a bit start *)
+  for _ = 1 to 3 do
+    step Lane_model.no_cmd Lane_model.no_cmd
+  done;
   step Lane_model.no_cmd go;
   for _ = 1 to 3 do
     step Lane_model.no_cmd Lane_model.no_cmd
@@ -255,11 +260,11 @@ let%expect_test "TX -> RX loopback: every line code and stuffing mode" =
   loopback ~code:Code.manchester ~stuff:0 ~stuff_len:5 ~div_int:16 ~div_frac:0 (0x55 :: bytes);
   loopback ~code:Code.manchester ~stuff:0 ~stuff_len:5 ~div_int:20 ~div_frac:100 (0x55 :: bytes);
   [%expect {|
-    code 0 stuff 0/5 div 16+0/256: bytes match, rx crc_ok true, error false, 1258 cycles
-    code 0 stuff 1/5 div 16+0/256: bytes match, rx crc_ok true, error false, 1354 cycles
-    code 0 stuff 1/5 div 13+77/256: bytes match, rx crc_ok true, error false, 1124 cycles
-    code 1 stuff 2/6 div 16+0/256: bytes match, rx crc_ok true, error false, 1306 cycles
-    code 2 stuff 0/5 div 16+0/256: bytes match, rx crc_ok true, error false, 1390 cycles
-    code 2 stuff 0/5 div 20+100/256: bytes match, rx crc_ok true, error false, 1770 cycles
+    code 0 stuff 0/5 div 16+0/256: bytes match, rx crc_ok true, error false, 1259 cycles
+    code 0 stuff 1/5 div 16+0/256: bytes match, rx crc_ok true, error false, 1355 cycles
+    code 0 stuff 1/5 div 13+77/256: bytes match, rx crc_ok true, error false, 1125 cycles
+    code 1 stuff 2/6 div 16+0/256: bytes match, rx crc_ok true, error false, 1307 cycles
+    code 2 stuff 0/5 div 16+0/256: bytes match, rx crc_ok true, error false, 1391 cycles
+    code 2 stuff 0/5 div 20+100/256: bytes match, rx crc_ok true, error false, 1771 cycles
     |}]
 ;;

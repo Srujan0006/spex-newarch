@@ -270,9 +270,16 @@ lane treats a frame as one continuous bit stream: the host packs the fields into
 and the lane sends `frame_bits` data bits from the TX FIFO, or receives that many into
 the RX FIFO. It does not parse fields (an RX frame's length is `frame_bits`).
 
-**The host writes a lane's CSRs only while that lane is Idle** (the RTL keeps registered
-copies of values derived from them, such as the sample point, so a write takes effect one
-cycle later; with the lane Idle this is invisible).
+**The host writes a lane's CSRs only while that lane is Idle, and not in the cycle
+before a GO to that lane** (the CSR value must be the same in the GO cycle as in the cycle
+before). The RTL keeps registered copies of values derived from the CSRs, such as the
+sample point, and registers its own data and clock pins from the synchroniser's first
+flop: `d` and `cs` equal `pins_s[data_pin]` / `pins_s[clk_pin]`, and their delayed copies
+equal the same bits of `pins_q`, only once `data_pin` and `clk_pin` have been unchanged
+for 2 cycles. An Idle lane and the GO cycle read no pin, so under this rule the
+difference is invisible from the cycle after GO. A write over SPI takes far longer than
+one cycle, so the rule matters only for a GO issued by a running spec in the cycle right
+after a host CSR write lands.
 
 **Configuration (CSRs, per lane):** `dir` (0 TX, 1 RX); bit timing `div` (16-bit integer
 ≥ 4, 8-bit fraction) or `clk_pin_en` with `clk_pin` and `clk_edge` (0 rising, 1 falling);

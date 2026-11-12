@@ -50,7 +50,7 @@
 | RX watermark compared with > | KILLED |
 | TX watermark ignores its enable | KILLED |
 | pin source select read from the next pin's field | KILLED |
-| pin source 'lane 1 AND engine' reads lane 0 | KILLED (rerun alone after adding the lane 1 CAN TX test) |
+| pin source 'lane 1 AND engine' reads lane 0 | KILLED |
 | rx_to_tx ignored: lane bytes stay in the RX FIFO | KILLED |
 | stuff bit one bit early | KILLED |
 | stuff bit not complemented | KILLED |
@@ -70,6 +70,9 @@
 | skipped bits left out of the CRC | KILLED |
 | length field read one bit late | KILLED |
 | len_max ignored | KILLED |
+| data pin register one cycle late (fed from pins_s) | KILLED |
+| dq fed from d's input (no data edge ever seen) | KILLED |
+| cq fed from cs's input (no clock edge ever seen) | KILLED |
 | SPI samples MOSI on the falling edge | KILLED |
 | SPI address does not auto-increment | KILLED |
 | location store bytes assembled big-endian | KILLED |
@@ -89,4 +92,4 @@
 | compiler: recover jumps nowhere | KILLED |
 | compiler checks an edge's load after its own END | KILLED |
 
-88/88 killed
+91/91 killed

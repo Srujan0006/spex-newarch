@@ -39,18 +39,20 @@
 module lane_tx_props (
     input clock, `LANE_CFG_PORTS,
     input go, input end_, input crc_cmd, input reset,
-    input [7:0] pins_s, input [7:0] tx_head, input tx_empty
+    input [7:0] sync1, input [7:0] tx_head, input tx_empty
 );
     reg init0 = 1'b1, init1 = 1'b1;
     always @(posedge clock) begin init0 <= 1'b0; init1 <= init0; end
-    reg [7:0] pins_q = 8'hFF;
-    always @(posedge clock) pins_q <= pins_s;  // the synchroniser's second flop
+    // the chip's pin stage: sync1 (free) -> pins_s -> pins_q; the lane takes sync1 and
+    // keeps private registers of its data and clock pins (review T1)
+    reg [7:0] pins_s = 8'hFF, pins_q = 8'hFF;
+    always @(posedge clock) begin pins_s <= sync1; pins_q <= pins_s; end
 
     wire out, pop, push, done_, crc_ok, sync_hit, error, active, lost, g_tx_bit, g_data_left;
     wire [7:0] push_data; wire [2:0] err_kind;
     wire [15:0] g_cnt; wire [31:0] g_crc; wire [2:0] g_run; wire g_last; wire [1:0] g_len;  // lemma only
     spex_lane dut (.clock(clock), .clear(init0), `LANE_CFG_CONNECT(1'b0, clk_edge, readback, 1'b1),
-        .go(go), .end_(end_), .crc_cmd(crc_cmd), .reset(reset), .pins_s(pins_s), .pins_q(pins_q),
+        .go(go), .end_(end_), .crc_cmd(crc_cmd), .reset(reset), .sync1(sync1),
         .tx_head(tx_head), .tx_empty(tx_empty), .out(out), .pop(pop), .push(push),
         .push_data(push_data), .done_(done_), .crc_ok(crc_ok), .sync_hit(sync_hit),
         .error(error), .err_kind(err_kind), .active(active), .lost(lost), .g_tx_bit(g_tx_bit),
@@ -126,7 +128,7 @@ endmodule
 // ---------------------------------------------------------------------------------------
 // L2: TX -> RX loopback. Two lanes with one configuration, clocked by one pin (clk_pin_en):
 // TX sends on one edge, RX samples on the other (as SPI). The wire is ideal (the TX `out`
-// is the RX `pins_s`); the 2-flop synchroniser of the chip is the host's SCK <= clk/6 rule,
+// is the RX `sync1`, so RX sees it a cycle later as `pins_s`); the rest of the chip's pin path is the host's SCK <= clk/6 rule,
 // and the divider-timed loopback is covered by simulation (test_lane.ml).
 module lane_loop_props (
     input clock, `LANE_CFG_PORTS,
@@ -144,13 +146,13 @@ module lane_loop_props (
     wire [7:0] t_byte, r_byte; wire [5:0] t_cleft, r_cleft; wire [1:0] t_mode, r_mode;
     wire t_last, r_last, t_crc_bad, r_crc_bad, t_prev, r_prev; wire [1:0] t_len, r_len;
     // RX data pin = TX out; clock pin = sck; other pins free
-    wire [7:0] pins_s = (pins_free & ~(8'd1 << data_pin) & ~(8'd1 << clk_pin))
+    wire [7:0] sync1 = (pins_free & ~(8'd1 << data_pin) & ~(8'd1 << clk_pin))
                       | ({7'd0, t_out} << data_pin) | ({7'd0, sck} << clk_pin);
-    reg [7:0] pins_q = 8'hFF;
-    always @(posedge clock) pins_q <= pins_s;
+    reg [7:0] pins_s = 8'hFF, pins_q = 8'hFF;
+    always @(posedge clock) begin pins_s <= sync1; pins_q <= pins_s; end
 
     spex_lane tx (.clock(clock), .clear(init0), `LANE_CFG_CONNECT(1'b0, clk_edge, 1'b0, 1'b1),
-        .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .pins_s(pins_s), .pins_q(pins_q),
+        .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .sync1(sync1),
         .tx_head(tx_head), .tx_empty(1'b0), .out(t_out), .pop(t_pop), .push(t_push),
         .push_data(t_pd), .done_(t_done), .crc_ok(t_crc_ok), .sync_hit(t_sync), .error(t_err),
         .err_kind(t_kind), .active(t_active), .lost(t_lost), .g_tx_bit(t_g), .g_data_left(t_left),
@@ -158,7 +160,7 @@ module lane_loop_props (
         .g_byte(t_byte), .g_left(t_cleft), .g_crc_bad(t_crc_bad), .g_prev(t_prev), .g_mode(t_mode),
         .g_len_cap(t_len[1]), .g_len_known(t_len[0]));
     spex_lane rx (.clock(clock), .clear(init0), `LANE_CFG_CONNECT(1'b1, !clk_edge, 1'b0, 1'b0),
-        .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .pins_s(pins_s), .pins_q(pins_q),
+        .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .sync1(sync1),
         .tx_head(8'hFF), .tx_empty(1'b1), .out(r_out), .pop(r_pop), .push(r_push),
         .push_data(r_pd), .done_(r_done), .crc_ok(r_crc_ok), .sync_hit(r_sync), .error(r_err),
         .err_kind(r_kind), .active(r_active), .lost(r_lost), .g_tx_bit(r_g), .g_data_left(r_left),
@@ -187,6 +189,10 @@ module lane_loop_props (
         assume (!(frame_bits == 16'd0 && stuff != 2'd0 && stuff_len == 3'd1));
         if (init0 || init1) assume (!go && !crc_cmd && !reset);
         if (go) assume (sck == sck_idle && pins_q[clk_pin] == sck_idle);
+        // TX out reaches RX's data register one cycle later than the clock pin reaches
+        // both lanes (out -> sync1 -> d), so a level of sck lasts at least 2 cycles: the
+        // weakest form of the host's SCK <= clk/6 rule that covers it
+        if (!init0 && sck != pins_s[clk_pin]) assume (pins_s[clk_pin] == pins_q[clk_pin]);
     end
 
     // every byte TX pops comes out of RX, in order, before the next pop
@@ -294,18 +300,18 @@ endmodule
 module lane_len_props (
     input clock, `LANE_CFG_PORTS,
     input go, input crc_cmd, input reset,
-    input [7:0] pins_s
+    input [7:0] sync1
 );
     reg init0 = 1'b1, init1 = 1'b1;
     always @(posedge clock) begin init0 <= 1'b0; init1 <= init0; end
-    reg [7:0] pins_q = 8'hFF;
-    always @(posedge clock) pins_q <= pins_s;
+    reg [7:0] pins_s = 8'hFF, pins_q = 8'hFF;
+    always @(posedge clock) begin pins_s <= sync1; pins_q <= pins_s; end
 
     wire out, pop, push, done_, crc_ok, sync_hit, error, active, lost, g_tx_bit, g_data_left;
     wire [7:0] push_data; wire [2:0] err_kind;
     wire [15:0] g_cnt; wire [2:0] g_bitpos; wire [7:0] g_byte, g_lim; wire [15:0] g_sr; wire [1:0] g_mode, g_len;
     spex_lane dut (.clock(clock), .clear(init0), `LANE_CFG_CONNECT(1'b1, clk_edge, readback, 1'b1),
-        .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .pins_s(pins_s), .pins_q(pins_q),
+        .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .sync1(sync1),
         .tx_head(8'hFF), .tx_empty(1'b1), .out(out), .pop(pop), .push(push),
         .push_data(push_data), .done_(done_), .crc_ok(crc_ok), .sync_hit(sync_hit),
         .error(error), .err_kind(err_kind), .active(active), .lost(lost), .g_tx_bit(g_tx_bit),
