@@ -72,6 +72,7 @@ runs:
       run: ./tt/tt_tool.py --create-tt-submission $TT_ARGS
 
     - name: Publish tt_submission artifact
+      continue-on-error: true   # 2026-11-13: a refused upload (storage quota) must not fail the harden
       uses: actions/upload-artifact@v4
       with:
         name: tt_submission

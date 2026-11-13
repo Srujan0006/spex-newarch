@@ -18,7 +18,7 @@ concurrency:
 jobs:
   gds:
     runs-on: ubuntu-24.04
-    timeout-minutes: 180
+    timeout-minutes: 240
     steps:
       - name: checkout repo
         uses: actions/checkout@v6
@@ -57,6 +57,7 @@ jobs:
       # netlists, the step logs and the per-path timing, for 7 days
       - name: Upload the LibreLane metrics, netlists, logs and timing
         if: always()
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: newarch-runs
@@ -69,8 +70,55 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
-  precheck:
+      # 2026-11-13: runs 5, 6 and 6b had every upload refused by the account's artifact storage quota (which counts
+      # use over the billing month), so the precheck job below never got its tt_submission. Run the same precheck
+      # here, on the files in place, and put the results and the routed netlist (gzip + base64) in the job log
+      - name: Routed netlist into the log (gzip, base64)
+        if: always()
+        run: |
+          f=$(ls tt_submission/*.v 2>/dev/null | head -1) || true
+          [ -n "$f" ] || { echo "no tt_submission netlist"; exit 0; }
+          sha256sum "$f"
+          echo "=== BEGIN NETLIST $(basename $f).gz.b64"
+          gzip -9c "$f" | base64 -w 120
+          echo "=== END NETLIST"
+
+      - name: Checkout tt-support-tools for the precheck
+        if: always()
+        uses: actions/checkout@v6
+        with:
+          repository: TinyTapeout/tt-support-tools
+          path: tt_pre
+          ref: ihp-sg13cmos5l
+
+      - name: Install precheck dependencies
+        if: always()
+        working-directory: tt_pre/precheck
+        run: pip install -r requirements.txt
+
+      - name: Install Nix
+        if: always()
+        uses: rikhuijzer/cache-install@c46c673b14b0780c6749d7a45f26ebc07c8c7388  # as tt-gds-action/precheck@3412659
+        with:
+          key: nix-${{ hashFiles('tt_pre/precheck/default.nix') }}
+          nix_file: 'tt_pre/precheck/default.nix'
+
+      - name: Run Tiny Tapeout precheck in this job
+        if: always()
+        working-directory: tt_pre/precheck
+        env:
+          PDK: ihp-sg13cmos5l
+          PDK_ROOT: /home/runner/pdk
+        run: |
+          ls $GITHUB_WORKSPACE/tt_submission/*.gds* > /dev/null 2>&1 || { echo "no GDS: harden did not finish"; exit 1; }
+          nix-build
+          nix-shell --run "python precheck.py --gds $GITHUB_WORKSPACE/tt_submission/*.gds* --tech $PDK" || rc=$?
+          cat reports/results.md | tee -a $GITHUB_STEP_SUMMARY || true
+          exit ${rc:-0}
+
+  precheck:   # needs the tt_submission artifact; while the quota refuses uploads the gds job's own precheck counts
     needs: gds
+    continue-on-error: true
     runs-on: ubuntu-24.04
     steps:
       - name: Run Tiny Tapeout Precheck
