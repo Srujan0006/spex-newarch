@@ -52,13 +52,21 @@ jobs:
           done
           mkdir -p runs/sta_paths && mv sta_paths_*.rpt runs/sta_paths/ || true
 
-      - name: Upload the LibreLane run directory
+      # 2026-11-13: runs 5 and 6 lost every artifact (and so precheck) to the account's artifact storage quota; the whole
+      # run directory was about 250 MB zipped. Keep what the reports and the gate-level replay need: metrics, the final
+      # netlists, the step logs and the per-path timing, for 7 days
+      - name: Upload the LibreLane metrics, netlists, logs and timing
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: newarch-runs
-          path: runs/
-          retention-days: 14
+          path: |
+            runs/wokwi/final/metrics.*
+            runs/wokwi/final/nl/
+            runs/wokwi/final/pnl/
+            runs/wokwi/*/*.log
+            runs/sta_paths/
+          retention-days: 7
           if-no-files-found: warn
 
   precheck:
