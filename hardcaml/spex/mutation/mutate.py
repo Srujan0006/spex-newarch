@@ -115,6 +115,7 @@ LANE_MUTANTS = [
     ("stuff bit one bit early", "let stuff_due = stuff_on &: (run.value ==: c.stuff_len) in",
      "let stuff_due = stuff_on &: (run.value ==: c.stuff_len -:. 1) in"),
     ("stuff bit not complemented", "mux2 (c.stuff ==:. 1) ~:(last.value) gnd", "mux2 (c.stuff ==:. 1) last.value gnd"),
+    ("RX stuff bit taken as a data bit", "let rx_data = ~:stuff_due in", "let rx_data = vdd in"),
     ("CRC feedback ignores the bit", "let fb = b ^: crc.value.:(31) in", "let fb = (b &: gnd) ^: crc.value.:(31) in"),
     ("CRC inversion ignored", "let crc_bit = crc.value.:(31) ^: c.crc_inv in", "let crc_bit = crc.value.:(31) in"),
     ("readback never compares", "&: sample &: (d <>: out.value)", "&: sample &: gnd &: (d <>: out.value)"),

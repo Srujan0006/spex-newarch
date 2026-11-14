@@ -26,7 +26,14 @@ ending at `len_pos`, forms `limit = skip + 8 min(field, len_max)` when below `fr
 and assembles bytes from bit `skip` on; the lane pushes exactly when the reference does,
 the same byte, and is Done only after `limit` data bits. k-induction, k = 12; its lemmas
 read the lane's `g_lim` (length) and `g_sr` (shift register), named for this. Line coding
-and destuffing are left to L2. "Skipped bits left out of the CRC" is not an L5 mutant
+and destuffing were left to L2 until 2026-11-14 (review F5): L5 now also covers NRZI and
+both stuffing modes, its reference decoding NRZI and dropping stuff bits itself (from
+ENGINE.md; a bad stuff bit ends the reference's frame), with lemmas on `g_prev`, `g_run`,
+`g_last`; still pin-clocked (Manchester and the divider are bit timing, L2). Proved, k = 12
+(L6, on the same harness, too). Non-vacuity of the widening: with `-DREACH` a BMC reaches
+a push after a dropped stuff bit in NRZI (step 19), and the new mutant "RX stuff bit taken
+as a data bit", which the NRZ-only L5 could not see, breaks it at step 6; the seven older
+L5 mutants still break it. "Skipped bits left out of the CRC" is not an L5 mutant
 (L5 says nothing about the CRC; `test_bridge.ml` kills it).
 
 P12 (bridge, 2026-11-03): with `rx_to_tx` held, the RX FIFO takes at most one push more than
@@ -75,3 +82,4 @@ L1 (PDR, 31 s), L2, L3 and L5 (k-induction, seconds) prove with `formal/prove_la
 | residual compares the CRC's low half | L6 (CRC residual: crc_ok after each byte) | L6          counterexample: Checking assertions in step 19.. Assert failed (A) Status: FAILED (2026-11-14) |
 | sync_hit not suppressed in residual mode | L6 (CRC residual: crc_ok after each byte) | L6          counterexample: Checking assertions in step 4.. Assert failed (C, sync_hit stays 0) Status: FAILED (2026-11-14) |
 | residual mode: len_en not ignored | L5 (RX skip and length field match the reference) | L5          counterexample: Checking assertions in step 6.. Assert failed (A, pushes) Status: FAILED (2026-11-14); in simulation first SURVIVED (random lane configs rarely reach a field length), killed after test_usb.ml gained a residual-mode packet with len_en set |
+| RX stuff bit taken as a data bit | L5 (RX skip and length field match the reference) | L5          counterexample: Checking assertions in step 6.. Assert failed (A, pushes) Status: FAILED (2026-11-14, L5 widened to NRZI and stuffing); killed in simulation |

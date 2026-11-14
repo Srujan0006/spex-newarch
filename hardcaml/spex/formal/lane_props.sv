@@ -298,8 +298,10 @@ endmodule
 
 // ---------------------------------------------------------------------------------------
 // L5: RX header skip and length field (ENGINE.md, Bit lanes: "Length field"). One RX lane
-// clocked by a pin (clk_pin_en), NRZ, no stuffing: the skip and the length field act on
-// the data bits after line decoding and destuffing, which L2 covers. A reference written
+// clocked by a pin (clk_pin_en), NRZ or NRZI, stuffing off or either mode (NRZ without
+// stuffing only until 2026-11-14, review F5): the reference decodes NRZI and drops stuff
+// bits itself, from ENGINE.md, and a bad stuff bit ends its frame as it ends the lane's.
+// Manchester and the divider are bit timing, which L2 covers. A reference written
 // from ENGINE.md counts the data bits, takes the field (4 bits ending at index len_pos,
 // first received is the MSB), forms limit = skip + 8 min(field, len_max) when shorter than
 // frame_bits, and assembles bytes from data bit `skip` on. The lane's pushes must be the
@@ -330,7 +332,7 @@ module lane_len_props (
     wire out, pop, push, done_, crc_ok, sync_hit, error, active, lost, g_tx_bit, g_data_left;
     wire [7:0] push_data; wire [2:0] err_kind;
     wire [15:0] g_cnt; wire [2:0] g_bitpos; wire [7:0] g_byte, g_lim; wire [15:0] g_sr; wire [1:0] g_mode, g_len;
-    wire [31:0] g_crc; wire g_resid_chk; wire [5:0] g_left;
+    wire [31:0] g_crc; wire g_resid_chk; wire [5:0] g_left; wire [2:0] g_run; wire g_last, g_prev;
     spex_lane dut (.clock(clock), .clear(init0), `LANE_CFG_CONNECT(1'b1, clk_edge, readback, 1'b1),
         .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .sync1(sync1),
         .tx_head(8'hFF), .tx_empty(1'b1), .out(out), .pop(pop), .push(push),
@@ -340,7 +342,7 @@ module lane_len_props (
         .g_mode(g_mode), .g_len_cap(g_len[1]), .g_len_known(g_len[0]), .g_lim(g_lim), .g_sr(g_sr),
         .g_crc(g_crc), .g_left(g_left)
 `ifndef NO_LEMMAS
-        , .g_resid_chk(g_resid_chk)  // lemma only (a mutant may leave the flop unread)
+        , .g_resid_chk(g_resid_chk), .g_run(g_run), .g_last(g_last), .g_prev(g_prev)  // lemma only (a mutant may leave the flop unread)
 `endif
         );
 
@@ -353,7 +355,9 @@ module lane_len_props (
     always @(posedge clock) cfg_q <= `CFG_BUS;
     always @* if (!init0 && !(idle && !go)) assume (`CFG_BUS == cfg_q);
     always @* begin
-        assume (clk_pin_en && code == 2'd0 && stuff == 2'd0 && clk_pin != data_pin);
+        // NRZ or NRZI, either stuffing mode (review F5, 2026-11-14; NRZ without stuffing before)
+        assume (clk_pin_en && code != 2'd2 && code != 2'd3 && clk_pin != data_pin);
+        assume (stuff != 2'd3 && (stuff == 2'd0 || stuff_len != 3'd0));
         if (len_on) assume (skip > len_pos);
         assume ($onehot0({go, crc_cmd}));
         if (init0 || init1) assume (!go && !crc_cmd && !reset);
@@ -362,10 +366,22 @@ module lane_len_props (
     // the line: a data bit is the data pin at a clock-pin edge (after the synchroniser)
     wire cs = pins_s[clk_pin], cq = pins_q[clk_pin];
     wire cedge = clk_edge ? (cq && !cs) : (cs && !cq);
-    wire d = pins_s[data_pin];
+    wire raw = pins_s[data_pin];
+
+    // line decoding and destuffing, from ENGINE.md (RX at each sample point; GO sets
+    // run = 0, last = 1, prev = 1): NRZI's bit is raw == prev; with stuffing on, after
+    // stuff_len equal bits (mode 1) or ones (mode 2) the next bit is a stuff bit, not
+    // counted, and one that is not the complement of last (mode 1) or 0 (mode 2) ends the
+    // frame with a stuff error. The reference follows the line while the lane is in Run
+    reg [2:0] rrun = 3'd0; reg rlast = 1'b1, rprev = 1'b1;
+    wire d = (code == 2'd1) ? (raw == rprev) : raw;
+    wire s_due = stuff != 2'd0 && rrun == stuff_len;
+    wire s_bad = s_due && d != ((stuff == 2'd1) ? !rlast : 1'b0);
+    wire [2:0] rrun_n = (stuff == 2'd2) ? (d ? rrun + 3'd1 : 3'd0)
+                                         : ((rrun != 3'd0 && d == rlast) ? rrun + 3'd1 : 3'd1);
 
     // reference
-    reg run_r = 1'b0;               // between GO and reset
+    reg run_r = 1'b0;               // between GO and reset (or a stuff error)
     reg [15:0] k = 16'd0;           // data bits received
     reg [3:0] fsr = 4'd0;           // the last 4 data bits, first received in bit 3
     reg [3:0] field = 4'd0; reg known = 1'b0;
@@ -373,7 +389,12 @@ module lane_len_props (
     wire [3:0] n = field > len_max ? len_max : field;
     wire [15:0] L = {10'd0, skip} + {9'd0, n, 3'b000};
     wire [15:0] limit = (len_on && known && L < frame_bits) ? L : frame_bits;
-    wire take = run_r && cedge && k < limit;
+    wire bit_r = run_r && active && cedge;
+`ifdef REACH
+    reg seen_stuff = 1'b0;
+    always @(posedge clock) if (go) seen_stuff <= 1'b0; else if (bit_r && s_due && !s_bad) seen_stuff <= 1'b1;
+`endif  // a bit read by the lane (stuff bits included)
+    wire take = bit_r && !s_due && k < limit;
     wire in_bytes = k >= {10'd0, skip};
     wire [7:0] byte_n = lsb_first ? {d, rbyte[7:1]} : {rbyte[6:0], d};
     wire ref_push = take && in_bytes && nb == 3'd7;
@@ -381,11 +402,19 @@ module lane_len_props (
         if (reset) run_r <= 1'b0;  // reset (stop) after the cycle's command, as ENGINE.md
         else if (go) begin
             run_r <= 1'b1; k <= 16'd0; fsr <= 4'd0; known <= 1'b0; nb <= 3'd0; rbyte <= 8'd0;
-        end else if (take) begin
+            rrun <= 3'd0; rlast <= 1'b1; rprev <= 1'b1;
+        end else if (bit_r && s_bad) run_r <= 1'b0;
+        else begin
+          if (bit_r) begin
+            if (code == 2'd1) rprev <= raw;
+            if (stuff != 2'd0) begin rrun <= rrun_n; rlast <= d; end
+          end
+          if (take) begin
             k <= k + 16'd1;
             fsr <= {fsr[2:0], d};
             if (len_on && k == {10'd0, len_pos}) begin field <= {fsr[2:0], d}; known <= 1'b1; end
             if (in_bytes) begin nb <= nb + 3'd1; rbyte <= byte_n; end
+          end
         end
 
 `ifdef L5_LEMMAS
@@ -409,6 +438,9 @@ module lane_len_props (
         // during the data bits the lane's shift register holds the reference's last bits
         if (g_len[1] || k < limit) assert (g_sr[3:0] == fsr);
         assert (!error);
+        // line decoding and stuffing state
+        if (code == 2'd1) assert (g_prev == rprev);
+        if (stuff != 2'd0) assert (g_run == rrun && g_last == rlast);
     end
 `endif
 `endif  // L5_LEMMAS (L5 and L6)
@@ -417,6 +449,11 @@ module lane_len_props (
         assert (push == ref_push);                        // A: pushes when the reference does
         if (push) assert (push_data == byte_n);           // B: the same byte
         if (done_) assert (k == limit);                   // C: Done only after all data bits
+`ifdef REACH
+        // cover, not a property (2026-11-14): with -DREACH a BMC must fail this, showing a
+        // push after a dropped stuff bit in NRZI is reachable (it fails at step 19)
+        assert (!(push && seen_stuff && code == 2'd1));
+`endif
     end
 `endif
 

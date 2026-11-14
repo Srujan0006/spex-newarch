@@ -51,6 +51,7 @@ LANE_TARGETS = {
     "residual compares the CRC's low half": "L6 (CRC residual: crc_ok after each byte)",
     "sync_hit not suppressed in residual mode": "L6 (CRC residual: crc_ok after each byte)",
     "residual mode: len_en not ignored": "L5 (RX skip and length field match the reference)",
+    "RX stuff bit taken as a data bit": "L5 (RX skip and length field match the reference)",
 }
 
 def main():
