@@ -18,6 +18,7 @@
 | change age starts at 0 | KILLED |
 | second-change age starts at 0 | KILLED |
 | FIFO full one entry early | KILLED |
+| FIFO empty from used's low bits (full reads as empty) | KILLED |
 | recover jumps to the start location | KILLED |
 | irq_ack ignored | KILLED |
 | UNEXPECTED ignores the watch mask | KILLED |
@@ -54,6 +55,7 @@
 | rx_to_tx ignored: lane bytes stay in the RX FIFO | KILLED |
 | stuff bit one bit early | KILLED |
 | stuff bit not complemented | KILLED |
+| RX stuff bit taken as a data bit | KILLED |
 | CRC feedback ignores the bit | KILLED |
 | CRC inversion ignored | KILLED |
 | readback never compares | KILLED |
@@ -98,4 +100,4 @@
 | compiler: recover jumps nowhere | KILLED |
 | compiler checks an edge's load after its own END | KILLED |
 
-97/97 killed
+99/99 killed
