@@ -377,21 +377,24 @@ let can_uart_bridge ~can_pin ~uart_pin ~n ~baud =
 
 (* SPI target: cycles from a MISO change to the controller's sampling edge (as the
    engine sees it), set by [Test_spi_target]'s sweep *)
-let spi_target_setup = 2
+let spi_target_setup = 3
 
 (** SPI target, any mode ([cpol], [cpha] in 0/1), MSB first. Follows the controller's
     SCK edges: each byte received on MOSI goes to the RX FIFO, and each byte sent on
     MISO comes from the TX FIFO (0xFF when it is empty). MISO is released while CS is
-    high. Inside a byte every SCK edge is a self-loop (no entry cost); between bytes
-    the spec passes through one or two other locations (about 6 to 11 cycles), which
-    sets the top SCK speed. Overspeed is a violation, not silent corruption.
+    high. Inside a byte every SCK edge is a self-loop (no entry cost); around the byte
+    boundary the spec passes through location [last], at most one location entry per SCK
+    half period (before 2026-11-14 two entries fell into one half period). Top speed at
+    40 MHz: 5.00 MHz CPHA 0, 4.00 MHz CPHA 1 (was 2.22 / 2.50) [Measured:
+    test_spi_target.ml]. Overspeed is a violation (UNEXPECTED or AMBIGUOUS), never silent
+    corruption: the test checks every faster half period down to 2 cycles.
     **Rule: the controller's sampling SCK edge (leading for CPHA 0, trailing for CPHA 1)
-    must arrive at least [setup] = 2 engine cycles after MISO changes.** Each MISO change
+    must arrive at least [setup] = 3 engine cycles after MISO changes.** Each MISO change
     resets clock 1 and the sampling edge's guard is [after ~clk:1 setup], judged when the
-    edge arrived (ENGINE.md: windows use the change's age). 2 is the largest value that
-    keeps the top speed (2.22 MHz CPHA 0, 2.50 MHz CPHA 1 at 40 MHz). An edge that comes earlier, or
-    that waited through a FETCH between bytes, matches no edge of the watched "xfer"
-    location and is UNEXPECTED (the engine halts). The other locations watch SCK too.
+    edge arrived (ENGINE.md: windows use the change's age). 3 is the largest value that
+    keeps the top speed (4 gives 4.00 / 3.33 MHz). An edge that comes earlier matches no
+    edge of the watched location and is UNEXPECTED (the engine halts). Every location but
+    [idle] watches SCK.
     A partial byte when CS rises is dropped. *)
 let spi_target ?(setup = spi_target_setup) ~cpol ~cpha ~cs ~sck ~mosi ~miso () =
   let lead g = if cpol = 0 then rises sck g else falls sck g in
@@ -402,16 +405,23 @@ let spi_target ?(setup = spi_target_setup) ~cpol ~cpha ~cs ~sck ~mosi ~miso () =
   let shift_out g = g |> send_bit miso |> tx Tx_op.shift |> reset 1 in
   let in_time g = g |> after ~clk:1 setup in
   let name = Printf.sprintf "spi_target_mode%d" ((2 * cpol) + cpha) in
+  (* The byte boundary (review F3, 2026-11-14): an edge cannot load tx_sr and send its
+     first bit (send_bit sends the old tx_sr[0]), and a self-loop byte boundary needs
+     more than the 4 edges a location has, so the boundary passes through [last]; the
+     next byte is loaded early (CPHA 0: with the last bit's send, which still sends the
+     old byte's bit 0; CPHA 1: with the eighth sample) so that no SCK half period holds
+     more than one location entry. *)
   if cpha = 0
   then
     (* CPHA 0: data out before the first leading edge, sample on leading edges,
-       change on trailing edges *)
+       change on trailing edges. cnt counts samples from 7: the seventh trailing edge
+       sees 0 *)
     { name
     ; locs =
         [ loc
             "idle"
             ~entry:(nop |> release miso)
-            [ edge ~goto:"first" (always |> falls cs) (nop |> tx Tx_op.load_rev |> cnt Cnt_op.load8) ]
+            [ edge ~goto:"first" (always |> falls cs) (nop |> tx Tx_op.load_rev |> cnt Cnt_op.load7) ]
         ; loc
             "first"
             ~watch:(bit sck)
@@ -422,20 +432,24 @@ let spi_target ?(setup = spi_target_setup) ~cpol ~cpha ~cs ~sck ~mosi ~miso () =
             [ deselect
             ; edge ~goto:"xfer" (always |> lead |> in_time) (nop |> sample |> cnt Cnt_op.dec)
             ; edge
-                ~goto:"next"
+                ~goto:"last"
                 (always |> trail |> flag Flag.cnt_zero)
-                (nop |> tx Tx_op.load_rev |> cnt Cnt_op.load8)
+                (nop |> send_bit miso |> tx Tx_op.load_rev |> reset 1)
             ; edge ~goto:"xfer" (always |> trail) (nop |> shift_out)
             ]
         ; loc
-            "next"
+            "last"
             ~watch:(bit sck)
-            [ edge ~goto:"xfer" (always |> sck_idle) (nop |> shift_out |> rx Rx_op.push) ]
+            [ deselect
+            ; edge ~goto:"last" (always |> lead |> in_time) (nop |> sample)
+            ; edge ~goto:"xfer" (always |> trail) (nop |> shift_out |> rx Rx_op.push |> cnt Cnt_op.load7)
+            ]
         ]
     }
   else
     (* CPHA 1: change on leading edges, sample on trailing edges. The counter starts
-       at 7 so that the eighth sample is the one that sees cnt = 0. *)
+       at 7 so that the eighth sample is the one that sees cnt = 0. The byte is pushed
+       with the next byte's first leading edge, or when CS rises after it *)
     { name
     ; locs =
         [ loc
@@ -448,15 +462,17 @@ let spi_target ?(setup = spi_target_setup) ~cpol ~cpha ~cs ~sck ~mosi ~miso () =
             [ deselect
             ; edge ~goto:"xfer" (always |> lead) (nop |> shift_out)
             ; edge
-                ~goto:"next"
+                ~goto:"last"
                 (always |> trail |> in_time |> flag Flag.cnt_zero)
-                (nop |> sample |> tx Tx_op.load_rev |> cnt Cnt_op.load7)
+                (nop |> sample |> tx Tx_op.load_rev)
             ; edge ~goto:"xfer" (always |> trail |> in_time) (nop |> sample |> cnt Cnt_op.dec)
             ]
         ; loc
-            "next"
+            "last"
             ~watch:(bit sck)
-            [ edge ~goto:"xfer" (always |> sck_idle) (nop |> rx Rx_op.push) ]
+            [ edge ~goto:"idle" (always |> rises cs) (nop |> release miso |> rx Rx_op.push)
+            ; edge ~goto:"xfer" (always |> lead) (nop |> shift_out |> rx Rx_op.push |> cnt Cnt_op.load7)
+            ]
         ]
     }
 ;;
