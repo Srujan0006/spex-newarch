@@ -104,7 +104,7 @@ commit 50b0353 on `new-arch` (no entry-time fix, no real SPI host port). Merge i
   still in `changed_all` on the first EVAL cycle, and in EVAL a change on a watched pin
   either fires an edge or is UNEXPECTED. **All six properties are proved unbounded.**
   Non-vacuity (`formal/vacuity.md`): P1 fails on the edge-priority mutant, P3 on the
-  lost-changes mutant, P2, P4 and P6 on theirs; P5 (TX FIFO flags) has no mutant yet.
+  lost-changes mutant, P2, P4 and P6 on theirs; P5 (TX FIFO flags) has no mutant yet (added 2026-11-14: "FIFO empty from used's low bits", see PROGRESS).
   Found while writing P3: **a `start` pulse while the engine is running restarts it
   and drops the changes latched so far.** That is reasonable, but ENGINE.md doesn't say
   it; now noted in ENGINE.md.

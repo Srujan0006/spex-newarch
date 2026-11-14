@@ -1,6 +1,6 @@
 # SPEX: a chip that executes protocol specifications
 
-An entry for the [Jane Street protocol emulator ASIC competition](https://blog.janestreet.com/protocol-emulator-asic-competition/): Tiny Tapeout, IHP SG13CMOS5L, 8x4 tiles planned, deadline 2027-01-18.
+An entry for the [Jane Street protocol emulator ASIC competition](https://blog.janestreet.com/protocol-emulator-asic-competition/): Tiny Tapeout, IHP SG13CMOS5L, 8x4 tiles, deadline 2027-01-18.
 
 SPEX does not run a program. It runs a **timed-automaton specification** of the protocol: locations, clocks, timing windows and pin events. The same spec runs in four roles:
 
@@ -11,14 +11,15 @@ SPEX does not run a program. It runs a **timed-automaton specification** of the 
 | Stress | drives at the earliest, latest, random or swept edge of every legal timing window |
 | Cover | records which spec transitions a device exercised, and the minimum and maximum measured timing of each |
 
-The specs are model-checked at design time with TChecker. The hardware is meant to be proven to follow any loaded spec.
+The engine is checked against an independent reference model on every cycle of every test, and formal proofs on the RTL hold for every spec that could be loaded (the SRAM contents are free in the proofs). The v1 specs were model-checked with TChecker; the new_arch specs are not yet.
 
-**Status:** pre-RTL, week 1. See `docs/notes/GATE_A.md`.
+**Status (2026-11-14):** the new_arch engine (Hardcaml, `hardcaml/spex/`) hardens at 8x4: LVS clean, 0 DRC, Tiny Tapeout precheck 9/9, 56.0 MHz at the slow corner, and the routed netlist matches the Hardcaml simulation through the chip's pins. Details and evidence: `hardcaml/spex/PROGRESS.md`; the submission draft is `hardcaml/spex/docs/submission-draft.md`.
 
 ## Start here
 
-- `docs/SEMANTICS.md`: normative semantics (draft).
-- `docs/DECISIONS.md`: decision log.
+- `hardcaml/spex/README.md`: the new_arch engine (build, tests, proofs, harden).
+- `hardcaml/spex/ENGINE.md`: its cycle-by-cycle semantics.
+- `docs/SEMANTICS.md`, `docs/DECISIONS.md`: the v1 semantics and decision log.
 
 ## Layout
 

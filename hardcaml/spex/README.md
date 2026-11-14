@@ -1,10 +1,10 @@
 # SPEX in Hardcaml
 
 SPEX is a protocol-emulator engine for the Jane Street ASIC competition (IHP 130 nm,
-Tiny Tapeout 6x4). It runs a protocol **spec** (a timed automaton) instead of a
-program, and the same spec works in three roles: **Drive** a bus, **Check** another
-device against the spec with exact violation timestamps, and **Stress** its timing
-windows; **Cover** (edge counts and timing margins) can be switched on in any role.
+Tiny Tapeout 8x4). It runs a protocol **spec** (a timed automaton) instead of a
+program, and the same spec works in four roles: **Drive** a bus, **Check** another
+device against the spec with exact violation timestamps, **Stress** its timing
+windows, and **Cover** (edge counts and timing margins, switched on in any role).
 
 | Start here | |
 |---|---|
@@ -22,7 +22,7 @@ python3 mutation/mutate.py                 # mutation test of the RTL
 # host loader: Loader.of_spec (image: header, store zero-filled to 64 locations, CRC-32),
 # Loader.load transport image (checks, SPI frames, verify, image_valid), Loader.start (src/loader.ml)
 formal/prove.sh                            # formal proofs (Yosys + ABC PDR) on out/spex_core.v
-formal/prove_lanes.sh                      # bit-lane proofs L1-L3, L5 on out/spex_lane.v
+formal/prove_lanes.sh                      # bit-lane proofs L1-L3, L5, L6 on out/spex_lane.v
 python3 formal/vacuity.py                  # each property must fail on a mutant
 # chip-level replay through the pins (vectors.exe writes out/tb_chip.v), with the IHP SRAM
 # models; for the gate-level replay replace spex_chip.v and project.v by the routed netlist
