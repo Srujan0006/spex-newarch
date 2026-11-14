@@ -479,17 +479,34 @@ let spi_target ?(setup = spi_target_setup) ~cpol ~cpha ~cs ~sck ~mosi ~miso () =
 
 (** I2C target at the 7-bit address in the host's [match_addr] CSR. SCL and SDA
     must be open-drain. Write transactions: ACKs its address and every byte, and
-    pushes each data byte into the RX FIFO. Read transactions: sends TX FIFO bytes
-    (0xFF when empty) until the controller NACKs. Another address is ignored until
+    pushes each data byte into the RX FIFO. Read transactions: sends TX FIFO bytes until
+    the controller NACKs, stretching the clock while the TX FIFO is empty (below). Another address is ignored until
     the next START. A STOP or START in the middle of a byte is a clean recovery: the
     partial byte is dropped and the spec goes back to idle (STOP) or to the address
-    byte (repeated START). No clock stretching. *)
-let i2c_target ~scl ~sda =
+    byte (repeated START).
+    **Clock stretching** (review F4, 2026-11-14): when a write byte arrives and the RX
+    FIFO is full, or a read byte is due and the TX FIFO is empty, the target holds SCL
+    low from the falling edge that ends the byte (write) or the ACK (read) until the
+    host pops a byte (write) or pushes one (read); it then pushes and drives the ACK
+    (write) or loads and drives the first data bit (read), and releases SCL [su]
+    cycles later, the data setup time (UM10204 tSU;DAT: 250 ns standard mode, 100 ns
+    fast mode [Memory]; the default 12 cycles is 300 ns at 40 MHz; [su] must exceed the
+    5-cycle location entry, as the window is exact). With room or data
+    the timing is as before and SCL is never touched. *)
+let i2c_target ?(su = 12) ~scl ~sda () =
   let start = always |> falls sda |> pin_hi scl in
   let stop = always |> rises sda |> pin_hi scl in
   let on_stop = edge ~goto:"idle" stop (nop |> release sda) in
   let on_start = edge ~goto:"addr" start (nop |> release sda |> cnt Cnt_op.load8) in
   let sample = nop |> rx ~pin:sda Rx_op.shift_msb |> cnt Cnt_op.dec in
+  (* read: the next byte is loaded while SCL is still high if TX has one; else the
+     falling edge is held (stretch) until it has *)
+  let rd_next =
+    [ on_stop
+    ; edge ~goto:"rd_go" (always |> pin_hi scl |> not_flag Flag.tx_empty) (nop |> tx Tx_op.load_rev)
+    ; edge ~goto:"rd_wait" (always |> falls scl) (nop |> set scl false)
+    ]
+  in
   { name = "i2c_target"
   ; locs =
       [ loc "idle" ~entry:(nop |> release sda) [ on_start ]
@@ -503,17 +520,12 @@ let i2c_target ~scl ~sda =
       ; loc
           "a_ack"
           [ edge ~goto:"idle" (always |> not_flag Flag.addr_match) nop
-          ; edge ~goto:"a_ack2" always (nop |> set sda false |> tx Tx_op.load_rev)
+          ; edge ~goto:"rd_next" (always |> flag Flag.rx_bit0) (nop |> set sda false)
+          ; edge ~goto:"a_ack2" always (nop |> set sda false)
           ]
       ; loc
           "a_ack2"
-          [ on_stop
-          ; edge
-              ~goto:"rd"
-              (always |> falls scl |> flag Flag.rx_bit0)
-              (nop |> send_bit sda |> tx Tx_op.shift |> cnt Cnt_op.load7)
-          ; edge ~goto:"data" (always |> falls scl) (nop |> release sda |> cnt Cnt_op.load8)
-          ]
+          [ on_stop; edge ~goto:"data" (always |> falls scl) (nop |> release sda |> cnt Cnt_op.load8) ]
       ; loc
           "data"
           [ on_stop
@@ -521,10 +533,35 @@ let i2c_target ~scl ~sda =
           ; edge ~goto:"data" (always |> rises scl) sample
           ; edge ~goto:"d_ack" (always |> falls scl |> flag Flag.cnt_zero) nop
           ]
-      ; loc "d_ack" [ edge ~goto:"d_ack2" always (nop |> set sda false |> rx Rx_op.push) ]
+      ; loc
+          "d_ack"
+          [ edge ~goto:"d_wait" (always |> flag Flag.rx_full) (nop |> set scl false)
+          ; edge ~goto:"d_ack2" always (nop |> set sda false |> rx Rx_op.push)
+          ]
+      ; (* write stretch: SCL held low until the RX FIFO has room *)
+        loc
+          "d_wait"
+          [ edge ~goto:"d_rel" (always |> not_flag Flag.rx_full) (nop |> set sda false |> rx Rx_op.push |> reset 0) ]
+      ; loc "d_rel" [ edge ~goto:"d_ack2" (always |> at su) (nop |> release scl) ]
       ; loc
           "d_ack2"
           [ edge ~goto:"data" (always |> falls scl) (nop |> release sda |> cnt Cnt_op.load8) ]
+      ; loc "rd_next" rd_next
+      ; loc
+          "rd_go"
+          [ on_stop
+          ; edge
+              ~goto:"rd"
+              (always |> falls scl)
+              (nop |> send_bit sda |> tx Tx_op.shift |> cnt Cnt_op.load7)
+          ]
+      ; (* read stretch: SCL held low until the TX FIFO has a byte; load it, drive its
+           first bit, release SCL after the setup time *)
+        loc "rd_wait" [ edge ~goto:"rd_send" (always |> not_flag Flag.tx_empty) (nop |> tx Tx_op.load_rev) ]
+      ; loc
+          "rd_send"
+          [ edge ~goto:"rd_rel" always (nop |> send_bit sda |> tx Tx_op.shift |> cnt Cnt_op.load7 |> reset 0) ]
+      ; loc "rd_rel" [ edge ~goto:"rd" (always |> at su) (nop |> release scl) ]
       ; loc
           "rd"
           [ on_stop
@@ -538,15 +575,7 @@ let i2c_target ~scl ~sda =
           "rd_ack"
           [ on_stop
           ; edge ~goto:"rd_end" (always |> rises scl |> pin_hi sda) nop
-          ; edge ~goto:"rd_more" (always |> rises scl |> pin_lo sda) nop
-          ]
-      ; loc
-          "rd_more"
-          ~entry:(nop |> tx Tx_op.load_rev)
-          [ edge
-              ~goto:"rd"
-              (always |> falls scl)
-              (nop |> send_bit sda |> tx Tx_op.shift |> cnt Cnt_op.load7)
+          ; edge ~goto:"rd_next" (always |> rises scl |> pin_lo sda) nop
           ]
       ; loc "rd_end" [ on_stop; on_start ]
       ]

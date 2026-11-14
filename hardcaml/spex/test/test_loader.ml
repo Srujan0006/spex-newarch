@@ -54,7 +54,7 @@ let%expect_test "full load over SPI over a larger spec, verify, image_valid, sta
   let w = ref 0 in
   let tr = transport t w in
   (* leave another spec's records in the store first *)
-  printf "first spec: %s\n" (show (Loader.load tr (Loader.of_spec (Protocols.i2c_target ~scl:0 ~sda:1))));
+  printf "first spec: %s\n" (show (Loader.load tr (Loader.of_spec (Protocols.i2c_target ~scl:0 ~sda:1 ()))));
   (* and junk in the last location, which only the zero fill clears *)
   ignore (tr ([ S.Space.records; (63 lsl 6) lsr 8; (63 lsl 6) land 0xFF ] @ List.init 64 ~f:(fun k -> k + 1)) : int list);
   w := 0;
