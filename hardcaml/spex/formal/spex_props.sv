@@ -14,8 +14,8 @@ module spex_props (
     input host_verify, input [31:0] host_crc_expect, input host_crc_expect_we,
     input [2:0] host_rx_wm, input [2:0] host_tx_wm, input host_tx_wm_en, input host_drop_clear,
     input host_rx_to_tx,
-    input [5:0] host_lane0_skip, input host_lane0_len_en, input [5:0] host_lane0_len_pos, input [3:0] host_lane0_len_max,
-    input [5:0] host_lane1_skip, input host_lane1_len_en, input [5:0] host_lane1_len_pos, input [3:0] host_lane1_len_max,
+    input [5:0] host_lane0_skip, input host_lane0_len_en, input [5:0] host_lane0_len_pos, input [3:0] host_lane0_len_max, input host_lane0_crc_resid,
+    input [5:0] host_lane1_skip, input host_lane1_len_en, input [5:0] host_lane1_len_pos, input [3:0] host_lane1_len_max, input host_lane1_crc_resid,
     // bit lanes (new-arch): lane configurations and pin source select, all free
     input host_lane0_clk_edge, input [2:0] host_lane0_clk_pin, input host_lane0_clk_pin_en, input [1:0] host_lane0_code, input host_lane0_crc_inv, input [5:0] host_lane0_crc_width, input [2:0] host_lane0_data_pin, input host_lane0_dir, input [7:0] host_lane0_div_frac, input [15:0] host_lane0_div_int, input [15:0] host_lane0_frame_bits, input [31:0] host_lane0_init, input host_lane0_lsb_first, input [31:0] host_lane0_poly, input host_lane0_readback, input [1:0] host_lane0_stuff, input [2:0] host_lane0_stuff_len, input [15:0] host_lane0_sync, input [15:0] host_lane0_sync_mask, input host_lane1_clk_edge, input [2:0] host_lane1_clk_pin, input host_lane1_clk_pin_en, input [1:0] host_lane1_code, input host_lane1_crc_inv, input [5:0] host_lane1_crc_width, input [2:0] host_lane1_data_pin, input host_lane1_dir, input [7:0] host_lane1_div_frac, input [15:0] host_lane1_div_int, input [15:0] host_lane1_frame_bits, input [31:0] host_lane1_init, input host_lane1_lsb_first, input [31:0] host_lane1_poly, input host_lane1_readback, input [1:0] host_lane1_stuff, input [2:0] host_lane1_stuff_len, input [15:0] host_lane1_sync, input [15:0] host_lane1_sync_mask, input [23:0] host_pin_src
 );

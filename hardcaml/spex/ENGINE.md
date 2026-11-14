@@ -289,7 +289,7 @@ insert the complement (CAN), 2 after `stuff_len` ones insert a 0 (USB)); CRC `po
 `sync` and `sync_mask` (16 bits); `data_pin`; `lsb_first`; `readback` (TX); `frame_bits`
 (16 bits, written by the host per frame); RX only: `skip` (6 bits, leading data bits not
 put into bytes), `len_en`, `len_pos` (6 bits) and `len_max` (4 bits) for a frame length
-taken from a 4-bit length field (CAN DLC).
+taken from a 4-bit length field (CAN DLC); `crc_resid` (RX, CRC residual mode, below).
 
 **State:** `mode` (Idle, Armed, Run, Done); phase `ph`, fraction `acc`, `extra`; data
 bits so far `cnt`; `bitpos` (0..7) and `byte`; `crc` (32), `crc_left`, `crc_bad`; stuffing
@@ -364,6 +364,26 @@ identifier): `skip` 39, `len_pos` 38, `frame_bits` 103. One configuration takes 
 format. A remote frame (RTR 1) has a DLC but no data: the lane expects data and reports
 a CRC or stuff error (DLC 0: a good frame with nothing to push). TX lanes ignore these
 fields.
+**CRC residual (RX, `crc_resid`).** For frames that a command ends (`END`, for example on
+USB's end of packet) rather than a count, so neither the length nor a header folded into
+`init` need be known in advance. The host receives the CRC field as data (`crc_width` 0:
+the CRC bytes are pushed like the rest) and sets `frame_bits` to the longest frame. With
+`crc_resid`:
+- `len_en` is ignored and `len_pos` is the **CRC start**: data bits with index below
+  `len_pos` do not enter the CRC (`crc` stays at `init`), so a header the host does not
+  know (USB's PID) can still be pushed (`skip` ≤ `len_pos`) without entering the CRC;
+- `sync` / `sync_mask` hold the **residual**, compared with `crc[31:16]` (CRCs up to 16
+  bits; the residual left-aligned at bit 15, as `poly`), and `sync_hit` stays 0;
+- in the cycle after each byte is pushed at a byte boundary (a full byte, not the partial
+  byte of an END), `crc_ok = ((crc[31:16] xor sync) and sync_mask) == 0`. It is not sticky:
+  each byte boundary sets or clears it, so after an `END` it tells whether the frame up to
+  its last whole byte ended on a good CRC. GO and the reset command clear it.
+The flag codes are unchanged (8 + 4 l + 1 is `crc_ok`). TX lanes ignore `crc_resid`.
+USB low speed, DATA0 / DATA1 of any length: NRZI, stuffing 2 / 6, LSB first, `poly`
+0x8005 << 16, `init` 0xFFFF << 16, `crc_width` 0, `skip` 8 (SYNC), `len_pos` 16 (SYNC and
+PID outside the CRC), residual `sync` 0x800D with `sync_mask` 0xFFFF, `frame_bits` 96 (SYNC,
+PID, 8 data bytes and the CRC); the RX FIFO gets the PID, the data and the 2 CRC bytes.
+
 An RX frame with `frame_bits = 0` and no CRC still takes one sample (step 2 with nothing
 to receive) before Done; with stuffing and `stuff_len = 1` that sample can make a stuff
 bit due, so the lane waits for it. Do not use an empty RX frame with `stuff_len = 1`.

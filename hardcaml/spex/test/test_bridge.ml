@@ -22,6 +22,7 @@ let std_cfg : int Layout.Lane_cfg.t =
   ; len_en = 1
   ; len_pos = 18
   ; len_max = 8
+  ; crc_resid = 0
   }
 ;;
 

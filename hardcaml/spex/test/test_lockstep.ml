@@ -181,11 +181,11 @@ let%expect_test "random specs: RTL and model agree on every output, every cycle"
   printf "runs ending with: coverage overrun %d, halted on violation %d, rx overflow %d, log overflow %d\n"
     stats.(1) stats.(2) stats.(3) stats.(4);
   [%expect {|
-    runs where a lane left Idle 16, cycles with a push waiting 0, runs ending with a lane error 2
+    runs where a lane left Idle 14, cycles with a push waiting 0, runs ending with a lane error 2
     image checks passed during the runs 0, runs whose first host error is a refused start 3
-    runs ending with a non-zero drop counter 16, with tx_collision set 0
+    runs ending with a non-zero drop counter 15, with tx_collision set 0
     300 specs x 3000 cycles = 900000 cycles in lockstep, no mismatch
-    runs ending with: coverage overrun 1, halted on violation 120, rx overflow 2, log overflow 12
+    runs ending with: coverage overrun 1, halted on violation 129, rx overflow 3, log overflow 10
     |}]
 ;;
 
@@ -249,5 +249,5 @@ let%expect_test "lanes and the engine push into the RX FIFO together: RTL and mo
   printf "40 runs x 4000 cycles in lockstep; runs where a push waited %d, cycles with a push waiting %d\n"
     !runs_with_wait !waits;
   ignore !pushed;
-  [%expect {| 40 runs x 4000 cycles in lockstep; runs where a push waited 29, cycles with a push waiting 147 |}]
+  [%expect {| 40 runs x 4000 cycles in lockstep; runs where a push waited 28, cycles with a push waiting 167 |}]
 ;;

@@ -76,6 +76,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let len_cap = rv 1 in
   let len_known = rv 1 in
   let lim = rv 8 in
+  (* CRC residual: a byte was pushed last cycle; compare the CRC now (registered inputs) *)
+  let resid_chk = rv 1 in
+  ignore (resid_chk.value -- "g_resid_chk" : Signal.t);
   (* named for the helper lemmas in formal/lane_props.sv *)
   ignore (cnt.value -- "g_cnt" : Signal.t);
   ignore (crc.value -- "g_crc" : Signal.t);
@@ -188,6 +191,10 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   (* data bits before [skip] go into the CRC and [sr] but not into a byte *)
   let past_skip = (select cnt.value 15 6 <>:. 0) |: (select cnt.value 5 0 >=: c.skip) in
   let rx_byte = rx_take &: past_skip in
+  (* CRC residual mode: data bits below len_pos stay out of the CRC *)
+  let crc_in =
+    ~:(c.crc_resid) |: (select cnt.value 15 6 <>:. 0) |: (select cnt.value 5 0 >=: c.len_pos)
+  in
   let push = rx_byte &: (bitpos.value ==:. 7) in
   let rx_crc = rx_step &: rx_data &: ~:data_avail &: crc_avail in
   let crc_bad_next = crc_bad.value |: (rbit <>: crc_bit) in
@@ -267,15 +274,15 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
                 rx_data
                 [ sr <-- sr_next
                 ; when_
-                    ((sr_next ^: c.sync) &: c.sync_mask ==:. 0)
+                    (~:(c.crc_resid) &: ((sr_next ^: c.sync) &: c.sync_mask ==:. 0))
                     [ sync_hit <--. 1 ]
                 ; when_
                     rx_take
-                    [ crc <-- crc_next rbit
+                    [ when_ crc_in [ crc <-- crc_next rbit ]
                     ; cnt <-- cnt.value +:. 1
                     ; when_ rx_byte [ byte <-- byte_rx; bitpos <-- bitpos.value +:. 1 ]
                     ; when_
-                        (c.len_en &: (select cnt.value 15 6 ==:. 0) &: (select cnt.value 5 0 ==: c.len_pos))
+                        (c.len_en &: ~:(c.crc_resid) &: (select cnt.value 15 6 ==:. 0) &: (select cnt.value 5 0 ==: c.len_pos))
                         [ len_cap <--. 1 ]
                     ]
                 ; when_
@@ -299,6 +306,12 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
            let l = uresize c.skip 8 +: concat_msb [ zero 1; n; zero 3 ] in
            when_ (uresize l 16 <: c.frame_bits) [ lim <-- l; len_known <--. 1 ])
         ]
+    ; (* CRC residual: the result for the byte pushed last cycle (after the counted CRC
+         check, which crc_width 0 leaves idle; before the commands, so GO wins) *)
+      resid_chk <-- (push &: c.crc_resid &: ~:(i.go) &: ~:(i.reset))
+    ; when_
+        resid_chk.value
+        [ crc_ok <-- ((select crc.value 31 16 ^: c.sync) &: c.sync_mask ==:. 0) ]
     ; (* commands, after this cycle's step *)
       when_ i.end_ [ mode <--. m_idle; out <--. 1 ]
     ; when_

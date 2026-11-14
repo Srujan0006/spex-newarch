@@ -2,7 +2,8 @@
 // against ENGINE.md (Bit lanes), not against lane.ml. Every configuration, command
 // sequence, TX FIFO byte and pin input is free, except as assumed below. The header skip
 // and length field (skip, len_en, len_pos, len_max) are free on every TX lane (ENGINE.md:
-// TX lanes ignore them), off on the RX lane of L2, and free on the RX lane of L5. One group per
+// TX lanes ignore them), off on the RX lane of L2, and free on the RX lane of L5 / L6. So is
+// crc_resid (CRC residual mode). One group per
 // run (prove_lanes.sh), each guarded by `ifdef L<n>`.
 //   L1  stuffing: the line never shows more than stuff_len equal bits (mode 1, CAN) or
 //       stuff_len ones (mode 2, USB) in a row
@@ -10,6 +11,12 @@
 //   L2  (lane_loop_props) TX -> RX loopback returns every byte, in order, with crc_ok
 //   L5  (lane_len_props) RX header skip and length field: the pushes and Done match a
 //       reference of ENGINE.md
+//   L6  (lane_len_props) RX CRC residual mode: after each pushed byte crc_ok is the residual
+//       compare of a reference CRC that leaves out the data bits below len_pos; crc_ok
+//       changes at no other time; sync_hit stays 0
+//   L6  (lane_len_props) RX CRC residual mode: after each pushed byte crc_ok is the residual
+//       compare of a reference CRC that leaves out the data bits below len_pos; crc_ok
+//       changes at no other time; sync_hit stays 0
 
 // The configuration a test drives into one lane.
 `define LANE_CFG_PORTS \
@@ -18,7 +25,7 @@
     input [15:0] frame_bits, input [31:0] init, input lsb_first, input [31:0] poly, \
     input readback, input [1:0] stuff, input [2:0] stuff_len, input [15:0] sync, \
     input [15:0] sync_mask, input [5:0] skip, input len_en, input [5:0] len_pos, \
-    input [3:0] len_max
+    input [3:0] len_max, input crc_resid
 
 // rxf_v = 1: the skip and length-field inputs reach the lane; 0: tied off
 `define LANE_CFG_CONNECT(dir_v, edge_v, rb_v, rxf_v) \
@@ -28,11 +35,12 @@
     .cfg_crc_inv(crc_inv), .cfg_sync(sync), .cfg_sync_mask(sync_mask), .cfg_data_pin(data_pin), \
     .cfg_lsb_first(lsb_first), .cfg_readback(rb_v), .cfg_frame_bits(frame_bits), \
     .cfg_skip(rxf_v ? skip : 6'd0), .cfg_len_en(rxf_v ? len_en : 1'b0), \
-    .cfg_len_pos(rxf_v ? len_pos : 6'd0), .cfg_len_max(rxf_v ? len_max : 4'd0)
+    .cfg_len_pos(rxf_v ? len_pos : 6'd0), .cfg_len_max(rxf_v ? len_max : 4'd0), \
+    .cfg_crc_resid(rxf_v ? crc_resid : 1'b0)
 
 `define CFG_BUS {clk_edge, clk_pin, clk_pin_en, code, crc_inv, crc_width, data_pin, div_frac, \
     div_int, frame_bits, init, lsb_first, poly, readback, stuff, stuff_len, sync, sync_mask, \
-    skip, len_en, len_pos, len_max}
+    skip, len_en, len_pos, len_max, crc_resid}
 
 // ---------------------------------------------------------------------------------------
 // One TX lane: L1, L3
@@ -297,6 +305,18 @@ endmodule
 // frame_bits, and assembles bytes from data bit `skip` on. The lane's pushes must be the
 // reference's, in the same cycle with the same byte, and Done must come only after all
 // `limit` data bits. The host rule skip > len_pos (with len_en) is assumed; no END.
+// L6 reuses L5's reference and lemmas, and (as lemmas) L5's assertions, except in the
+// NO_LEMMAS mutant runs, where an L6 run checks the L6 assertions alone
+`ifdef L5
+`define L5_LEMMAS
+`define L5_MAINS
+`endif
+`ifdef L6
+`define L5_LEMMAS
+`ifndef NO_LEMMAS
+`define L5_MAINS
+`endif
+`endif
 module lane_len_props (
     input clock, `LANE_CFG_PORTS,
     input go, input crc_cmd, input reset,
@@ -310,13 +330,22 @@ module lane_len_props (
     wire out, pop, push, done_, crc_ok, sync_hit, error, active, lost, g_tx_bit, g_data_left;
     wire [7:0] push_data; wire [2:0] err_kind;
     wire [15:0] g_cnt; wire [2:0] g_bitpos; wire [7:0] g_byte, g_lim; wire [15:0] g_sr; wire [1:0] g_mode, g_len;
+    wire [31:0] g_crc; wire g_resid_chk; wire [5:0] g_left;
     spex_lane dut (.clock(clock), .clear(init0), `LANE_CFG_CONNECT(1'b1, clk_edge, readback, 1'b1),
         .go(go), .end_(1'b0), .crc_cmd(crc_cmd), .reset(reset), .sync1(sync1),
         .tx_head(8'hFF), .tx_empty(1'b1), .out(out), .pop(pop), .push(push),
         .push_data(push_data), .done_(done_), .crc_ok(crc_ok), .sync_hit(sync_hit),
         .error(error), .err_kind(err_kind), .active(active), .lost(lost), .g_tx_bit(g_tx_bit),
         .g_data_left(g_data_left), .g_cnt(g_cnt), .g_bitpos(g_bitpos), .g_byte(g_byte),
-        .g_mode(g_mode), .g_len_cap(g_len[1]), .g_len_known(g_len[0]), .g_lim(g_lim), .g_sr(g_sr));
+        .g_mode(g_mode), .g_len_cap(g_len[1]), .g_len_known(g_len[0]), .g_lim(g_lim), .g_sr(g_sr),
+        .g_crc(g_crc), .g_left(g_left)
+`ifndef NO_LEMMAS
+        , .g_resid_chk(g_resid_chk)  // lemma only (a mutant may leave the flop unread)
+`endif
+        );
+
+    // CRC residual mode ignores len_en (len_pos is then the CRC start)
+    wire len_on = len_en && !crc_resid;
 
     // CSRs written only while the lane is Idle and not in a GO cycle; one command per cycle
     wire idle = !active && !done_;
@@ -325,7 +354,7 @@ module lane_len_props (
     always @* if (!init0 && !(idle && !go)) assume (`CFG_BUS == cfg_q);
     always @* begin
         assume (clk_pin_en && code == 2'd0 && stuff == 2'd0 && clk_pin != data_pin);
-        if (len_en) assume (skip > len_pos);
+        if (len_on) assume (skip > len_pos);
         assume ($onehot0({go, crc_cmd}));
         if (init0 || init1) assume (!go && !crc_cmd && !reset);
     end
@@ -343,7 +372,7 @@ module lane_len_props (
     reg [2:0] nb = 3'd0; reg [7:0] rbyte = 8'd0;
     wire [3:0] n = field > len_max ? len_max : field;
     wire [15:0] L = {10'd0, skip} + {9'd0, n, 3'b000};
-    wire [15:0] limit = (len_en && known && L < frame_bits) ? L : frame_bits;
+    wire [15:0] limit = (len_on && known && L < frame_bits) ? L : frame_bits;
     wire take = run_r && cedge && k < limit;
     wire in_bytes = k >= {10'd0, skip};
     wire [7:0] byte_n = lsb_first ? {d, rbyte[7:1]} : {rbyte[6:0], d};
@@ -355,11 +384,11 @@ module lane_len_props (
         end else if (take) begin
             k <= k + 16'd1;
             fsr <= {fsr[2:0], d};
-            if (len_en && k == {10'd0, len_pos}) begin field <= {fsr[2:0], d}; known <= 1'b1; end
+            if (len_on && k == {10'd0, len_pos}) begin field <= {fsr[2:0], d}; known <= 1'b1; end
             if (in_bytes) begin nb <= nb + 3'd1; rbyte <= byte_n; end
         end
 
-`ifdef L5
+`ifdef L5_LEMMAS
 `ifndef NO_LEMMAS
     // helper lemmas (assertions too): the lane's counters are the reference's
     always @* if (!init0) begin
@@ -367,25 +396,62 @@ module lane_len_props (
         if (active) assert (g_mode == 2'd2);
         if (run_r) assert (k <= limit);
         if (run_r) assert (nb == (in_bytes ? k[2:0] - skip[2:0] : 3'd0));  // bytes start at skip
-        if (run_r) assert (known == (len_en && k > {10'd0, len_pos}));     // the field is taken once
+        if (run_r) assert (known == (len_on && k > {10'd0, len_pos}));     // the field is taken once
     end
     always @* if (!init0 && (active || done_)) begin
         assert (g_cnt == k && g_bitpos == nb);
         if (nb != 3'd0) assert (lsb_first ? (g_byte >> (4'd8 - nb)) == (rbyte >> (4'd8 - nb))
                                           : (g_byte << (4'd8 - nb)) == (rbyte << (4'd8 - nb)));
         // the lane computes the length a cycle after the field (len_cap), the reference at once
-        assert (g_len[0] == (len_en && known && L < frame_bits && !g_len[1]));
-        if (g_len[1]) assert (len_en && known && k == {10'd0, len_pos} + 16'd1 && !g_len[0]);
+        assert (g_len[0] == (len_on && known && L < frame_bits && !g_len[1]));
+        if (g_len[1]) assert (len_on && known && k == {10'd0, len_pos} + 16'd1 && !g_len[0]);
         if (g_len[0]) assert (g_lim == L[7:0]);
         // during the data bits the lane's shift register holds the reference's last bits
         if (g_len[1] || k < limit) assert (g_sr[3:0] == fsr);
         assert (!error);
     end
 `endif
+`endif  // L5_LEMMAS (L5 and L6)
+`ifdef L5_MAINS
     always @* if (!init0) begin
         assert (push == ref_push);                        // A: pushes when the reference does
         if (push) assert (push_data == byte_n);           // B: the same byte
         if (done_) assert (k == limit);                   // C: Done only after all data bits
+    end
+`endif
+
+`ifdef L6
+    // ENGINE.md (CRC residual): the host receives the CRC field as data (crc_width 0)
+    always @* if (crc_resid) assume (crc_width == 6'd0);
+    // reference CRC over the data bits taken, those below len_pos left out
+    reg [31:0] ref_crc = 32'd0;
+    wire crc_take = take && (!crc_resid || k >= {10'd0, len_pos});
+    always @(posedge clock)
+        if (go) ref_crc <= init;
+        else if (crc_take) ref_crc <= (ref_crc << 1) ^ ((d ^ ref_crc[31]) ? poly : 32'd0);
+    wire match = ((ref_crc[31:16] ^ sync) & sync_mask) == 16'd0;
+    // chk: the cycle after a pushed byte (residual mode, no GO or reset with the push);
+    // the lane's crc_ok shows that cycle's compare from the next cycle, unless GO or reset
+    reg chk = 1'b0, chk_q = 1'b0, m_q = 1'b0, ok_q = 1'b0, clr_q = 1'b0;
+    always @(posedge clock) begin
+        chk <= ref_push && crc_resid && !go && !reset;
+        chk_q <= chk && !go && !reset;
+        m_q <= match;
+        ok_q <= crc_ok;
+        clr_q <= go || reset;
+    end
+`ifndef NO_LEMMAS
+    always @* if (!init0 && run_r && crc_resid) begin
+        assert (g_crc == ref_crc);
+        assert (g_resid_chk == chk);
+        assert (g_left == 6'd0);  // crc_width 0: no counted CRC bits
+    end
+    always @* if (!init0 && chk) assert (run_r && crc_resid);
+`endif
+    always @* if (!init0 && !init1) begin
+        if (chk_q) assert (crc_ok == m_q);                                   // A: the compare
+        if (run_r && crc_resid && !chk_q && !clr_q) assert (crc_ok == ok_q);  // B: only then
+        if (run_r && crc_resid) assert (!sync_hit);                          // C
     end
 `endif
 endmodule

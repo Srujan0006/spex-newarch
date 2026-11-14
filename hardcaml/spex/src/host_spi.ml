@@ -25,7 +25,7 @@
     - 5 RX FIFO, read only: each data byte read pops the head (0 when empty).
     - 6 bit-lane configuration, write only: lane l at 32 l. Bytes 0-1 div_int, 2 div_frac,
       3 {crc_inv, readback, lsb_first, code 2, clk_edge, clk_pin_en, dir}, 4 {data_pin 3,
-      clk_pin 3}, 5 {stuff_len 3, stuff 2}, 6 crc_width, 7 {len_en, 0, skip 6}, 8-11 poly,
+      clk_pin 3}, 5 {stuff_len 3, stuff 2}, 6 crc_width, 7 {len_en, crc_resid, skip 6}, 8-11 poly,
       12-15 init, 16-17 sync, 18-19 sync_mask, 20-21 frame_bits (all little-endian),
       22 len_pos, 23 len_max.
 
@@ -118,6 +118,7 @@ let lane_cfg_of (b : Signal.t list) : Signal.t Layout.Lane_cfg.t =
   ; len_en = (b 7).:(7)
   ; len_pos = select (b 22) 5 0
   ; len_max = select (b 23) 3 0
+  ; crc_resid = (b 7).:(6)
   }
 ;;
 

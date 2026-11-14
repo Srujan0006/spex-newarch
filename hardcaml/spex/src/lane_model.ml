@@ -36,6 +36,7 @@ type t =
   ; mutable len_cap : bool (* RX: the length field's last bit came in the previous step *)
   ; mutable len_known : bool
   ; mutable lim : int (* the data length the field gave, once known and below frame_bits *)
+  ; mutable resid_chk : bool (* CRC residual: a byte was pushed in the previous step *)
   }
 
 let create () =
@@ -62,6 +63,7 @@ let create () =
   ; len_cap = false
   ; len_known = false
   ; lim = 0
+  ; resid_chk = false
   }
 ;;
 
@@ -98,6 +100,8 @@ let flags t =
 let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
   let rx = c.dir = 1 in
   let mode0 = t.mode in
+  let resid = c.crc_resid = 1 in
+  let crc0 = t.crc in
   let d = bit pins_s c.data_pin in
   let dedge = d <> bit pins_q c.data_pin in
   let cedge =
@@ -242,10 +246,11 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
     else (
       count b;
       t.sr <- ((t.sr lsl 1) lor b) land 0xFFFF;
-      if (t.sr lxor c.sync) land c.sync_mask = 0 then t.sync_hit <- true;
+      if (not resid) && (t.sr lxor c.sync) land c.sync_mask = 0 then t.sync_hit <- true;
       if t.cnt < limit
       then (
-        crc_update b;
+        (* CRC residual mode: data bits below [len_pos] stay out of the CRC *)
+        if (not resid) || t.cnt >= c.len_pos then crc_update b;
         (* bits before [skip]: CRC and sr only; the length field ends at [len_pos] *)
         if t.cnt >= c.skip
         then (
@@ -255,7 +260,7 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
             push := Some t.byte;
             pushed := true);
           t.bitpos <- (t.bitpos + 1) land 7);
-        if c.len_en = 1 && t.cnt = c.len_pos then len_now := true;
+        if c.len_en = 1 && (not resid) && t.cnt = c.len_pos then len_now := true;
         t.cnt <- t.cnt + 1)
       else if t.crc_left > 0
       then (
@@ -274,6 +279,11 @@ let step t (c : int Lane_cfg.t) (k : cmd) ~pins_s ~pins_q ~tx_head =
       t.lim <- l;
       t.len_known <- true));
   t.len_cap <- !len_now;
+  (* CRC residual: the result for the byte pushed in the previous step, from the CRC as
+     this step found it *)
+  if t.resid_chk
+  then t.crc_ok <- ((crc0 lsr 16) lxor c.sync) land c.sync_mask = 0;
+  t.resid_chk <- !pushed && resid && (not k.go) && not k.reset;
   (* commands, after this cycle's step *)
   let lost =
     k.reset

@@ -50,6 +50,7 @@ let lane_cfg ~pid ~n : int Layout.Lane_cfg.t =
   ; len_en = 0
   ; len_pos = 0
   ; len_max = 0
+  ; crc_resid = 0
   }
 ;;
 
@@ -192,5 +193,145 @@ let%expect_test "USB LS: packets decoded by an independent receiver; EOP timing"
     PID 4b data [01 02 03 04]: 64 bits; SYNC ok PID 4b data ok CRC ok, stuff ok; cells whole bits (1.500 Mb/s); last bit K, then J for 1 cycles (21 ns), then SE0; SE0 64 cycles = 1333 ns (1250..1500: ok); J after >= 1 bit (1102 cycles)
     PID c3 data [ff ff ff]: 56 bits; SYNC ok PID c3 data ok CRC ok, stuff ok; cells whole bits (1.500 Mb/s); last bit K, then J for 1 cycles (21 ns), then SE0; SE0 64 cycles = 1333 ns (1250..1500: ok); J after >= 1 bit (845 cycles)
     PID 4b data [80 06 00 01 00 00 40 00]: 96 bits; SYNC ok PID 4b data ok CRC ok, stuff ok; cells whole bits (1.500 Mb/s); last bit K, then J for 1 cycles (21 ns), then SE0; SE0 64 cycles = 1333 ns (1250..1500: ok); J after >= 1 bit (1362 cycles)
+    |}]
+;;
+
+(* ---- receive: data packets of any PID and length, in the lane's CRC residual mode ----
+   The packets come from a low-speed transmitter written here from USB 2.0, not from the
+   lane: SYNC, PID, data, CRC-16/USB (catalogue, [crc16_usb]) sent LSB first; bit stuffing
+   (a 0 after six ones, through the CRC); NRZI from idle J (a 0 is a change of state);
+   EOP = SE0 for 2 bit times, then J. A bit cell is [period] cycles (fractional periods
+   place cell i at floor (i * period)), so rates off nominal can be tried.
+   Mutants (by hand): residual 0x800C instead of 0x800D (every good packet: crc_error);
+   [len_pos] 8 instead of 16, so the PID enters the CRC (every good packet: crc_error);
+   the lane CRC fed from data bit 0 on in residual mode (RTL, crc_in forced to 1: every
+   good packet crc_error). *)
+
+let rx_cfg : int Layout.Lane_cfg.t =
+  { (lane_cfg ~pid:0 ~n:0) with
+    dir = 1
+  ; init = 0xFFFF lsl 16
+  ; crc_width = 0
+  ; crc_inv = 0
+  ; crc_resid = 1
+  ; skip = 8
+  ; len_pos = 16
+  ; sync = Protocols.usb_crc16_residual
+  ; sync_mask = 0xFFFF
+  ; frame_bits = 96
+  }
+;;
+
+let lsb_bits bytes = List.concat_map bytes ~f:(fun b -> List.init 8 ~f:(fun i -> (b lsr i) land 1))
+
+(* one (D-, D+) pair per cycle: 64 cycles of J, the packet, EOP, then J *)
+let wire ~period ?corrupt ~pid data =
+  let crc = crc16_usb (lsb_bits data) in
+  let bits = lsb_bits ([ 0x80; pid ] @ data) @ List.init 16 ~f:(fun i -> (crc lsr i) land 1) in
+  let bits =
+    match corrupt with
+    | None -> bits
+    | Some k -> List.mapi bits ~f:(fun i b -> if i = k then 1 - b else b)
+  in
+  let stuffed, _ =
+    List.fold bits ~init:([], 0) ~f:(fun (acc, ones) b ->
+      let acc = b :: acc
+      and ones = if b = 1 then ones + 1 else 0 in
+      if ones = 6 then 0 :: acc, 0 else acc, ones)
+  in
+  let cells, _ =
+    List.fold (List.rev stuffed) ~init:([], J) ~f:(fun (acc, s) b ->
+      let s = if b = 1 then s else if equal_st s J then K else J in
+      s :: acc, s)
+  in
+  let cells = List.rev cells @ [ SE0; SE0 ] in
+  let at i = Float.to_int (Float.round_down (Float.of_int i *. period)) in
+  let body =
+    List.concat_mapi cells ~f:(fun i s -> List.init (at (i + 1) - at i) ~f:(fun _ -> s))
+  in
+  List.init 64 ~f:(fun _ -> J) @ body @ List.init 64 ~f:(fun _ -> J)
+;;
+
+let receive ?(cfg = rx_cfg) ?(note = "") ?(period = Float.of_int bit) ?corrupt ~pid data =
+  let spec = Protocols.usb_ls_rx ~dm ~dp () in
+  let t = H.create () in
+  H.load t spec;
+  Layout.Lane_cfg.iter2 t.i.host.lane0 cfg ~f:H.set;
+  let level s =
+    let m, p = match s with J -> 1, 0 | K -> 0, 1 | SE0 -> 0, 0 | SE1 -> 1, 1 in
+    0xFF land lnot ((1 lsl dm) lor (1 lsl dp)) lor (m lsl dm) lor (p lsl dp)
+  in
+  t.device <- (fun ~out:_ ~oe:_ -> level J);
+  H.start t ~role:Layout.Role.check ();
+  H.cycles t 8;
+  let w = Array.of_list (wire ~period ?corrupt ~pid data) in
+  let t0 = t.cycle in
+  let name () = (List.nth_exn spec.locs (H.get t.o.status.cur_loc)).name in
+  let path = ref [ name () ] in
+  t.device
+  <- (fun ~out:_ ~oe:_ ->
+       let l = name () in
+       if not (String.equal l (List.hd_exn !path)) then path := l :: !path;
+       let k = t.cycle - t0 in
+       level (if k < Array.length w then w.(k) else J));
+  (* the RX FIFO is 8 deep: the host reads it while the packet comes in *)
+  let got = ref [] in
+  while t.cycle - t0 < Array.length w + 16 do
+    H.cycles t 128;
+    got := !got @ H.drain_rx t
+  done;
+  let got = !got in
+  let loc = String.concat ~sep:" " (List.rev !path) in
+  let crc = crc16_usb (lsb_bits data) in
+  let expect = (pid :: data) @ [ crc land 0xFF; crc lsr 8 ] in
+  printf
+    "%sPID %02x, %d bytes%s at %.3f Mb/s: %s; RX FIFO %s\n"
+    note
+    pid
+    (List.length data)
+    (match corrupt with None -> "" | Some k -> Printf.sprintf ", bit %d flipped" k)
+    (48.0 /. period)
+    loc
+    (if List.equal Int.equal got expect
+     then "PID, data, CRC"
+     else String.concat ~sep:" " (List.map got ~f:(Printf.sprintf "%02x")))
+;;
+
+let%expect_test "USB LS receive: DATA0 / DATA1, 0 to 8 bytes, CRC by residual" =
+  for n = 0 to 8 do
+    receive ~pid:(if n % 2 = 0 then data0 else data1) (List.init n ~f:(fun i -> (37 * (i + 1)) land 0xFF))
+  done;
+  (* runs of ones: stuff bits in the data and the CRC *)
+  receive ~pid:data1 [ 0xFF; 0xFF; 0xFF; 0xFF ];
+  receive ~pid:data0 [ 0x80; 0x06; 0x00; 0x01; 0x00; 0x00; 0x40; 0x00 ];
+  (* the data rate at the low-speed limits, +-1.5 % *)
+  receive ~period:(32.0 /. 0.985) ~pid:data0 [ 0x12; 0x34; 0x56; 0x78; 0x9A; 0xBC; 0xDE; 0xF0 ];
+  receive ~period:(32.0 /. 1.015) ~pid:data1 [ 0x12; 0x34; 0x56; 0x78; 0x9A; 0xBC; 0xDE; 0xF0 ];
+  (* corrupted: a data bit, a CRC bit (both caught); a PID bit (outside the CRC, as in
+     USB: the PID has its own check nibble, which the host reads) *)
+  receive ~corrupt:20 ~pid:data0 [ 0x01; 0x02; 0x03 ];
+  receive ~corrupt:45 ~pid:data0 [ 0x01; 0x02; 0x03 ];
+  receive ~corrupt:9 ~pid:data0 [ 0x01; 0x02; 0x03 ];
+  (* residual mode ignores len_en (len_pos is the CRC start): with it set and len_max 0 a
+     length field would cut the frame after SYNC *)
+  receive ~cfg:{ rx_cfg with len_en = 1; len_max = 0 } ~note:"len_en set: " ~pid:data1 [ 0xA5; 0x5A ];
+  [%expect {|
+    PID c3, 0 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID 4b, 1 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID c3, 2 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID 4b, 3 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID c3, 4 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID 4b, 5 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID c3, 6 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID 4b, 7 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID c3, 8 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID 4b, 4 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID c3, 8 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID c3, 8 bytes at 1.478 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID 4b, 8 bytes at 1.522 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
+    PID c3, 3 bytes, bit 20 flipped at 1.500 Mb/s: pkt eop crc_error; RX FIFO c3 11 02 03 9e 9e
+    PID c3, 3 bytes, bit 45 flipped at 1.500 Mb/s: pkt eop crc_error; RX FIFO c3 01 02 03 be 9e
+    PID c3, 3 bytes, bit 9 flipped at 1.500 Mb/s: pkt eop idle pkt; RX FIFO c1 01 02 03 9e 9e
+    len_en set: PID 4b, 2 bytes at 1.500 Mb/s: pkt eop idle pkt; RX FIFO PID, data, CRC
     |}]
 ;;

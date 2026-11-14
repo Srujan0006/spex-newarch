@@ -707,6 +707,43 @@ let usb_ls_tx ?lane:(l = 0) ~dm ~dp ~bit () =
   }
 ;;
 
+(** USB low-speed packet receiver (monitor) on bit lane [lane], for data packets whose PID
+    and length are not known in advance: the lane's CRC residual mode (ENGINE.md, CRC
+    residual) checks CRC-16 on any length, and the engine ends the frame on EOP. Host setup
+    (Test_usb.rx_cfg): lane RX, NRZI, USB stuffing after 6 ones, LSB first, CRC-16 poly with
+    init all ones, [crc_width] 0, [crc_resid], [skip] 8 (SYNC), [len_pos] 16 (SYNC and PID
+    outside the CRC), residual 0x800D, [frame_bits] 96 (SYNC, PID, 8 data bytes, CRC); pin
+    [dm] (D-) is the data pin (low speed: J = D- high, the lane's idle 1). The RX FIFO gets
+    the PID, the data and the two CRC bytes of each packet.
+    Locations: [idle] (J; arms the lane, which starts on SYNC's first K), [pkt] (until SE0:
+    END), [eop] (back in J: a good CRC re-arms, else [crc_error]), [stuff_error]. *)
+let usb_ls_rx ?lane:(l = 0) ~dm ~dp () =
+  { name = "usb_ls_rx"
+  ; locs =
+      [ loc
+          "idle"
+          ~accepting:true
+          [ edge ~goto:"pkt" (always |> pin_hi dm |> pin_lo dp) (nop |> lane (Lane_cmd.go l)) ]
+      ; loc
+          "pkt"
+          [ edge ~goto:"stuff_error" (always |> flag (Flag.lane_error l)) nop
+          ; edge ~goto:"eop" (always |> pin_lo dm |> pin_lo dp) (nop |> lane (Lane_cmd.end_ l))
+          ]
+      ; (* the frame's CRC result is in from the cycle after its last byte, long before
+           the SE0; wait for J so the lane is not re-armed during the EOP *)
+        loc
+          "eop"
+          [ edge ~goto:"idle" (always |> pin_hi dm |> pin_lo dp |> flag (Flag.lane_crc_ok l)) nop
+          ; edge ~goto:"crc_error" (always |> not_flag (Flag.lane_crc_ok l)) nop
+          ]
+      ; loc "crc_error" []
+      ; loc "stuff_error" []
+      ]
+  }
+;;
+
+let usb_crc16_residual = 0x800D
+
 (** The lane's CRC register (ENGINE.md: [fb = b xor crc[31]], shift left) after the bits
     of [bytes] sent LSB first, from [init] (32 bits, left-aligned). Host-side helper. *)
 let lane_crc_after ~poly ~init bytes =

@@ -43,6 +43,7 @@ let can_cfg ~dir ~frame_bits : int Lane_cfg.t =
   ; len_en = 0
   ; len_pos = 0
   ; len_max = 0
+  ; crc_resid = 0
   }
 ;;
 

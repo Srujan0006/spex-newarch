@@ -8,7 +8,7 @@ in the tests, or a change with no visible effect (an equivalent mutant).
 
 usage: python3 mutation/mutate.py        (from the repo root, with opam env loaded)
 """
-import subprocess, sys, pathlib
+import subprocess, sys, pathlib, os
 
 SRC = pathlib.Path("src/engine.ml")
 SPI = pathlib.Path("src/host_spi.ml")
@@ -138,6 +138,18 @@ LANE_MUTANTS = [
      "let d = reg spec (reg spec (pin c.data_pin i.sync1)) in"),
     ("dq fed from d's input (no data edge ever seen)", "let dq = reg spec d in", "let dq = d in"),
     ("cq fed from cs's input (no clock edge ever seen)", "let cq = reg spec cs in", "let cq = cs in"),
+    # CRC residual mode (review F1)
+    ("residual mode: CRC start (len_pos) ignored",
+     "    ~:(c.crc_resid) |: (select cnt.value 15 6 <>:. 0) |: (select cnt.value 5 0 >=: c.len_pos)", "    vdd"),
+    ("residual compared in the push cycle (byte's last bit not in)",
+     "        resid_chk.value\n        [ crc_ok <--", "        (push &: c.crc_resid)\n        [ crc_ok <--"),
+    ("residual crc_ok sticky (only ever set)",
+     "[ crc_ok <-- ((select crc.value 31 16 ^: c.sync) &: c.sync_mask ==:. 0) ]",
+     "[ when_ ((select crc.value 31 16 ^: c.sync) &: c.sync_mask ==:. 0) [ crc_ok <--. 1 ] ]"),
+    ("residual compares the CRC's low half", "(select crc.value 31 16 ^: c.sync)", "(select crc.value 15 0 ^: c.sync)"),
+    ("sync_hit not suppressed in residual mode", "(~:(c.crc_resid) &: ((sr_next ^: c.sync) &: c.sync_mask ==:. 0))",
+     "(((sr_next ^: c.sync) &: c.sync_mask ==:. 0))"),
+    ("residual mode: len_en not ignored", "(c.len_en &: ~:(c.crc_resid) &: (select", "(c.len_en &: (select"),
 ]
 
 # host SPI port (test/test_spi_host.ml drives it through its pins only)
@@ -189,6 +201,8 @@ def main():
             [(SRC, m) for m in MUTANTS] + [(LANE, m) for m in LANE_MUTANTS] + [(SPI, m) for m in SPI_MUTANTS]
             + [(SPEC, m) for m in SPEC_MUTANTS]
         ):
+            if os.environ.get("ONLY") and os.environ["ONLY"] not in name:
+                continue
             for f, text in originals.items():
                 f.write_text(text)
             original = originals[src]
@@ -213,6 +227,8 @@ def main():
         run("dune build 2>&1")
     tried = sum(1 for _, r in rows if r in ("KILLED", "SURVIVED"))
     print(f"\n{killed}/{tried} mutants killed")
+    if os.environ.get("ONLY"):
+        return 0  # a partial run does not replace results.md
     with open("mutation/results.md", "w") as f:
         f.write("| Mutant | Result |\n|---|---|\n")
         for name, r in rows:

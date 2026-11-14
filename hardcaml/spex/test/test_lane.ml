@@ -121,6 +121,7 @@ let random_cfg rs : int Lane_cfg.t =
   ; len_en = Bool.to_int (int 3 = 0)
   ; len_pos = int 40
   ; len_max = int 16
+  ; crc_resid = Bool.to_int (int 3 = 0)
   }
 ;;
 
@@ -130,7 +131,8 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
   and errors = ref 0
   and crc_oks = ref 0
   and dones = ref 0
-  and len_set = ref 0 in
+  and len_set = ref 0
+  and resid_oks = ref 0 in
   for seed = 1 to 400 do
     let rs = Random.State.make [| seed |] in
     let int n = Random.State.int rs n in
@@ -159,6 +161,7 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
       cycle l ~pins:!pins k;
       if l.model.error then Int.incr errors;
       if l.model.crc_ok then Int.incr crc_oks;
+      if l.model.crc_ok && (cfg_of l).crc_resid = 1 then Int.incr resid_oks;
       if Lane_model.equal_mode l.model.mode Done then seen_done := true;
       if l.model.len_known then seen_len := true
     done;
@@ -169,9 +172,9 @@ let%expect_test "lane RTL and model agree: 400 random configurations x 3000 cycl
   done;
   printf
     "pushes %d, pops %d, configurations reaching Done %d, cycles with error %d, with crc_ok %d, \
-     with a length from the field %d\n"
-    !pushes !pops !dones !errors !crc_oks !len_set;
-  [%expect {| pushes 1299, pops 3663, configurations reaching Done 30, cycles with error 28462, with crc_ok 0, with a length from the field 3 |}]
+     with a length from the field %d; crc_ok cycles in CRC residual mode %d\n"
+    !pushes !pops !dones !errors !crc_oks !len_set !resid_oks;
+  [%expect {| pushes 1357, pops 3853, configurations reaching Done 48, cycles with error 24400, with crc_ok 491, with a length from the field 0; crc_ok cycles in CRC residual mode 355 |}]
 ;;
 
 (* ---- TX -> RX loopback ---- *)
@@ -202,6 +205,7 @@ let loopback ~code ~stuff ~stuff_len ~div_int ~div_frac bytes =
     ; len_en = 0
     ; len_pos = 0
     ; len_max = 0
+    ; crc_resid = 0
     }
   in
   let tx = create base in

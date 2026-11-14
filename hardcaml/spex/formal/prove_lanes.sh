@@ -12,8 +12,8 @@
 set -e
 cd "$(dirname "$0")"
 V=${1:-../out/spex_lane.v}
-for g in ${PROPS:-L1 L3 L2 L5}; do
-  case $g in L2) TOP=lane_loop_props; K=6 ;; L3) TOP=lane_tx_props; K=12 ;; L5) TOP=lane_len_props; K=${K5:-12} ;; *) TOP=lane_tx_props ;; esac
+for g in ${PROPS:-L1 L3 L2 L5 L6}; do
+  case $g in L2) TOP=lane_loop_props; K=6 ;; L3) TOP=lane_tx_props; K=12 ;; L5) TOP=lane_len_props; K=${K5:-12} ;; L6) TOP=lane_len_props; K=${K6:-12} ;; *) TOP=lane_tx_props ;; esac
   printf "%-11s " "$g"
   if [ -n "$BMC" ]; then
     yosys -q -p "read_verilog -formal $V; expose spex_lane/g_*; read_verilog -sv -formal -D$g -DNO_LEMMAS lane_props.sv; prep -top $TOP; flatten; async2sync; dffunmap; opt_clean; setundef -undriven -anyseq; write_smt2 -wires model_$g.smt2"

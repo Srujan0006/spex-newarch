@@ -35,6 +35,7 @@ module spex_sim_top (
     host_lane1_len_max,
     host_lane1_skip,
     host_lane1_len_pos,
+    host_lane1_crc_resid,
     host_lane1_len_en,
     host_lane1_stuff,
     host_lane1_readback,
@@ -55,6 +56,7 @@ module spex_sim_top (
     host_lane0_len_max,
     host_lane0_skip,
     host_lane0_len_pos,
+    host_lane0_crc_resid,
     host_lane0_len_en,
     host_lane0_stuff,
     host_lane0_clk_pin,
@@ -148,6 +150,7 @@ module spex_sim_top (
     input [3:0] host_lane1_len_max;
     input [5:0] host_lane1_skip;
     input [5:0] host_lane1_len_pos;
+    input host_lane1_crc_resid;
     input host_lane1_len_en;
     input [1:0] host_lane1_stuff;
     input host_lane1_readback;
@@ -168,6 +171,7 @@ module spex_sim_top (
     input [3:0] host_lane0_len_max;
     input [5:0] host_lane0_skip;
     input [5:0] host_lane0_len_pos;
+    input host_lane0_crc_resid;
     input host_lane0_len_en;
     input [1:0] host_lane0_stuff;
     input [2:0] host_lane0_clk_pin;
@@ -224,339 +228,342 @@ module spex_sim_top (
     output [39:0] st_drops;
     output [15:0] st_lane_status;
 
-    wire [2:0] _452;
-    wire [2:0] _482;
-    wire [2:0] _483;
-    wire [2:0] _455;
-    wire [2:0] _454;
-    wire [2:0] _456;
-    wire [2:0] _457;
-    wire [2:0] _484;
-    wire [2:0] _486;
+    wire [2:0] _458;
     wire [2:0] _488;
+    wire [2:0] _489;
+    wire [2:0] _461;
+    wire [2:0] _460;
+    wire [2:0] _462;
+    wire [2:0] _463;
+    wire [2:0] _490;
+    wire [2:0] _492;
+    wire [2:0] _494;
     wire [2:0] _1;
-    reg [2:0] _453;
-    wire [7:0] _667;
-    wire [2:0] _638;
-    wire [2:0] _612;
-    wire [2:0] _613;
-    wire [2:0] _639;
-    wire [2:0] _641;
-    wire [2:0] _643;
+    reg [2:0] _459;
+    wire [7:0] _673;
+    wire [2:0] _644;
+    wire [2:0] _618;
+    wire [2:0] _619;
+    wire [2:0] _645;
+    wire [2:0] _647;
+    wire [2:0] _649;
     wire [2:0] _2;
-    reg [2:0] _609;
-    wire [7:0] _655;
-    wire [15:0] _668;
-    wire [7:0] _755;
+    reg [2:0] _615;
+    wire [7:0] _661;
+    wire [15:0] _674;
     wire [7:0] _761;
-    wire [7:0] _762;
-    wire [7:0] _757;
-    wire _758;
-    wire _759;
+    wire [7:0] _767;
+    wire [7:0] _768;
+    wire [7:0] _763;
+    wire _764;
+    wire _765;
+    wire _757;
+    wire _754;
+    wire _755;
     wire _751;
     wire _748;
     wire _749;
-    wire _745;
-    wire _742;
-    wire _743;
-    wire _744;
-    wire _746;
     wire _750;
     wire _752;
-    wire _741;
-    wire _753;
-    wire _760;
-    wire [7:0] _763;
-    wire [7:0] _765;
+    wire _756;
+    wire _758;
+    wire _747;
+    wire _759;
+    wire _766;
+    wire [7:0] _769;
+    wire [7:0] _771;
     wire [7:0] _4;
-    reg [7:0] _756;
-    wire [7:0] _864;
-    wire _860;
-    wire _861;
+    reg [7:0] _762;
+    wire [7:0] _870;
+    wire _866;
+    wire _867;
+    wire _859;
+    wire _856;
+    wire _857;
     wire _853;
     wire _850;
     wire _851;
-    wire _847;
-    wire _844;
-    wire _845;
-    wire _846;
-    wire _848;
     wire _852;
     wire _854;
-    wire _740;
-    wire _842;
-    wire _843;
-    wire _855;
-    wire _862;
-    wire [7:0] _865;
-    wire [7:0] _867;
+    wire _858;
+    wire _860;
+    wire _746;
+    wire _848;
+    wire _849;
+    wire _861;
+    wire _868;
+    wire [7:0] _871;
+    wire [7:0] _873;
     wire [7:0] _5;
-    reg [7:0] _858;
-    wire [7:0] _1738;
+    reg [7:0] _864;
+    wire [7:0] _1744;
+    wire _1740;
+    wire _1741;
     wire _1734;
     wire _1735;
-    wire _1728;
-    wire _1729;
-    wire _1736;
-    wire [7:0] _1739;
-    wire [7:0] _1741;
+    wire _1742;
+    wire [7:0] _1745;
+    wire [7:0] _1747;
     wire [7:0] _6;
-    reg [7:0] _1732;
-    wire [7:0] _1753;
-    wire _1749;
-    wire _1750;
-    wire _1751;
-    wire [7:0] _1754;
-    wire [7:0] _1756;
+    reg [7:0] _1738;
+    wire [7:0] _1759;
+    wire _1755;
+    wire _1756;
+    wire _1757;
+    wire [7:0] _1760;
+    wire [7:0] _1762;
     wire [7:0] _7;
-    reg [7:0] _1747;
-    wire [7:0] _1780;
-    wire _1776;
-    wire _1777;
-    wire _1778;
-    wire [7:0] _1781;
+    reg [7:0] _1753;
+    wire [7:0] _1786;
+    wire _1782;
+    wire _1783;
+    wire _1784;
+    wire [7:0] _1787;
     wire _9;
-    wire [7:0] _1783;
+    wire [7:0] _1789;
     wire [7:0] _10;
-    reg [7:0] _1774;
-    wire [39:0] _1784;
-    wire _1817;
-    wire _1819;
-    wire _1797;
-    wire _1815;
-    wire _1820;
-    wire _1822;
+    reg [7:0] _1780;
+    wire [39:0] _1790;
+    wire _1823;
+    wire _1825;
+    wire _1803;
+    wire _1821;
+    wire _1826;
+    wire _1828;
     wire _12;
-    reg _1818;
-    wire [1:0] _1831;
-    wire [2:0] _1886;
-    wire [2:0] _1888;
+    reg _1824;
+    wire [1:0] _1837;
+    wire [2:0] _1892;
+    wire [2:0] _1894;
     wire [2:0] _17;
-    reg [2:0] _1885;
-    wire _1881;
-    wire [2:0] _1871;
-    wire [2:0] _1867;
-    wire [2:0] _1868;
-    wire [2:0] _1872;
-    wire [2:0] _1864;
-    wire [2:0] _1863;
-    wire [2:0] _1865;
+    reg [2:0] _1891;
+    wire _1887;
+    wire [2:0] _1877;
     wire [2:0] _1873;
-    wire _1859;
-    wire _1856;
-    wire _1857;
-    wire _1858;
-    wire _1860;
-    wire _1852;
-    wire _1853;
-    wire _1829;
-    wire _1849;
-    wire _1850;
-    wire _1830;
-    wire [1:0] _20;
-    wire _1847;
-    wire _1848;
-    wire _1851;
-    wire _1854;
-    wire _1843;
-    wire _1839;
-    wire _1844;
-    wire _1837;
-    wire _22;
-    wire _1836;
-    wire _1838;
-    wire _1845;
-    wire _1834;
-    wire _1835;
-    wire _1846;
-    wire _1855;
-    wire _1861;
     wire [2:0] _1874;
-    wire _1876;
-    wire _1877;
+    wire [2:0] _1878;
+    wire [2:0] _1870;
+    wire [2:0] _1869;
+    wire [2:0] _1871;
+    wire [2:0] _1879;
+    wire _1865;
+    wire _1862;
+    wire _1863;
+    wire _1864;
+    wire _1866;
+    wire _1858;
+    wire _1859;
+    wire _1835;
+    wire _1855;
+    wire _1856;
+    wire _1836;
+    wire [1:0] _20;
+    wire _1853;
+    wire _1854;
+    wire _1857;
+    wire _1860;
+    wire _1849;
+    wire _1845;
+    wire _1850;
+    wire _1843;
+    wire _22;
+    wire _1842;
+    wire _1844;
+    wire _1851;
+    wire _1840;
+    wire _1841;
+    wire _1852;
+    wire _1861;
+    wire _1867;
+    wire [2:0] _1880;
     wire _1882;
-    wire _1890;
+    wire _1883;
+    wire _1888;
+    wire _1896;
     wire _24;
-    wire _1892;
-    wire _25;
-    reg _1880;
-    wire _1769;
-    wire _1770;
-    wire _1761;
-    wire _1771;
     wire _1898;
-    wire _1900;
+    wire _25;
+    reg _1886;
+    wire _1775;
+    wire _1776;
+    wire _1767;
+    wire _1777;
+    wire _1904;
+    wire _1906;
     wire _27;
-    reg _1896;
-    wire _1744;
-    wire _1905;
-    wire _1907;
-    wire _29;
-    reg _1903;
+    reg _1902;
+    wire _1750;
     wire _1911;
-    wire _1726;
-    wire _1719;
-    wire _1727;
-    wire _840;
-    wire _836;
-    wire _841;
-    wire _1908;
-    wire _31;
-    wire _1909;
-    wire _1910;
-    wire _1912;
+    wire _1913;
+    wire _29;
+    reg _1909;
     wire _1917;
-    wire _1919;
-    wire _32;
-    reg _1915;
+    wire _1732;
+    wire _1725;
+    wire _1733;
+    wire _846;
+    wire _842;
+    wire _847;
+    wire _1914;
+    wire _31;
+    wire _1915;
+    wire _1916;
+    wire _1918;
     wire _1923;
-    wire _1924;
+    wire _1925;
+    wire _32;
+    reg _1921;
     wire _1929;
-    wire _36;
-    wire _1931;
-    wire _1933;
-    wire _37;
-    reg _1927;
-    wire _1962;
-    wire _1964;
-    wire _1960;
-    wire _1966;
-    wire _1967;
-    wire _1968;
+    wire _1930;
     wire _1935;
-    wire _1969;
-    wire _1971;
-    wire _38;
-    reg _1922;
-    wire _1986;
-    wire [2:0] _40;
-    wire [3:0] _1979;
-    wire _1980;
-    wire _1981;
-    wire _42;
-    wire _1982;
-    wire [2:0] _44;
+    wire _36;
+    wire _1937;
+    wire _1939;
+    wire _37;
+    reg _1933;
+    wire _1968;
+    wire _1970;
+    wire _1966;
+    wire _1972;
     wire _1973;
-    wire [2:0] _1975;
-    wire [3:0] _1976;
+    wire _1974;
+    wire _1941;
+    wire _1975;
     wire _1977;
-    wire _1978;
-    wire _1983;
+    wire _38;
+    reg _1928;
+    wire _1992;
+    wire [2:0] _40;
+    wire [3:0] _1985;
+    wire _1986;
     wire _1987;
+    wire _42;
     wire _1988;
+    wire [2:0] _44;
+    wire _1979;
+    wire [2:0] _1981;
+    wire [3:0] _1982;
+    wire _1983;
+    wire _1984;
     wire _1989;
-    wire _2091;
-    wire _2090;
-    wire _2092;
-    wire [31:0] _2089;
-    wire _2083;
-    wire _2081;
-    wire _2079;
-    wire _47;
-    wire _2078;
-    wire _2080;
-    wire _2082;
-    wire f_host_cov_we;
+    wire _1993;
+    wire _1994;
+    wire _1995;
+    wire _2097;
+    wire _2096;
+    wire _2098;
+    wire [31:0] _2095;
+    wire _2089;
+    wire _2087;
     wire _2085;
-    wire [11:0] _2072;
+    wire _47;
+    wire _2084;
+    wire _2086;
+    wire _2088;
+    wire f_host_cov_we;
+    wire _2091;
+    wire [11:0] _2078;
+    wire _2075;
+    wire _2076;
+    wire [11:0] _2077;
+    wire _2079;
+    wire [11:0] _2080;
+    wire [11:0] _2081;
+    wire [11:0] _2067;
+    wire [11:0] _2028;
+    wire [11:0] _2025;
+    wire [12:0] _2022;
+    wire [9:0] _2019;
+    wire [12:0] _2020;
+    wire [12:0] _2021;
+    reg [2:0] _1996;
+    wire [2:0] _48;
+    reg [2:0] _2016;
+    wire [12:0] _2017;
+    wire [12:0] _2002;
+    wire [12:0] _2001;
+    wire [15:0] _1997;
+    wire _2000;
+    wire [12:0] _2003;
+    wire [12:0] _49;
+    reg [12:0] _2012;
+    wire _2018;
+    wire [12:0] _2023;
+    wire [12:0] _2009;
+    wire _2024;
+    wire [11:0] _2027;
+    wire [15:0] _2004;
+    wire _2005;
+    wire _50;
+    reg _2008;
+    wire [11:0] _2029;
+    wire [11:0] _51;
+    reg [11:0] _2068;
+    wire [11:0] _2032;
+    reg [1:0] _1998;
+    reg [15:0] _1999;
+    wire [15:0] _2030;
+    wire _2031;
+    wire [11:0] _2034;
+    wire [11:0] _52;
+    reg [11:0] _2065;
     wire _2069;
     wire _2070;
     wire [11:0] _2071;
-    wire _2073;
+    wire [11:0] _2062;
+    wire _2072;
+    wire [11:0] _2073;
+    wire _2061;
     wire [11:0] _2074;
-    wire [11:0] _2075;
-    wire [11:0] _2061;
-    wire [11:0] _2022;
-    wire [11:0] _2019;
-    wire [12:0] _2016;
-    wire [9:0] _2013;
-    wire [12:0] _2014;
-    wire [12:0] _2015;
-    reg [2:0] _1990;
-    wire [2:0] _48;
-    reg [2:0] _2010;
-    wire [12:0] _2011;
-    wire [12:0] _1996;
-    wire [12:0] _1995;
-    wire [15:0] _1991;
-    wire _1994;
-    wire [12:0] _1997;
-    wire [12:0] _49;
-    reg [12:0] _2006;
-    wire _2012;
-    wire [12:0] _2017;
-    wire [12:0] _2003;
-    wire _2018;
-    wire [11:0] _2021;
-    wire [15:0] _1998;
-    wire _1999;
-    wire _50;
-    reg _2002;
-    wire [11:0] _2023;
-    wire [11:0] _51;
-    reg [11:0] _2062;
-    wire [11:0] _2026;
-    reg [1:0] _1992;
-    reg [15:0] _1993;
-    wire [15:0] _2024;
-    wire _2025;
-    wire [11:0] _2028;
-    wire [11:0] _52;
-    reg [11:0] _2059;
-    wire _2063;
-    wire _2064;
-    wire [11:0] _2065;
-    wire [11:0] _2056;
-    wire _2066;
-    wire [11:0] _2067;
-    wire _2055;
-    wire [11:0] _2068;
-    wire [7:0] _2051;
-    wire [1:0] _2046;
-    wire [1:0] _2045;
-    wire _2030;
-    wire _2029;
-    wire _2031;
+    wire [7:0] _2057;
+    wire [1:0] _2052;
+    wire [1:0] _2051;
+    wire _2036;
+    wire _2035;
+    wire _2037;
     wire _53;
-    reg _2044;
-    wire [1:0] _2047;
-    wire [6:0] _2041;
-    wire [8:0] _2048;
-    wire [7:0] _2039;
-    wire [8:0] _2040;
-    wire [8:0] _2049;
-    wire _2050;
-    wire [7:0] _2053;
-    wire [31:0] _2076;
+    reg _2050;
+    wire [1:0] _2053;
+    wire [6:0] _2047;
+    wire [8:0] _2054;
+    wire [7:0] _2045;
+    wire [8:0] _2046;
+    wire [8:0] _2055;
+    wire _2056;
+    wire [7:0] _2059;
+    wire [31:0] _2082;
     wire [31:0] _55;
-    wire [31:0] _2077;
-    reg [31:0] _2086[0:255];
+    wire [31:0] _2083;
+    reg [31:0] _2092[0:255];
     wire [7:0] _56;
-    reg [7:0] _2037;
-    wire [7:0] _1765;
+    reg [7:0] _2043;
+    wire [7:0] _1771;
     wire [7:0] _57;
-    reg [7:0] _1768;
+    reg [7:0] _1774;
     wire [7:0] _59;
-    wire [7:0] _2034;
-    wire _2032;
+    wire [7:0] _2040;
+    wire _2038;
     wire _61;
-    wire _1757;
-    wire _2033;
+    wire _1763;
+    wire _2039;
     wire _62;
-    reg _1760;
+    reg _1766;
     wire _63;
-    reg _1842;
-    wire [7:0] _2038;
-    wire [31:0] _2087;
-    reg [31:0] _2093;
+    reg _1848;
+    wire [7:0] _2044;
+    wire [31:0] _2093;
+    reg [31:0] _2099;
     wire [31:0] _64;
-    wire _2094;
-    wire _2095;
-    wire [31:0] _2097;
-    wire [2:0] _2464;
+    wire _2100;
+    wire _2101;
+    wire [31:0] _2103;
+    wire [2:0] _2470;
+    wire _2471;
+    wire _2472;
+    wire [47:0] _2469;
+    reg [47:0] _2473;
     wire _2465;
     wire _2466;
-    wire [47:0] _2463;
     reg [47:0] _2467;
     wire _2459;
     wire _2460;
@@ -573,279 +580,279 @@ module spex_sim_top (
     wire _2435;
     wire _2436;
     reg [47:0] _2437;
+    wire [2:0] _2110;
+    wire [2:0] _2111;
+    wire [2:0] _67;
+    reg [2:0] _2108;
     wire _2429;
     wire _2430;
-    reg [47:0] _2431;
-    wire [2:0] _2104;
-    wire [2:0] _2105;
-    wire [2:0] _67;
-    reg [2:0] _2102;
-    wire _2423;
-    wire _2424;
-    wire [2:0] _2396;
-    wire [28:0] _2113;
-    wire [28:0] _2112;
-    wire [28:0] _2115;
-    wire [28:0] _2116;
-    wire [2:0] _2109;
-    wire _2111;
-    wire [28:0] _2117;
+    wire [2:0] _2402;
+    wire [28:0] _2119;
+    wire [28:0] _2118;
+    wire [28:0] _2121;
+    wire [28:0] _2122;
+    wire [2:0] _2115;
+    wire _2117;
+    wire [28:0] _2123;
     wire [28:0] _68;
     reg [28:0] ts_hi_m1;
-    wire [28:0] _2394;
-    wire [2:0] _2135;
-    wire _2131;
+    wire [28:0] _2400;
+    wire [2:0] _2141;
+    wire _2137;
+    wire _2138;
+    wire _2135;
+    wire _2139;
+    wire [2:0] _2142;
     wire _2132;
-    wire _2129;
     wire _2133;
-    wire [2:0] _2136;
-    wire _2126;
-    wire _2127;
-    wire _2124;
-    wire _2123;
+    wire _2130;
+    wire _2129;
+    wire _2131;
+    wire _2134;
+    wire [2:0] _2144;
     wire _2125;
-    wire _2128;
-    wire [2:0] _2138;
-    wire _2119;
-    wire [2:0] _2139;
+    wire [2:0] _2145;
     wire [2:0] _69;
-    reg [2:0] _2122;
-    wire _2385;
-    wire [2:0] _2387;
-    wire [2:0] _2156;
-    wire _2152;
+    reg [2:0] _2128;
+    wire _2391;
+    wire [2:0] _2393;
+    wire [2:0] _2162;
+    wire _2158;
+    wire _2159;
+    wire _2156;
+    wire _2160;
+    wire [2:0] _2163;
     wire _2153;
-    wire _2150;
     wire _2154;
-    wire [2:0] _2157;
-    wire _2147;
-    wire _2148;
-    wire _2145;
-    wire _2144;
+    wire _2151;
+    wire _2150;
+    wire _2152;
+    wire _2155;
+    wire [2:0] _2165;
     wire _2146;
-    wire _2149;
-    wire [2:0] _2159;
-    wire _2140;
-    wire [2:0] _2160;
+    wire [2:0] _2166;
     wire [2:0] _70;
-    reg [2:0] _2143;
-    wire _2382;
-    wire [2:0] _2384;
-    wire [2:0] _2388;
-    wire [2:0] _2177;
-    wire _2173;
-    wire _2174;
-    wire _2171;
-    wire _2175;
-    wire [2:0] _2178;
-    wire _2168;
-    wire _2169;
-    wire _2166;
-    wire _2165;
-    wire _2167;
-    wire _2170;
-    wire [2:0] _2180;
-    wire _2161;
-    wire [2:0] _2181;
-    wire [2:0] _71;
-    reg [2:0] _2164;
-    wire _2378;
-    wire [2:0] _2380;
-    wire [2:0] _2198;
-    wire _2194;
-    wire _2195;
-    wire _2192;
-    wire _2196;
-    wire [2:0] _2199;
-    wire _2189;
-    wire _2190;
-    wire _2187;
-    wire _2186;
-    wire _2188;
-    wire _2191;
-    wire [2:0] _2201;
-    wire _2182;
-    wire [2:0] _2202;
-    wire [2:0] _72;
-    reg [2:0] _2185;
-    wire _2375;
-    wire [2:0] _2377;
-    wire [2:0] _2381;
-    wire [2:0] _2389;
-    wire [2:0] _2219;
-    wire _2215;
-    wire _2216;
-    wire _2213;
-    wire _2217;
-    wire [2:0] _2220;
-    wire _2210;
-    wire _2211;
-    wire _2208;
-    wire _2207;
-    wire _2209;
-    wire _2212;
-    wire [2:0] _2222;
-    wire _2203;
-    wire [2:0] _2223;
-    wire [2:0] _73;
-    reg [2:0] _2206;
-    wire _2370;
-    wire [2:0] _2372;
-    wire [2:0] _2240;
-    wire _2236;
-    wire _2237;
-    wire _2234;
-    wire _2238;
-    wire [2:0] _2241;
-    wire _2231;
-    wire _2232;
-    wire _2229;
-    wire _2228;
-    wire _2230;
-    wire _2233;
-    wire [2:0] _2243;
-    wire _2224;
-    wire [2:0] _2244;
-    wire [2:0] _74;
-    reg [2:0] _2227;
-    wire _2367;
-    wire [2:0] _2369;
-    wire [2:0] _2373;
-    wire [2:0] _2261;
-    wire _2257;
-    wire _2258;
-    wire _2255;
-    wire _2259;
-    wire [2:0] _2262;
-    wire _2252;
-    wire _2253;
-    wire _2250;
-    wire _2249;
-    wire _2251;
-    wire _2254;
-    wire [2:0] _2264;
-    wire _2245;
-    wire [2:0] _2265;
-    wire [2:0] _75;
-    reg [2:0] _2248;
-    wire _2363;
-    wire [2:0] _2365;
-    wire [2:0] _2282;
-    wire _2278;
-    wire _2279;
-    wire _2276;
-    wire _2280;
-    wire [2:0] _2283;
-    wire _2273;
-    wire _2274;
-    wire _2271;
-    wire _2270;
-    wire _2272;
-    wire _2275;
-    wire [2:0] _2285;
-    wire _2266;
-    wire [2:0] _2286;
-    wire [2:0] _76;
-    reg [2:0] _2269;
-    wire _2360;
-    wire [2:0] _2362;
-    wire [2:0] _2366;
-    wire [2:0] _2374;
+    reg [2:0] _2149;
+    wire _2388;
     wire [2:0] _2390;
-    wire _2355;
-    wire _2354;
-    wire _2356;
-    wire _2352;
-    wire _2351;
-    wire _2353;
-    wire _2357;
-    wire _2348;
-    wire _2347;
-    wire _2349;
-    wire _2345;
-    wire _2344;
-    wire _2346;
-    wire _2350;
+    wire [2:0] _2394;
+    wire [2:0] _2183;
+    wire _2179;
+    wire _2180;
+    wire _2177;
+    wire _2181;
+    wire [2:0] _2184;
+    wire _2174;
+    wire _2175;
+    wire _2172;
+    wire _2171;
+    wire _2173;
+    wire _2176;
+    wire [2:0] _2186;
+    wire _2167;
+    wire [2:0] _2187;
+    wire [2:0] _71;
+    reg [2:0] _2170;
+    wire _2384;
+    wire [2:0] _2386;
+    wire [2:0] _2204;
+    wire _2200;
+    wire _2201;
+    wire _2198;
+    wire _2202;
+    wire [2:0] _2205;
+    wire _2195;
+    wire _2196;
+    wire _2193;
+    wire _2192;
+    wire _2194;
+    wire _2197;
+    wire [2:0] _2207;
+    wire _2188;
+    wire [2:0] _2208;
+    wire [2:0] _72;
+    reg [2:0] _2191;
+    wire _2381;
+    wire [2:0] _2383;
+    wire [2:0] _2387;
+    wire [2:0] _2395;
+    wire [2:0] _2225;
+    wire _2221;
+    wire _2222;
+    wire _2219;
+    wire _2223;
+    wire [2:0] _2226;
+    wire _2216;
+    wire _2217;
+    wire _2214;
+    wire _2213;
+    wire _2215;
+    wire _2218;
+    wire [2:0] _2228;
+    wire _2209;
+    wire [2:0] _2229;
+    wire [2:0] _73;
+    reg [2:0] _2212;
+    wire _2376;
+    wire [2:0] _2378;
+    wire [2:0] _2246;
+    wire _2242;
+    wire _2243;
+    wire _2240;
+    wire _2244;
+    wire [2:0] _2247;
+    wire _2237;
+    wire _2238;
+    wire _2235;
+    wire _2234;
+    wire _2236;
+    wire _2239;
+    wire [2:0] _2249;
+    wire _2230;
+    wire [2:0] _2250;
+    wire [2:0] _74;
+    reg [2:0] _2233;
+    wire _2373;
+    wire [2:0] _2375;
+    wire [2:0] _2379;
+    wire [2:0] _2267;
+    wire _2263;
+    wire _2264;
+    wire _2261;
+    wire _2265;
+    wire [2:0] _2268;
+    wire _2258;
+    wire _2259;
+    wire _2256;
+    wire _2255;
+    wire _2257;
+    wire _2260;
+    wire [2:0] _2270;
+    wire _2251;
+    wire [2:0] _2271;
+    wire [2:0] _75;
+    reg [2:0] _2254;
+    wire _2369;
+    wire [2:0] _2371;
+    wire [2:0] _2288;
+    wire _2284;
+    wire _2285;
+    wire _2282;
+    wire _2286;
+    wire [2:0] _2289;
+    wire _2279;
+    wire _2280;
+    wire _2277;
+    wire _2276;
+    wire _2278;
+    wire _2281;
+    wire [2:0] _2291;
+    wire _2272;
+    wire [2:0] _2292;
+    wire [2:0] _76;
+    reg [2:0] _2275;
+    wire _2366;
+    wire [2:0] _2368;
+    wire [2:0] _2372;
+    wire [2:0] _2380;
+    wire [2:0] _2396;
+    wire _2361;
+    wire _2360;
+    wire _2362;
     wire _2358;
-    wire [2:0] _2391;
-    wire _2333;
-    wire _2332;
-    wire _2334;
-    wire [2:0] _2336;
-    wire _2328;
-    wire _2327;
-    wire _2329;
-    wire [2:0] _2331;
-    wire _2337;
-    wire [2:0] _2338;
-    wire _2321;
-    wire _2320;
-    wire _2322;
-    wire [2:0] _2324;
-    wire _2316;
-    wire _2315;
-    wire _2317;
-    wire [2:0] _2319;
-    wire _2325;
-    wire [2:0] _2326;
+    wire _2357;
+    wire _2359;
+    wire _2363;
+    wire _2354;
+    wire _2353;
+    wire _2355;
+    wire _2351;
+    wire _2350;
+    wire _2352;
+    wire _2356;
+    wire _2364;
+    wire [2:0] _2397;
     wire _2339;
-    wire [2:0] _2340;
-    wire _2307;
-    wire _2306;
-    wire _2308;
-    wire [2:0] _2310;
-    wire _2302;
-    wire _2301;
-    wire _2303;
-    wire [2:0] _2305;
-    wire _2311;
-    wire [2:0] _2312;
-    wire _2295;
-    wire _2294;
-    wire _2296;
-    wire [2:0] _2298;
-    wire _2290;
-    wire _2289;
-    wire _2291;
-    wire [2:0] _2293;
-    wire _2299;
-    wire [2:0] _2300;
-    wire _2313;
-    wire [2:0] _2314;
-    wire _2341;
+    wire _2338;
+    wire _2340;
     wire [2:0] _2342;
-    wire [2:0] _2343;
-    wire [2:0] _2392;
-    wire [2:0] _2287;
-    wire _2393;
-    wire [28:0] _2395;
-    wire [31:0] _2397;
-    wire [47:0] _2401;
+    wire _2334;
+    wire _2333;
+    wire _2335;
+    wire [2:0] _2337;
+    wire _2343;
+    wire [2:0] _2344;
+    wire _2327;
+    wire _2326;
+    wire _2328;
+    wire [2:0] _2330;
+    wire _2322;
+    wire _2321;
+    wire _2323;
+    wire [2:0] _2325;
+    wire _2331;
+    wire [2:0] _2332;
+    wire _2345;
+    wire [2:0] _2346;
+    wire _2313;
+    wire _2312;
+    wire _2314;
+    wire [2:0] _2316;
+    wire _2308;
+    wire _2307;
+    wire _2309;
+    wire [2:0] _2311;
+    wire _2317;
+    wire [2:0] _2318;
+    wire _2301;
+    wire _2300;
+    wire _2302;
+    wire [2:0] _2304;
+    wire _2296;
+    wire _2295;
+    wire _2297;
+    wire [2:0] _2299;
+    wire _2305;
+    wire [2:0] _2306;
+    wire _2319;
+    wire [2:0] _2320;
+    wire _2347;
+    wire [2:0] _2348;
+    wire [2:0] _2349;
+    wire [2:0] _2398;
+    wire [2:0] _2293;
+    wire _2399;
+    wire [28:0] _2401;
+    wire [31:0] _2403;
+    wire [47:0] _2407;
     wire [47:0] _77;
-    reg [47:0] _2425;
-    wire [2:0] _2418;
-    wire [3:0] _1984;
-    wire [3:0] _2407;
-    wire [3:0] _2408;
-    wire [3:0] _2406;
-    wire [3:0] _2409;
-    wire [3:0] _1742;
-    wire _1743;
-    wire _2098;
+    reg [47:0] _2431;
+    wire [2:0] _2424;
+    wire [3:0] _1990;
+    wire [3:0] _2413;
+    wire [3:0] _2414;
+    wire [3:0] _2412;
+    wire [3:0] _2415;
+    wire [3:0] _1748;
+    wire _1749;
+    wire _2104;
     wire _78;
-    wire _2099;
-    wire _2404;
-    wire [3:0] _2410;
-    reg [3:0] _2413;
+    wire _2105;
+    wire _2410;
+    wire [3:0] _2416;
+    reg [3:0] _2419;
     wire [3:0] _79;
-    wire _1985;
-    wire _2402;
+    wire _1991;
+    wire _2408;
     wire _81;
-    wire _2403;
-    wire [2:0] _2419;
+    wire _2409;
+    wire [2:0] _2425;
     wire [2:0] _82;
-    reg [2:0] _2416;
-    reg [47:0] _2468;
+    reg [2:0] _2422;
+    reg [47:0] _2474;
+    wire _2538;
+    wire _2539;
+    reg [7:0] _2540;
     wire _2532;
     wire _2533;
     reg [7:0] _2534;
@@ -864,223 +871,226 @@ module spex_sim_top (
     wire _2502;
     wire _2503;
     reg [7:0] _2504;
+    wire [2:0] _2483;
+    wire [2:0] _2484;
+    wire [2:0] _85;
+    reg [2:0] _2481;
     wire _2496;
     wire _2497;
     reg [7:0] _2498;
-    wire [2:0] _2477;
-    wire [2:0] _2478;
-    wire [2:0] _85;
-    reg [2:0] _2475;
-    wire _2490;
-    wire _2491;
-    reg [7:0] _2492;
-    wire [2:0] _2485;
-    wire [2:0] _2486;
+    wire [2:0] _2491;
+    wire [2:0] _2492;
     wire [2:0] _86;
-    reg [2:0] _2483;
-    reg [7:0] _2535;
-    wire [31:0] _2536;
-    wire [31:0] _2537;
+    reg [2:0] _2489;
+    reg [7:0] _2541;
+    wire [31:0] _2542;
+    wire [31:0] _2543;
     wire [31:0] _90;
     reg [31:0] ts_reg;
-    wire [1:0] _2539;
-    wire [1:0] _2398;
-    wire [1:0] _2400;
-    reg [1:0] _2540;
-    reg _2543;
+    wire [1:0] _2545;
+    wire [1:0] _2404;
+    wire [1:0] _2406;
     reg [1:0] _2546;
     reg _2549;
-    wire _2550;
-    wire _2551;
-    wire _2552;
-    wire [7:0] _2693;
-    wire [7:0] _2694;
-    wire [7:0] _2574;
-    wire [7:0] _2572;
-    wire [7:0] _2571;
-    wire [7:0] _2570;
-    wire [7:0] _2569;
-    reg [7:0] _2573;
-    wire [7:0] _2575;
-    wire [7:0] _2576;
-    wire [7:0] _2567;
-    wire [7:0] _2568;
+    reg [1:0] _2552;
+    reg _2555;
+    wire _2556;
+    wire _2557;
+    wire _2558;
+    wire [7:0] _2699;
+    wire [7:0] _2700;
+    wire [7:0] _2580;
+    wire [7:0] _2578;
     wire [7:0] _2577;
-    wire [7:0] _2611;
-    wire [7:0] _2612;
-    wire [7:0] _2614;
-    wire [7:0] _2616;
+    wire [7:0] _2576;
+    wire [7:0] _2575;
+    reg [7:0] _2579;
+    wire [7:0] _2581;
+    wire [7:0] _2582;
+    wire [7:0] _2573;
+    wire [7:0] _2574;
+    wire [7:0] _2583;
+    wire [7:0] _2617;
+    wire [7:0] _2618;
+    wire [7:0] _2620;
+    wire [7:0] _2622;
     wire [7:0] _100;
     reg [7:0] f_poe;
-    wire [7:0] _2695;
+    wire [7:0] _2701;
     wire [7:0] _103;
-    wire [7:0] _4280;
+    wire [7:0] _4344;
+    wire _2696;
+    wire _2695;
+    wire _2693;
+    wire _2694;
+    wire _2692;
+    wire _2691;
     wire _2690;
-    wire _2689;
+    wire [2:0] _2689;
+    reg _2697;
     wire _2687;
-    wire _2688;
     wire _2686;
-    wire _2685;
     wire _2684;
-    wire [2:0] _2683;
-    reg _2691;
+    wire _2685;
+    wire _2683;
+    wire _2682;
     wire _2681;
-    wire _2680;
+    wire [2:0] _2680;
+    reg _2688;
     wire _2678;
-    wire _2679;
     wire _2677;
-    wire _2676;
     wire _2675;
-    wire [2:0] _2674;
-    reg _2682;
+    wire _2676;
+    wire _2674;
+    wire _2673;
     wire _2672;
-    wire _2671;
+    wire [2:0] _2671;
+    reg _2679;
     wire _2669;
-    wire _2670;
     wire _2668;
-    wire _2667;
     wire _2666;
-    wire [2:0] _2665;
-    reg _2673;
+    wire _2667;
+    wire _2665;
+    wire _2664;
     wire _2663;
-    wire _2662;
+    wire [2:0] _2662;
+    reg _2670;
     wire _2660;
-    wire _2661;
     wire _2659;
-    wire _2658;
     wire _2657;
-    wire [2:0] _2656;
-    reg _2664;
+    wire _2658;
+    wire _2656;
+    wire _2655;
     wire _2654;
-    wire _2653;
+    wire [2:0] _2653;
+    reg _2661;
     wire _2651;
-    wire _2652;
     wire _2650;
-    wire _2649;
     wire _2648;
-    wire [2:0] _2647;
-    reg _2655;
+    wire _2649;
+    wire _2647;
+    wire _2646;
     wire _2645;
-    wire _2644;
+    wire [2:0] _2644;
+    reg _2652;
     wire _2642;
-    wire _2643;
     wire _2641;
-    wire _2640;
     wire _2639;
-    wire [2:0] _2638;
-    reg _2646;
+    wire _2640;
+    wire _2638;
+    wire _2637;
     wire _2636;
-    wire _2635;
+    wire [2:0] _2635;
+    reg _2643;
     wire _2633;
-    wire _2634;
     wire _2632;
-    wire _2631;
     wire _2630;
-    wire [2:0] _2629;
-    reg _2637;
-    wire _2627;
-    wire _2626;
-    wire _2624;
-    wire _2625;
-    wire _2623;
-    wire _2622;
-    wire [2:0] _4272;
-    wire _4269;
-    wire [1:0] _4270;
-    wire [3:0] _4271;
-    wire [6:0] _4273;
-    wire [7:0] _4274;
-    wire [7:0] _4275;
+    wire _2631;
+    wire _2629;
+    wire _2628;
+    wire [2:0] _4336;
+    wire _4333;
+    wire [1:0] _4334;
+    wire [3:0] _4335;
+    wire [6:0] _4337;
+    wire [7:0] _4338;
+    wire [7:0] _4339;
+    wire _2614;
+    wire _2613;
+    wire _2612;
+    wire _2610;
+    wire _2611;
     wire _2608;
-    wire _2607;
-    wire _2606;
-    wire _2604;
+    wire _2609;
     wire _2605;
+    wire _2606;
+    wire _2607;
     wire _2602;
     wire _2603;
+    wire _2604;
     wire _2599;
-    wire _2600;
-    wire _2601;
-    wire _2596;
-    wire _2597;
     wire _2598;
-    wire _2593;
-    wire _2592;
-    wire _2594;
-    wire _2591;
-    wire _2595;
-    wire [7:0] _2609;
-    wire _2578;
+    wire _2600;
+    wire _2597;
+    wire _2601;
+    wire [7:0] _2615;
     wire _2584;
-    wire [7:0] _2610;
-    wire [7:0] _4267;
-    wire [7:0] _4263;
-    wire [7:0] _4261;
-    wire [7:0] _4260;
-    wire [7:0] _4259;
-    wire [7:0] _4258;
-    reg [7:0] _4262;
-    wire [7:0] _4264;
-    wire [7:0] _4265;
-    wire [7:0] _2565;
-    wire [7:0] _2563;
-    wire [7:0] _2562;
-    wire [7:0] _2561;
-    wire [7:0] _2560;
-    reg [7:0] _2564;
+    wire _2590;
+    wire [7:0] _2616;
+    wire [7:0] _4331;
+    wire [7:0] _4327;
+    wire [7:0] _4325;
+    wire [7:0] _4324;
+    wire [7:0] _4323;
+    wire [7:0] _4322;
+    reg [7:0] _4326;
+    wire [7:0] _4328;
+    wire [7:0] _4329;
+    wire [7:0] _2571;
+    wire [7:0] _2569;
+    wire [7:0] _2568;
+    wire [7:0] _2567;
     wire [7:0] _2566;
-    wire [7:0] _4256;
-    wire [7:0] _4257;
-    wire [7:0] _4266;
-    wire [7:0] _4268;
-    wire [7:0] _4276;
-    wire _2554;
-    wire _2555;
-    wire _2556;
-    wire [7:0] _4277;
+    reg [7:0] _2570;
+    wire [7:0] _2572;
+    wire [7:0] _4320;
+    wire [7:0] _4321;
+    wire [7:0] _4330;
+    wire [7:0] _4332;
+    wire [7:0] _4340;
+    wire _2560;
+    wire _2561;
+    wire _2562;
+    wire [7:0] _4341;
     wire [31:0] _105;
-    wire [31:0] _4249;
-    wire [31:0] _2810;
-    wire [30:0] _2808;
-    wire [31:0] _2809;
-    wire [31:0] _2811;
-    wire [30:0] _2805;
-    wire [31:0] _2806;
-    wire [30:0] _2798;
-    wire [31:0] _2799;
-    wire [31:0] _2801;
-    wire [30:0] _2795;
-    wire [31:0] _2796;
-    wire [30:0] _2788;
-    wire [31:0] _2789;
-    wire [31:0] _2791;
-    wire [30:0] _2785;
-    wire [31:0] _2786;
-    wire [30:0] _2778;
-    wire [31:0] _2779;
-    wire [31:0] _2781;
-    wire [30:0] _2775;
-    wire [31:0] _2776;
-    wire [30:0] _2768;
-    wire [31:0] _2769;
-    wire [31:0] _2771;
-    wire [30:0] _2765;
-    wire [31:0] _2766;
-    wire [30:0] _2758;
-    wire [31:0] _2759;
-    wire [31:0] _2761;
-    wire [30:0] _2755;
-    wire [31:0] _2756;
-    wire [30:0] _2748;
-    wire [31:0] _2749;
-    wire [31:0] _2751;
-    wire [30:0] _2745;
-    wire [31:0] _2746;
-    wire [30:0] _2738;
-    wire [31:0] _2739;
-    wire [31:0] _2741;
-    wire [30:0] _2735;
-    wire [31:0] _2736;
+    wire [31:0] _4313;
+    wire [31:0] _2816;
+    wire [30:0] _2814;
+    wire [31:0] _2815;
+    wire [31:0] _2817;
+    wire [30:0] _2811;
+    wire [31:0] _2812;
+    wire [30:0] _2804;
+    wire [31:0] _2805;
+    wire [31:0] _2807;
+    wire [30:0] _2801;
+    wire [31:0] _2802;
+    wire [30:0] _2794;
+    wire [31:0] _2795;
+    wire [31:0] _2797;
+    wire [30:0] _2791;
+    wire [31:0] _2792;
+    wire [30:0] _2784;
+    wire [31:0] _2785;
+    wire [31:0] _2787;
+    wire [30:0] _2781;
+    wire [31:0] _2782;
+    wire [30:0] _2774;
+    wire [31:0] _2775;
+    wire [31:0] _2777;
+    wire [30:0] _2771;
+    wire [31:0] _2772;
+    wire [30:0] _2764;
+    wire [31:0] _2765;
+    wire [31:0] _2767;
+    wire [30:0] _2761;
+    wire [31:0] _2762;
+    wire [30:0] _2754;
+    wire [31:0] _2755;
+    wire [31:0] _2757;
+    wire [30:0] _2751;
+    wire [31:0] _2752;
+    wire [30:0] _2744;
+    wire [31:0] _2745;
+    wire [31:0] _2747;
+    wire [30:0] _2741;
+    wire [31:0] _2742;
+    wire [7:0] _2735;
+    wire [7:0] _2734;
+    wire [7:0] _2733;
+    wire [7:0] _2732;
+    wire [7:0] _2731;
+    wire [7:0] _2730;
     wire [7:0] _2729;
     wire [7:0] _2728;
     wire [7:0] _2727;
@@ -1091,7484 +1101,7596 @@ module spex_sim_top (
     wire [7:0] _2722;
     wire [7:0] _2721;
     wire [7:0] _2720;
-    wire [7:0] _2719;
-    wire [7:0] _2718;
-    wire [7:0] _2717;
-    wire [7:0] _2716;
-    wire [7:0] _2715;
-    wire [7:0] _2714;
-    wire [12:0] _2711;
-    wire [12:0] _2712;
-    wire [3:0] _2713;
-    reg [7:0] _2730;
-    wire [23:0] _2710;
-    wire [31:0] _2731;
-    wire _2708;
-    wire _2709;
-    wire [31:0] _2813;
-    wire [31:0] _2703;
-    wire [31:0] _2814;
+    wire [12:0] _2717;
+    wire [12:0] _2718;
+    wire [3:0] _2719;
+    reg [7:0] _2736;
+    wire [23:0] _2716;
+    wire [31:0] _2737;
+    wire _2714;
+    wire _2715;
+    wire [31:0] _2819;
+    wire [31:0] _2709;
+    wire [31:0] _2820;
     wire [31:0] _106;
-    reg [31:0] _2701;
-    wire [31:0] _2732;
-    wire _2733;
-    wire [31:0] _2742;
-    wire _2743;
-    wire [31:0] _2752;
-    wire _2753;
-    wire [31:0] _2762;
-    wire _2763;
-    wire [31:0] _2772;
-    wire _2773;
-    wire [31:0] _2782;
-    wire _2783;
-    wire [31:0] _2792;
-    wire _2793;
-    wire [31:0] _2802;
-    wire _2803;
-    wire [31:0] _2812;
-    wire [31:0] _4250;
+    reg [31:0] _2707;
+    wire [31:0] _2738;
+    wire _2739;
+    wire [31:0] _2748;
+    wire _2749;
+    wire [31:0] _2758;
+    wire _2759;
+    wire [31:0] _2768;
+    wire _2769;
+    wire [31:0] _2778;
+    wire _2779;
+    wire [31:0] _2788;
+    wire _2789;
+    wire [31:0] _2798;
+    wire _2799;
+    wire [31:0] _2808;
+    wire _2809;
+    wire [31:0] _2818;
+    wire [31:0] _4314;
     wire f_sw_match;
-    wire _4252;
-    wire _4254;
-    wire _4244;
-    wire _4246;
-    wire _4248;
-    wire [12:0] _4237;
+    wire _4316;
+    wire _4318;
+    wire _4308;
+    wire _4310;
+    wire _4312;
+    wire [12:0] _4301;
     wire f_sw_last;
-    wire _4240;
+    wire _4304;
     wire _108;
-    wire _4234;
-    wire _4235;
-    wire _4236;
-    wire _4242;
-    wire _2697;
-    wire [1:0] _4226;
-    wire [1:0] _4222;
-    wire [1:0] _1961;
-    wire _4213;
-    wire [1:0] _4215;
-    wire _4212;
-    wire [1:0] _4217;
-    wire _4211;
-    wire [1:0] _4219;
-    wire [1:0] _4220;
-    wire [7:0] _1695;
-    wire _1697;
-    wire _1688;
-    wire [15:0] _1683;
-    wire _1684;
-    wire _1685;
-    wire _1682;
-    wire _1686;
-    wire _1689;
-    wire [3:0] _1679;
-    wire _1681;
+    wire _4298;
+    wire _4299;
+    wire _4300;
+    wire _4306;
+    wire _2703;
+    wire [1:0] _4290;
+    wire [1:0] _4286;
+    wire [1:0] _1967;
+    wire _4277;
+    wire [1:0] _4279;
+    wire _4276;
+    wire [1:0] _4281;
+    wire _4275;
+    wire [1:0] _4283;
+    wire [1:0] _4284;
+    wire [7:0] _1701;
+    wire _1703;
+    wire _1694;
+    wire [15:0] _1689;
     wire _1690;
-    wire _1677;
-    wire _1673;
-    wire _1674;
-    wire _1671;
-    wire _1675;
-    wire _1678;
-    wire _1669;
-    reg [2:0] _1663;
-    wire [15:0] _1664;
-    wire _1665;
-    wire _1659;
-    wire _1666;
-    wire _1657;
-    wire _1667;
-    wire _1670;
-    wire [1:0] _1656;
-    reg _1691;
-    wire _1655;
+    wire _1691;
+    wire _1688;
     wire _1692;
-    wire _1652;
-    wire [3:0] _1650;
-    reg _1651;
+    wire _1695;
+    wire [3:0] _1685;
+    wire _1687;
+    wire _1696;
+    wire _1683;
+    wire _1679;
+    wire _1680;
+    wire _1677;
+    wire _1681;
+    wire _1684;
+    wire _1675;
+    reg [2:0] _1669;
+    wire [15:0] _1670;
+    wire _1671;
+    wire _1665;
+    wire _1672;
+    wire _1663;
+    wire _1673;
+    wire _1676;
+    wire [1:0] _1662;
+    reg _1697;
+    wire _1661;
+    wire _1698;
+    wire _1658;
+    wire [3:0] _1656;
+    reg _1657;
+    wire _1659;
+    wire [15:0] _1651;
     wire _1653;
-    wire [15:0] _1645;
-    wire _1647;
-    wire [16:0] _1640;
-    wire [15:0] _1636;
-    wire [16:0] _1637;
-    wire [16:0] _1638;
-    reg [16:0] _1641;
-    wire _1642;
-    wire _1643;
-    wire [15:0] _1632;
-    wire _1634;
-    wire _1616;
-    wire [2:0] _1618;
-    wire _1613;
-    wire [2:0] _1615;
-    wire _1619;
-    wire [2:0] _1620;
-    wire _1608;
-    wire [2:0] _1610;
-    wire _1605;
-    wire [2:0] _1607;
-    wire _1611;
-    wire [2:0] _1612;
-    wire _1621;
-    wire [2:0] _1622;
-    wire _1598;
-    wire [2:0] _1600;
-    wire _1595;
-    wire [2:0] _1597;
-    wire _1601;
-    wire [2:0] _1602;
-    wire _1590;
-    wire [2:0] _1592;
-    wire [7:0] _1586;
-    wire _1587;
-    wire [2:0] _1589;
-    wire _1593;
-    wire [2:0] _1594;
-    wire _1603;
-    wire [2:0] _1604;
-    wire _1623;
-    wire [2:0] _1624;
-    wire [13:0] _1585;
-    wire [16:0] _1625;
-    wire [111:0] _1582;
-    wire [15:0] _1583;
-    wire [16:0] _1584;
-    wire [16:0] _1626;
-    reg [16:0] _1629;
-    wire [16:0] _1581;
-    wire _1630;
-    wire _1631;
-    wire _1635;
-    wire _1644;
-    wire [1:0] _1577;
-    reg [15:0] _1578;
-    wire _1580;
+    wire [16:0] _1646;
+    wire [15:0] _1642;
+    wire [16:0] _1643;
+    wire [16:0] _1644;
+    reg [16:0] _1647;
     wire _1648;
+    wire _1649;
+    wire [15:0] _1638;
+    wire _1640;
+    wire _1622;
+    wire [2:0] _1624;
+    wire _1619;
+    wire [2:0] _1621;
+    wire _1625;
+    wire [2:0] _1626;
+    wire _1614;
+    wire [2:0] _1616;
+    wire _1611;
+    wire [2:0] _1613;
+    wire _1617;
+    wire [2:0] _1618;
+    wire _1627;
+    wire [2:0] _1628;
+    wire _1604;
+    wire [2:0] _1606;
+    wire _1601;
+    wire [2:0] _1603;
+    wire _1607;
+    wire [2:0] _1608;
+    wire _1596;
+    wire [2:0] _1598;
+    wire [7:0] _1592;
+    wire _1593;
+    wire [2:0] _1595;
+    wire _1599;
+    wire [2:0] _1600;
+    wire _1609;
+    wire [2:0] _1610;
+    wire _1629;
+    wire [2:0] _1630;
+    wire [13:0] _1591;
+    wire [16:0] _1631;
+    wire [111:0] _1588;
+    wire [15:0] _1589;
+    wire [16:0] _1590;
+    wire [16:0] _1632;
+    reg [16:0] _1635;
+    wire [16:0] _1587;
+    wire _1636;
+    wire _1637;
+    wire _1641;
+    wire _1650;
+    wire [1:0] _1583;
+    reg [15:0] _1584;
+    wire _1586;
+    wire _1654;
+    wire [7:0] _1577;
+    wire _1579;
+    wire _1580;
+    wire _1576;
+    wire _1581;
+    wire [7:0] _1570;
+    wire [7:0] _1568;
+    wire [7:0] _1569;
     wire [7:0] _1571;
     wire _1573;
     wire _1574;
-    wire _1570;
-    wire _1575;
-    wire [7:0] _1564;
-    wire [7:0] _1562;
-    wire [7:0] _1563;
-    wire [7:0] _1565;
-    wire _1567;
-    wire _1568;
-    wire _1576;
-    wire _1649;
-    wire _1654;
-    wire _1693;
-    wire _1694;
-    wire _1698;
+    wire _1582;
+    wire _1655;
+    wire _1660;
+    wire _1699;
+    wire _1700;
+    wire _1704;
     wire f_fire3;
-    wire [7:0] _1246;
-    wire _1248;
-    wire _1234;
-    wire _1230;
-    wire _1231;
-    wire _1228;
-    wire _1232;
-    wire _1235;
-    wire [3:0] _1225;
-    wire _1227;
+    wire [7:0] _1252;
+    wire _1254;
+    wire _1240;
     wire _1236;
-    wire _1223;
-    wire _1219;
-    wire _1220;
-    wire _1217;
-    wire _1221;
-    wire _1224;
-    wire _1215;
-    reg [2:0] _1209;
-    wire [15:0] _1210;
-    wire _1211;
-    wire _1205;
-    wire _1212;
-    wire _1203;
-    wire _1213;
-    wire _1216;
-    wire [1:0] _1202;
-    reg _1237;
-    wire _1201;
+    wire _1237;
+    wire _1234;
     wire _1238;
-    wire _1193;
-    wire [3:0] _1169;
-    reg _1192;
-    wire _1194;
-    wire [15:0] _1164;
-    wire _1166;
-    wire [15:0] _1155;
-    wire [16:0] _1156;
-    wire [16:0] _1157;
-    reg [16:0] _1160;
-    wire _1161;
-    wire _1162;
-    wire [15:0] _1151;
-    wire _1153;
-    wire _1117;
-    wire [2:0] _1137;
-    wire _1096;
-    wire [2:0] _1116;
-    wire _1138;
-    wire [2:0] _1139;
-    wire _1073;
-    wire [2:0] _1093;
-    wire _1052;
-    wire [2:0] _1072;
-    wire _1094;
-    wire [2:0] _1095;
-    wire _1140;
-    wire [2:0] _1141;
-    wire _1027;
-    wire [2:0] _1047;
-    wire _1006;
-    wire [2:0] _1026;
-    wire _1048;
-    wire [2:0] _1049;
-    wire _983;
-    wire [2:0] _1003;
-    wire [7:0] _961;
-    wire _962;
-    wire [2:0] _982;
-    wire _1004;
-    wire [2:0] _1005;
-    wire _1050;
-    wire [2:0] _1051;
-    wire _1142;
-    wire [2:0] _1143;
-    wire [16:0] _1144;
-    wire [111:0] _957;
-    wire [15:0] _958;
-    wire [16:0] _959;
-    wire [16:0] _1145;
-    reg [16:0] _1148;
-    wire [16:0] _939;
-    wire _1149;
-    wire _1150;
-    wire _1154;
-    wire _1163;
-    wire [1:0] _926;
-    reg [15:0] _936;
-    wire _938;
+    wire _1241;
+    wire [3:0] _1231;
+    wire _1233;
+    wire _1242;
+    wire _1229;
+    wire _1225;
+    wire _1226;
+    wire _1223;
+    wire _1227;
+    wire _1230;
+    wire _1221;
+    reg [2:0] _1215;
+    wire [15:0] _1216;
+    wire _1217;
+    wire _1211;
+    wire _1218;
+    wire _1209;
+    wire _1219;
+    wire _1222;
+    wire [1:0] _1208;
+    reg _1243;
+    wire _1207;
+    wire _1244;
+    wire _1199;
+    wire [3:0] _1175;
+    reg _1198;
+    wire _1200;
+    wire [15:0] _1170;
+    wire _1172;
+    wire [15:0] _1161;
+    wire [16:0] _1162;
+    wire [16:0] _1163;
+    reg [16:0] _1166;
     wire _1167;
-    wire [7:0] _920;
-    wire _922;
-    wire _923;
-    wire _911;
-    wire _924;
-    wire [7:0] _904;
-    wire [7:0] _902;
-    wire [7:0] _903;
-    wire [7:0] _905;
-    wire _907;
-    wire [127:0] _885;
-    wire [2:0] _4196;
-    wire [2:0] _4192;
-    wire _4187;
-    wire [2:0] _4189;
-    wire [7:0] _1952;
-    wire _1954;
-    wire _1955;
-    wire _1950;
-    wire _1951;
+    wire _1168;
+    wire [15:0] _1157;
+    wire _1159;
+    wire _1123;
+    wire [2:0] _1143;
+    wire _1102;
+    wire [2:0] _1122;
+    wire _1144;
+    wire [2:0] _1145;
+    wire _1079;
+    wire [2:0] _1099;
+    wire _1058;
+    wire [2:0] _1078;
+    wire _1100;
+    wire [2:0] _1101;
+    wire _1146;
+    wire [2:0] _1147;
+    wire _1033;
+    wire [2:0] _1053;
+    wire _1012;
+    wire [2:0] _1032;
+    wire _1054;
+    wire [2:0] _1055;
+    wire _989;
+    wire [2:0] _1009;
+    wire [7:0] _967;
+    wire _968;
+    wire [2:0] _988;
+    wire _1010;
+    wire [2:0] _1011;
+    wire _1056;
+    wire [2:0] _1057;
+    wire _1148;
+    wire [2:0] _1149;
+    wire [16:0] _1150;
+    wire [111:0] _963;
+    wire [15:0] _964;
+    wire [16:0] _965;
+    wire [16:0] _1151;
+    reg [16:0] _1154;
+    wire [16:0] _945;
+    wire _1155;
+    wire _1156;
+    wire _1160;
+    wire _1169;
+    wire [1:0] _932;
+    reg [15:0] _942;
+    wire _944;
+    wire _1173;
+    wire [7:0] _926;
+    wire _928;
+    wire _929;
+    wire _917;
+    wire _930;
+    wire [7:0] _910;
+    wire [7:0] _908;
+    wire [7:0] _909;
+    wire [7:0] _911;
+    wire _913;
+    wire [127:0] _891;
+    wire [2:0] _4260;
+    wire [2:0] _4256;
+    wire _4251;
+    wire [2:0] _4253;
+    wire [7:0] _1958;
+    wire _1960;
+    wire _1961;
+    wire _1956;
+    wire _1957;
     wire f_unexp_now;
-    wire _2818;
-    wire _2819;
-    wire _2821;
-    wire _2822;
-    wire _2817;
-    wire _2815;
+    wire _2824;
+    wire _2825;
+    wire _2827;
+    wire _2828;
     wire _2823;
+    wire _2821;
+    wire _2829;
     wire _109;
-    reg _1947;
-    wire _1948;
-    wire [15:0] _4178;
-    wire [15:0] _4179;
-    wire _4175;
-    wire _4176;
-    wire _4177;
-    wire [15:0] _4180;
-    wire [2:0] _4120;
-    wire [2:0] _4118;
-    wire [2:0] _4117;
-    wire [2:0] _4116;
-    wire [2:0] _4115;
-    wire [7:0] _1556;
-    wire _1558;
-    wire _1549;
-    wire _1545;
-    wire _1546;
-    wire _1543;
-    wire _1547;
-    wire _1550;
-    wire [3:0] _1540;
-    wire _1542;
+    reg _1953;
+    wire _1954;
+    wire [15:0] _4242;
+    wire [15:0] _4243;
+    wire _4239;
+    wire _4240;
+    wire _4241;
+    wire [15:0] _4244;
+    wire [2:0] _4184;
+    wire [2:0] _4182;
+    wire [2:0] _4181;
+    wire [2:0] _4180;
+    wire [2:0] _4179;
+    wire [7:0] _1562;
+    wire _1564;
+    wire _1555;
     wire _1551;
-    wire _1538;
-    wire _1534;
-    wire _1535;
-    wire _1532;
-    wire _1536;
-    wire _1539;
-    wire _1530;
-    reg [2:0] _1524;
-    wire [15:0] _1525;
-    wire _1526;
-    wire _1520;
-    wire _1527;
-    wire _1518;
-    wire _1528;
-    wire _1531;
-    wire [1:0] _1517;
-    reg _1552;
-    wire _1516;
+    wire _1552;
+    wire _1549;
     wire _1553;
-    wire _1513;
-    wire [3:0] _1511;
-    reg _1512;
+    wire _1556;
+    wire [3:0] _1546;
+    wire _1548;
+    wire _1557;
+    wire _1544;
+    wire _1540;
+    wire _1541;
+    wire _1538;
+    wire _1542;
+    wire _1545;
+    wire _1536;
+    reg [2:0] _1530;
+    wire [15:0] _1531;
+    wire _1532;
+    wire _1526;
+    wire _1533;
+    wire _1524;
+    wire _1534;
+    wire _1537;
+    wire [1:0] _1523;
+    reg _1558;
+    wire _1522;
+    wire _1559;
+    wire _1519;
+    wire [3:0] _1517;
+    reg _1518;
+    wire _1520;
+    wire [15:0] _1512;
     wire _1514;
-    wire [15:0] _1506;
-    wire _1508;
-    wire [15:0] _1497;
-    wire [16:0] _1498;
-    wire [16:0] _1499;
-    reg [16:0] _1502;
-    wire _1503;
-    wire _1504;
-    wire [15:0] _1493;
-    wire _1495;
-    wire _1477;
-    wire [2:0] _1479;
-    wire _1474;
-    wire [2:0] _1476;
-    wire _1480;
-    wire [2:0] _1481;
-    wire _1469;
-    wire [2:0] _1471;
-    wire _1466;
-    wire [2:0] _1468;
-    wire _1472;
-    wire [2:0] _1473;
-    wire _1482;
-    wire [2:0] _1483;
-    wire _1459;
-    wire [2:0] _1461;
-    wire _1456;
-    wire [2:0] _1458;
-    wire _1462;
-    wire [2:0] _1463;
-    wire _1451;
-    wire [2:0] _1453;
-    wire [7:0] _1447;
-    wire _1448;
-    wire [2:0] _1450;
-    wire _1454;
-    wire [2:0] _1455;
-    wire _1464;
-    wire [2:0] _1465;
-    wire _1484;
-    wire [2:0] _1485;
-    wire [16:0] _1486;
-    wire [111:0] _1443;
-    wire [15:0] _1444;
-    wire [16:0] _1445;
-    wire [16:0] _1487;
-    reg [16:0] _1490;
-    wire [16:0] _1442;
-    wire _1491;
-    wire _1492;
-    wire _1496;
-    wire _1505;
-    wire [1:0] _1438;
-    reg [15:0] _1439;
-    wire _1441;
+    wire [15:0] _1503;
+    wire [16:0] _1504;
+    wire [16:0] _1505;
+    reg [16:0] _1508;
     wire _1509;
+    wire _1510;
+    wire [15:0] _1499;
+    wire _1501;
+    wire _1483;
+    wire [2:0] _1485;
+    wire _1480;
+    wire [2:0] _1482;
+    wire _1486;
+    wire [2:0] _1487;
+    wire _1475;
+    wire [2:0] _1477;
+    wire _1472;
+    wire [2:0] _1474;
+    wire _1478;
+    wire [2:0] _1479;
+    wire _1488;
+    wire [2:0] _1489;
+    wire _1465;
+    wire [2:0] _1467;
+    wire _1462;
+    wire [2:0] _1464;
+    wire _1468;
+    wire [2:0] _1469;
+    wire _1457;
+    wire [2:0] _1459;
+    wire [7:0] _1453;
+    wire _1454;
+    wire [2:0] _1456;
+    wire _1460;
+    wire [2:0] _1461;
+    wire _1470;
+    wire [2:0] _1471;
+    wire _1490;
+    wire [2:0] _1491;
+    wire [16:0] _1492;
+    wire [111:0] _1449;
+    wire [15:0] _1450;
+    wire [16:0] _1451;
+    wire [16:0] _1493;
+    reg [16:0] _1496;
+    wire [16:0] _1448;
+    wire _1497;
+    wire _1498;
+    wire _1502;
+    wire _1511;
+    wire [1:0] _1444;
+    reg [15:0] _1445;
+    wire _1447;
+    wire _1515;
+    wire [7:0] _1438;
+    wire _1440;
+    wire _1441;
+    wire _1437;
+    wire _1442;
+    wire [7:0] _1431;
+    wire [7:0] _1429;
+    wire [7:0] _1430;
     wire [7:0] _1432;
     wire _1434;
     wire _1435;
-    wire _1431;
-    wire _1436;
-    wire [7:0] _1425;
-    wire [7:0] _1423;
-    wire [7:0] _1424;
-    wire [7:0] _1426;
-    wire _1428;
-    wire _1429;
-    wire _1437;
-    wire _1510;
-    wire _1515;
-    wire _1554;
-    wire _1555;
-    wire _1559;
+    wire _1443;
+    wire _1516;
+    wire _1521;
+    wire _1560;
+    wire _1561;
+    wire _1565;
     wire f_fire2;
-    wire [1:0] _1704;
-    wire _1281;
+    wire [1:0] _1710;
+    wire _1287;
     wire [7:0] f_chgmask3;
     wire f_valid3;
-    wire [7:0] _1271;
+    wire [7:0] _1277;
     wire [7:0] f_chgmask2;
     wire f_valid2;
+    wire [7:0] _1271;
     wire [7:0] _1265;
-    wire [7:0] _1259;
     wire [7:0] f_chgmask0;
-    wire [7:0] _1253;
+    wire [7:0] _1259;
     wire [7:0] f_watch;
-    wire [7:0] _1254;
     wire [7:0] _1260;
     wire [7:0] _1266;
+    wire [7:0] _1272;
     wire [7:0] f_relevant;
-    wire [7:0] _1273;
-    wire _1275;
-    wire _1276;
-    wire f_amb_now;
-    wire _1278;
+    wire [7:0] _1279;
+    wire _1281;
     wire _1282;
-    wire [7:0] _1244;
-    wire [7:0] _2828;
-    wire [7:0] _2829;
-    wire _2825;
-    wire [7:0] _2827;
-    wire _2824;
-    wire [7:0] _2830;
-    wire [7:0] _2832;
+    wire f_amb_now;
+    wire _1284;
+    wire _1288;
+    wire [7:0] _1250;
+    wire [7:0] _2834;
+    wire [7:0] _2835;
+    wire _2831;
+    wire [7:0] _2833;
+    wire _2830;
+    wire [7:0] _2836;
+    wire [7:0] _2838;
     wire [7:0] _110;
-    reg [7:0] _1243;
+    reg [7:0] _1249;
     wire [7:0] f_multi_eff;
-    wire [7:0] _1417;
-    wire _1419;
-    wire _1410;
-    wire _1406;
-    wire _1407;
-    wire _1404;
-    wire _1408;
-    wire _1411;
-    wire [3:0] _1401;
-    wire _1403;
+    wire [7:0] _1423;
+    wire _1425;
+    wire _1416;
     wire _1412;
-    wire _1399;
-    wire _1395;
-    wire _1396;
-    wire _1393;
-    wire _1397;
-    wire _1400;
-    wire _1391;
-    reg [2:0] _1385;
-    wire [15:0] _1386;
-    wire _1387;
-    wire _1381;
-    wire _1388;
-    wire _1379;
-    wire _1389;
-    wire _1392;
-    wire [1:0] _1378;
-    reg _1413;
-    wire [1:0] _112;
-    wire [1:0] _2833;
-    wire [1:0] _113;
-    reg [1:0] _1198;
-    wire _1200;
-    wire _1377;
+    wire _1413;
+    wire _1410;
     wire _1414;
-    wire _1374;
-    wire _2837;
-    wire _2835;
-    wire _2838;
-    wire _2840;
-    wire _2842;
+    wire _1417;
+    wire [3:0] _1407;
+    wire _1409;
+    wire _1418;
+    wire _1405;
+    wire _1401;
+    wire _1402;
+    wire _1399;
+    wire _1403;
+    wire _1406;
+    wire _1397;
+    reg [2:0] _1391;
+    wire [15:0] _1392;
+    wire _1393;
+    wire _1387;
+    wire _1394;
+    wire _1385;
+    wire _1395;
+    wire _1398;
+    wire [1:0] _1384;
+    reg _1419;
+    wire [1:0] _112;
+    wire [1:0] _2839;
+    wire [1:0] _113;
+    reg [1:0] _1204;
+    wire _1206;
+    wire _1383;
+    wire _1420;
+    wire _1380;
+    wire _2843;
+    wire _2841;
+    wire _2844;
+    wire _2846;
+    wire _2848;
     wire _114;
-    reg _654;
-    wire [15:0] _116;
-    wire [15:0] _118;
-    wire [15:0] _2848;
-    wire [15:0] _2849;
-    wire _2851;
-    wire _2853;
-    wire _2854;
-    wire _2855;
-    wire _2856;
+    reg _660;
+    wire [15:0] _2855;
+    wire [15:0] _2856;
     wire _2858;
-    wire _2860;
-    wire _119;
-    reg _651;
-    wire _2873;
-    wire _2874;
-    wire _2876;
-    wire _2877;
-    wire _2878;
-    wire _2879;
+    wire _2849;
+    wire _2859;
+    wire _2861;
+    wire _2862;
+    wire _2863;
+    wire _2864;
+    wire _2866;
+    wire _2868;
+    wire _115;
+    reg _657;
+    wire [15:0] _117;
+    wire [15:0] _119;
+    wire [15:0] _2906;
+    wire [15:0] _2907;
+    wire [15:0] _2908;
+    wire _2910;
     wire _2881;
-    wire _120;
-    reg g_crc_bad;
-    wire _2875;
+    wire _2882;
     wire _2884;
-    wire [5:0] _2882;
-    wire _2883;
     wire _2885;
     wire _2886;
     wire _2887;
-    wire _2888;
     wire _2889;
-    wire _2891;
-    wire _2893;
-    wire _121;
-    reg _648;
-    wire _2897;
-    wire _2895;
-    wire _2898;
+    wire _120;
+    reg g_crc_bad;
+    wire _2883;
     wire _2900;
+    wire [5:0] _2898;
+    wire _2899;
+    wire _2901;
     wire _2902;
-    wire _122;
-    reg _666;
-    wire [15:0] _124;
-    wire [15:0] _126;
-    wire [15:0] _2908;
-    wire [15:0] _2909;
+    wire _2903;
+    wire _2904;
+    wire _2905;
+    wire _2893;
+    wire _2891;
+    wire _2890;
+    wire _2892;
+    wire _2894;
+    wire _121;
+    reg g_resid_chk;
     wire _2911;
     wire _2913;
-    wire _2914;
     wire _2915;
-    wire _2916;
-    wire _2918;
+    wire _122;
+    reg _654;
+    wire _2919;
+    wire _2917;
     wire _2920;
-    wire _127;
-    reg _663;
-    wire _2933;
+    wire _2922;
+    wire _2924;
+    wire _123;
+    reg _672;
+    wire [15:0] _2931;
+    wire [15:0] _2932;
     wire _2934;
-    wire _2936;
+    wire _2925;
+    wire _2935;
     wire _2937;
     wire _2938;
     wire _2939;
-    wire _2941;
-    wire _128;
-    reg g_crc_bad_0;
-    wire _2935;
+    wire _2940;
+    wire _2942;
     wire _2944;
-    wire _2943;
-    wire _2945;
-    wire _2946;
-    wire _2947;
-    wire _2948;
-    wire _2949;
-    wire _2951;
-    wire _2953;
-    wire _129;
-    reg _660;
-    wire [7:0] _131;
-    wire [6:0] _1190;
-    wire [6:0] _1189;
-    wire _1191;
-    wire [15:0] _1186;
-    wire _2958;
+    wire _124;
+    reg _669;
+    wire [15:0] _126;
+    wire [15:0] _128;
+    wire [15:0] _2982;
+    wire [15:0] _2983;
+    wire [15:0] _2984;
+    wire _2986;
     wire _2957;
-    wire _2959;
-    wire _2956;
+    wire _2958;
     wire _2960;
-    wire _2955;
     wire _2961;
-    wire [14:0] _2954;
-    wire [15:0] _2962;
-    wire [15:0] _132;
-    reg [15:0] _1187;
-    wire _1188;
-    wire [3:0] _2975;
-    wire [3:0] _2973;
-    wire [3:0] _2976;
-    wire _2470;
-    wire _2479;
-    wire _134;
-    wire _2480;
-    wire _2471;
-    wire _2969;
-    wire _2965;
+    wire _2962;
     wire _2963;
-    wire _2964;
+    wire _2965;
+    wire _129;
+    reg g_crc_bad_0;
+    wire _2959;
+    wire _2976;
+    wire _2975;
+    wire _2977;
+    wire _2978;
+    wire _2979;
+    wire _2980;
+    wire _2981;
+    wire _2969;
+    wire _2967;
     wire _2966;
+    wire _2968;
     wire _2970;
-    wire f_rx_push;
-    wire _2472;
-    wire _2971;
-    wire [3:0] _2977;
-    reg [3:0] _2980;
-    wire [3:0] _136;
-    wire _737;
-    wire _1182;
-    wire [6:0] _3889;
-    wire [7:0] _3890;
-    wire _3887;
-    wire _3886;
-    wire _3885;
-    wire _3884;
-    wire _3883;
-    wire _3882;
-    wire _3881;
-    wire _3880;
-    wire [7:0] _3888;
-    wire [3:0] _3872;
-    wire [3:0] _3870;
-    wire [3:0] _3873;
-    wire _739;
+    wire _130;
+    reg g_resid_chk_0;
+    wire _2987;
+    wire _2989;
+    wire _2991;
+    wire _131;
+    reg _666;
+    wire [7:0] _133;
+    wire [6:0] _1196;
+    wire [6:0] _1195;
+    wire _1197;
+    wire [15:0] _1192;
     wire _2996;
-    wire _2993;
-    wire _138;
+    wire _2995;
+    wire _2997;
     wire _2994;
-    wire _733;
-    wire [2:0] _727;
-    wire _722;
+    wire _2998;
+    wire _2993;
+    wire _2999;
+    wire [14:0] _2992;
+    wire [15:0] _3000;
+    wire [15:0] _134;
+    reg [15:0] _1193;
+    wire _1194;
+    wire [3:0] _3013;
+    wire [3:0] _3011;
+    wire [3:0] _3014;
+    wire _2476;
+    wire _2485;
+    wire _136;
+    wire _2486;
+    wire _2477;
+    wire _3007;
+    wire _3003;
+    wire _3001;
+    wire _3002;
+    wire _3004;
+    wire _3008;
+    wire f_rx_push;
+    wire _2478;
+    wire _3009;
+    wire [3:0] _3015;
+    reg [3:0] _3018;
+    wire [3:0] _138;
+    wire _743;
+    wire _1188;
+    wire [6:0] _3953;
+    wire [7:0] _3954;
+    wire _3951;
+    wire _3950;
+    wire _3949;
+    wire _3948;
+    wire _3947;
+    wire _3946;
+    wire _3945;
+    wire _3944;
+    wire [7:0] _3952;
+    wire [3:0] _3936;
+    wire [3:0] _3934;
+    wire [3:0] _3937;
+    wire _745;
+    wire _3034;
+    wire _3031;
+    wire _140;
+    wire _3032;
+    wire _739;
+    wire [2:0] _733;
+    wire _728;
     wire g_tx_bit;
-    wire _723;
-    wire _724;
-    wire _725;
-    wire [2:0] _728;
+    wire _729;
     wire _730;
     wire _731;
-    wire _702;
-    wire _732;
-    wire _734;
+    wire [2:0] _734;
+    wire _736;
+    wire _737;
+    wire _708;
+    wire _738;
+    wire _740;
+    wire _704;
+    wire [5:0] _695;
+    wire _696;
+    wire _697;
+    wire [9:0] _691;
+    wire _693;
+    wire _694;
     wire _698;
-    wire [5:0] _689;
-    wire _690;
-    wire _691;
-    wire [9:0] _685;
-    wire _687;
-    wire _688;
-    wire _692;
-    wire _3860;
-    wire _3861;
-    wire [1:0] _3864;
-    wire _3853;
-    wire _3854;
+    wire _3924;
+    wire _3925;
+    wire [1:0] _3928;
+    wire _3917;
+    wire _3918;
+    wire _3919;
+    wire _3920;
+    wire [1:0] _3922;
+    wire [2:0] _3903;
+    wire [2:0] _3900;
+    wire _3896;
+    wire _3894;
+    wire _3895;
+    wire _3897;
+    wire [2:0] _3901;
+    wire _3892;
+    wire [2:0] _3904;
+    wire _3905;
+    wire [2:0] _3886;
+    wire _3882;
+    wire _3880;
+    wire _3881;
+    wire _3883;
+    wire [2:0] _3887;
+    wire _3878;
+    wire [2:0] _3889;
+    wire _3890;
+    wire _3906;
+    wire _3907;
+    wire _3908;
+    wire _3874;
+    wire [5:0] _3871;
+    wire _3872;
+    wire _3875;
+    wire [15:0] _3867;
+    wire _3868;
+    wire _3865;
+    wire _3869;
+    wire _3863;
+    wire _3864;
+    wire _3870;
+    wire _3876;
+    wire _3909;
+    wire [1:0] _3911;
+    wire [1:0] _3913;
+    wire [1:0] _3859;
     wire _3855;
-    wire _3856;
-    wire [1:0] _3858;
-    wire [2:0] _3839;
-    wire [2:0] _3836;
-    wire _3832;
-    wire _3830;
-    wire _3831;
-    wire _3833;
-    wire [2:0] _3837;
-    wire _3828;
-    wire [2:0] _3840;
-    wire _3841;
-    wire [2:0] _3822;
-    wire _3818;
-    wire _3816;
-    wire _3817;
-    wire _3819;
-    wire [2:0] _3823;
-    wire _3814;
-    wire [2:0] _3825;
-    wire _3826;
-    wire _3842;
-    wire _3843;
-    wire _3844;
-    wire _3810;
-    wire [5:0] _3807;
-    wire _3808;
-    wire _3811;
-    wire [15:0] _3803;
-    wire _3804;
-    wire _3801;
-    wire _3805;
-    wire _3799;
-    wire _3800;
-    wire _3806;
-    wire _3812;
-    wire _3845;
-    wire [1:0] _3847;
-    wire [1:0] _3849;
-    wire [1:0] _3795;
-    wire _3791;
-    wire [1:0] _3793;
-    wire [1:0] _3796;
-    wire _3072;
-    wire _3073;
-    wire _139;
-    reg _2983;
-    wire _3717;
-    wire _3715;
-    wire _3716;
-    reg _3718;
-    wire [2:0] _141;
-    wire [2:0] _3699;
-    wire [2:0] _3700;
-    wire [2:0] _3695;
-    wire _3691;
-    wire _3689;
-    wire _3690;
-    wire _3692;
-    wire [2:0] _3696;
-    wire _3687;
-    wire [2:0] _3701;
-    wire [2:0] _3702;
-    wire [2:0] _3681;
-    wire [2:0] _3682;
-    wire [2:0] _3677;
-    wire _3068;
-    wire _3067;
-    wire _3066;
-    wire _3065;
-    wire _3064;
-    wire _3063;
-    wire _3062;
-    wire _3058;
-    wire _3057;
-    wire _3056;
-    wire _3055;
-    wire _3054;
-    wire _3053;
-    wire _3052;
-    wire _3044;
-    wire _3045;
-    reg [7:0] _3046;
-    wire _3038;
-    wire _3039;
-    reg [7:0] _3040;
-    wire _3032;
-    wire _3033;
-    reg [7:0] _3034;
-    wire _3026;
-    wire _3027;
-    reg [7:0] _3028;
-    wire _3020;
-    wire _3021;
-    reg [7:0] _3022;
-    wire _3014;
-    wire _3015;
-    reg [7:0] _3016;
-    wire _3008;
-    wire _3009;
-    reg [7:0] _3010;
-    wire [2:0] _3075;
-    wire [2:0] _3076;
-    wire [2:0] _142;
-    reg [2:0] _3000;
-    wire _3002;
-    wire _3003;
-    wire [7:0] _3143;
-    wire [7:0] _3144;
-    wire [7:0] _3094;
-    wire [7:0] _3092;
-    wire [7:0] _3095;
-    wire [7:0] _143;
-    reg [7:0] _3081;
-    wire [7:0] _3090;
-    wire [7:0] _3091;
-    wire [7:0] _3136;
-    wire [7:0] _3103;
-    wire [7:0] _3101;
-    wire [7:0] _3104;
-    wire [7:0] _144;
-    reg [7:0] _3100;
-    wire [6:0] _3121;
-    wire [7:0] _3122;
-    wire [6:0] _3119;
-    wire _3117;
-    wire _3116;
-    wire _3115;
-    wire _3114;
-    wire _3113;
-    wire _3112;
-    wire _3111;
+    wire [1:0] _3857;
+    wire [1:0] _3860;
     wire _3110;
-    wire [2:0] _3108;
-    wire [2:0] _3107;
-    wire [2:0] _3106;
-    wire [2:0] _3105;
-    reg [2:0] _3109;
-    reg _3118;
-    wire [7:0] _3120;
-    reg [7:0] _3123;
-    wire [7:0] _3124;
-    wire [7:0] _145;
-    reg [7:0] _1181;
+    wire _3111;
+    wire _141;
+    reg _3021;
+    wire _3781;
+    wire _3779;
+    wire _3780;
+    reg _3782;
+    wire [2:0] _143;
+    wire [2:0] _3763;
+    wire [2:0] _3764;
+    wire [2:0] _3759;
+    wire _3755;
+    wire _3753;
+    wire _3754;
+    wire _3756;
+    wire [2:0] _3760;
+    wire _3751;
+    wire [2:0] _3765;
+    wire [2:0] _3766;
+    wire [2:0] _3745;
+    wire [2:0] _3746;
+    wire [2:0] _3741;
+    wire _3106;
+    wire _3105;
+    wire _3104;
+    wire _3103;
     wire _3102;
-    wire _3128;
+    wire _3101;
+    wire _3100;
     wire _3096;
-    wire _3097;
-    wire _3126;
-    wire [1:0] _1712;
-    wire [1:0] _1711;
-    wire [1:0] _1710;
-    wire [1:0] _1709;
-    reg [1:0] _1713;
-    wire [1:0] _1715;
-    wire f_eng_push;
-    wire _1718;
-    wire _1724;
-    wire _1721;
-    wire _1722;
-    wire _1720;
-    wire _1723;
-    wire _1725;
-    wire _3129;
-    wire _146;
-    reg _870;
-    wire [7:0] _3135;
+    wire _3095;
+    wire _3094;
     wire _3093;
-    wire _3133;
-    wire _833;
-    wire [2:0] _827;
-    wire _822;
-    wire g_tx_bit_0;
-    wire _823;
-    wire _824;
-    wire _825;
-    wire [2:0] _828;
-    wire _830;
-    wire _831;
-    wire _802;
-    wire _832;
-    wire _834;
-    wire _798;
-    wire _799;
-    wire _835;
+    wire _3092;
+    wire _3091;
+    wire _3090;
+    wire _3082;
+    wire _3083;
+    reg [7:0] _3084;
+    wire _3076;
     wire _3077;
-    wire _3078;
-    wire _3131;
-    wire _3134;
-    wire _147;
-    reg _768;
-    wire _838;
-    wire _837;
-    wire _839;
-    wire [7:0] _3137;
-    wire [7:0] _3145;
-    wire [7:0] _148;
-    wire [7:0] _149;
-    wire [7:0] _151;
-    wire [7:0] _2990;
-    reg [7:0] _3004;
-    wire [2:0] _3521;
-    wire _3518;
-    wire _1812;
-    wire _803;
-    wire _3508;
-    wire _3509;
-    wire [1:0] _3512;
-    wire _3501;
-    wire _3502;
-    wire _3503;
-    wire _3504;
-    wire [1:0] _3506;
-    wire [2:0] _3487;
-    wire [2:0] _3484;
-    wire _3480;
-    wire _3478;
-    wire _3479;
-    wire _3481;
-    wire [2:0] _3485;
-    wire _3476;
-    wire [2:0] _3488;
-    wire _3489;
-    wire [2:0] _3470;
-    wire _3466;
-    wire _3464;
-    wire _3465;
-    wire _3467;
-    wire [2:0] _3471;
-    wire _3462;
-    wire [2:0] _3473;
-    wire _3474;
-    wire _3490;
-    wire _3491;
-    wire _3492;
-    wire _3458;
-    wire _3456;
-    wire _3459;
-    wire [15:0] _3451;
-    wire _3452;
-    wire _3449;
-    wire _3453;
-    wire _3447;
-    wire _3448;
-    wire _3454;
-    wire _3460;
-    wire _3493;
-    wire [1:0] _3495;
-    wire [1:0] _3497;
-    wire [1:0] _3443;
-    wire _3439;
-    wire [1:0] _3441;
-    wire [1:0] _3444;
-    wire _3173;
-    wire _3174;
-    wire _152;
-    reg _3148;
-    wire _3369;
-    wire _3367;
-    wire _3368;
-    reg _3370;
-    wire [2:0] _154;
-    wire [2:0] _3351;
-    wire [2:0] _3352;
-    wire [2:0] _3347;
-    wire _3343;
-    wire _3341;
-    wire _3342;
-    wire _3344;
-    wire [2:0] _3348;
-    wire _3339;
-    wire [2:0] _3353;
-    wire [2:0] _3354;
-    wire [2:0] _3333;
-    wire [2:0] _3334;
-    wire [2:0] _3329;
-    wire _3169;
-    wire _3168;
-    wire _3167;
-    wire _3166;
-    wire _3165;
-    wire _3164;
-    wire _3163;
-    wire _3159;
-    wire _3158;
-    wire _3157;
-    wire _3156;
+    reg [7:0] _3078;
+    wire _3070;
+    wire _3071;
+    reg [7:0] _3072;
+    wire _3064;
+    wire _3065;
+    reg [7:0] _3066;
+    wire _3058;
+    wire _3059;
+    reg [7:0] _3060;
+    wire _3052;
+    wire _3053;
+    reg [7:0] _3054;
+    wire _3046;
+    wire _3047;
+    reg [7:0] _3048;
+    wire [2:0] _3113;
+    wire [2:0] _3114;
+    wire [2:0] _144;
+    reg [2:0] _3038;
+    wire _3040;
+    wire _3041;
+    wire [7:0] _3181;
+    wire [7:0] _3182;
+    wire [7:0] _3132;
+    wire [7:0] _3130;
+    wire [7:0] _3133;
+    wire [7:0] _145;
+    reg [7:0] _3119;
+    wire [7:0] _3128;
+    wire [7:0] _3129;
+    wire [7:0] _3174;
+    wire [7:0] _3141;
+    wire [7:0] _3139;
+    wire [7:0] _3142;
+    wire [7:0] _146;
+    reg [7:0] _3138;
+    wire [6:0] _3159;
+    wire [7:0] _3160;
+    wire [6:0] _3157;
     wire _3155;
     wire _3154;
     wire _3153;
-    wire [7:0] _3150;
-    wire [6:0] _3087;
-    wire [7:0] _3088;
-    wire [6:0] _3085;
-    wire [7:0] _3086;
-    wire [7:0] _3089;
-    wire [7:0] _3179;
-    wire [7:0] _3180;
-    wire [7:0] _3181;
-    wire [7:0] _3182;
-    wire [7:0] _3175;
-    wire [7:0] _3176;
-    wire [7:0] _3177;
-    wire [7:0] _3178;
-    wire [7:0] _3183;
-    wire [7:0] _155;
-    reg [7:0] g_byte;
-    wire _1809;
-    wire _1806;
-    wire _1807;
-    wire _1810;
-    wire [7:0] _3151;
     wire _3152;
-    wire [7:0] _3160;
-    wire _157;
-    wire [7:0] _3161;
-    wire _3162;
-    wire [2:0] _3191;
-    wire [5:0] _789;
-    wire _790;
-    wire _791;
-    wire [9:0] _785;
-    wire _787;
-    wire _788;
-    wire _792;
+    wire _3151;
+    wire _3150;
+    wire _3149;
+    wire _3148;
+    wire [2:0] _3146;
+    wire [2:0] _3145;
+    wire [2:0] _3144;
+    wire [2:0] _3143;
+    reg [2:0] _3147;
+    reg _3156;
+    wire [7:0] _3158;
+    reg [7:0] _3161;
+    wire [7:0] _3162;
+    wire [7:0] _147;
+    reg [7:0] _1187;
+    wire _3140;
+    wire _3166;
+    wire _3134;
+    wire _3135;
+    wire _3164;
+    wire [1:0] _1718;
+    wire [1:0] _1717;
+    wire [1:0] _1716;
+    wire [1:0] _1715;
+    reg [1:0] _1719;
+    wire [1:0] _1721;
+    wire f_eng_push;
+    wire _1724;
+    wire _1730;
+    wire _1727;
+    wire _1728;
+    wire _1726;
+    wire _1729;
+    wire _1731;
+    wire _3167;
+    wire _148;
+    reg _876;
+    wire [7:0] _3173;
+    wire _3131;
+    wire _3171;
+    wire _839;
+    wire [2:0] _833;
+    wire _828;
+    wire g_tx_bit_0;
+    wire _829;
+    wire _830;
+    wire _831;
+    wire [2:0] _834;
+    wire _836;
+    wire _837;
+    wire _808;
+    wire _838;
+    wire _840;
+    wire _804;
+    wire _805;
+    wire _841;
+    wire _3115;
+    wire _3116;
+    wire _3169;
+    wire _3172;
+    wire _149;
+    reg _774;
+    wire _844;
+    wire _843;
+    wire _845;
+    wire [7:0] _3175;
+    wire [7:0] _3183;
+    wire [7:0] _150;
+    wire [7:0] _151;
+    wire [7:0] _153;
+    wire [7:0] _3028;
+    reg [7:0] _3042;
+    wire [2:0] _3572;
+    wire _3569;
+    wire _1818;
+    wire _809;
+    wire _3559;
+    wire _3560;
+    wire [1:0] _3563;
+    wire _3552;
+    wire _3553;
+    wire _3554;
+    wire _3555;
+    wire [1:0] _3557;
+    wire [2:0] _3538;
+    wire [2:0] _3535;
+    wire _3531;
+    wire _3529;
+    wire _3530;
+    wire _3532;
+    wire [2:0] _3536;
+    wire _3527;
+    wire [2:0] _3539;
+    wire _3540;
+    wire [2:0] _3521;
+    wire _3517;
+    wire _3515;
+    wire _3516;
+    wire _3518;
+    wire [2:0] _3522;
+    wire _3513;
+    wire [2:0] _3524;
+    wire _3525;
+    wire _3541;
+    wire _3542;
+    wire _3543;
+    wire _3509;
+    wire _3507;
+    wire _3510;
+    wire [15:0] _3502;
+    wire _3503;
+    wire _3500;
+    wire _3504;
+    wire _3498;
+    wire _3499;
+    wire _3505;
+    wire _3511;
+    wire _3544;
+    wire [1:0] _3546;
+    wire [1:0] _3548;
+    wire [1:0] _3494;
+    wire _3490;
+    wire [1:0] _3492;
+    wire [1:0] _3495;
+    wire _3211;
+    wire _3212;
+    wire _154;
+    reg _3186;
+    wire _3420;
+    wire _3418;
+    wire _3419;
+    reg _3421;
+    wire [2:0] _156;
+    wire [2:0] _3402;
+    wire [2:0] _3403;
+    wire [2:0] _3398;
+    wire _3394;
+    wire _3392;
+    wire _3393;
+    wire _3395;
+    wire [2:0] _3399;
+    wire _3390;
+    wire [2:0] _3404;
+    wire [2:0] _3405;
+    wire [2:0] _3384;
+    wire [2:0] _3385;
+    wire [2:0] _3380;
+    wire _3207;
+    wire _3206;
+    wire _3205;
+    wire _3204;
+    wire _3203;
+    wire _3202;
+    wire _3201;
+    wire _3197;
+    wire _3196;
+    wire _3195;
+    wire _3194;
+    wire _3193;
+    wire _3192;
+    wire _3191;
+    wire [7:0] _3188;
+    wire [6:0] _3125;
+    wire [7:0] _3126;
+    wire [6:0] _3123;
+    wire [7:0] _3124;
+    wire [7:0] _3127;
+    wire [7:0] _3217;
+    wire [7:0] _3218;
+    wire [7:0] _3219;
+    wire [7:0] _3220;
+    wire [7:0] _3213;
+    wire [7:0] _3214;
+    wire [7:0] _3215;
+    wire [7:0] _3216;
+    wire [7:0] _3221;
+    wire [7:0] _157;
+    reg [7:0] g_byte;
+    wire _1815;
+    wire _1812;
+    wire _1813;
+    wire _1816;
+    wire [7:0] _3189;
+    wire _3190;
+    wire [7:0] _3198;
+    wire _159;
+    wire [7:0] _3199;
+    wire _3200;
+    wire [2:0] _3229;
+    wire [5:0] _795;
+    wire _796;
+    wire _797;
+    wire [9:0] _791;
     wire _793;
-    wire [2:0] _3192;
-    wire [2:0] _3193;
-    wire [2:0] _3194;
-    wire [2:0] _3195;
-    wire [2:0] _3185;
-    wire [2:0] _3186;
-    wire [2:0] _3187;
-    wire [2:0] _3188;
-    wire [2:0] _3189;
-    wire [2:0] _3196;
-    wire [2:0] _3198;
-    wire [2:0] _158;
+    wire _794;
+    wire _798;
+    wire _799;
+    wire [2:0] _3230;
+    wire [2:0] _3231;
+    wire [2:0] _3232;
+    wire [2:0] _3233;
+    wire [2:0] _3223;
+    wire [2:0] _3224;
+    wire [2:0] _3225;
+    wire [2:0] _3226;
+    wire [2:0] _3227;
+    wire [2:0] _3234;
+    wire [2:0] _3236;
+    wire [2:0] _160;
     reg [2:0] g_bitpos;
-    reg _3170;
-    wire _160;
-    wire [31:0] _162;
-    wire [30:0] _3240;
-    wire [31:0] _3242;
-    wire _3234;
-    wire _3235;
-    wire [31:0] _3237;
-    wire [30:0] _3231;
-    wire [31:0] _3233;
-    wire [31:0] _3238;
-    wire [31:0] _3239;
-    wire [5:0] _164;
-    wire [5:0] _3208;
-    wire [5:0] _3209;
-    wire [5:0] _3210;
-    wire [5:0] _3211;
-    wire [5:0] _3202;
-    wire [5:0] _3203;
-    wire [5:0] _3204;
-    wire [5:0] _3205;
-    wire [5:0] _3206;
-    wire [5:0] _3212;
-    wire [5:0] _3213;
-    wire [5:0] _3215;
-    wire [5:0] _165;
-    reg [5:0] g_left;
-    wire _818;
-    wire _819;
-    wire _2865;
-    wire _2864;
-    wire _2866;
-    wire _2867;
-    wire [31:0] _3243;
-    wire [31:0] _3244;
-    wire [31:0] _3245;
-    wire [31:0] _167;
-    wire _3222;
-    wire _3223;
-    wire [31:0] _3225;
-    wire [30:0] _3219;
-    wire [31:0] _3221;
-    wire [31:0] _3226;
-    wire [30:0] _3216;
-    wire [31:0] _3218;
-    wire [31:0] _3227;
-    wire [31:0] _3228;
-    wire [31:0] _3229;
-    wire [31:0] _3230;
-    wire [31:0] _3246;
-    wire [31:0] _3247;
-    wire [31:0] _3249;
-    wire [31:0] _168;
-    reg [31:0] g_crc;
-    wire _2871;
-    wire _2872;
-    wire [7:0] _3265;
-    wire [7:0] _3266;
-    wire [7:0] _169;
-    reg [7:0] g_lim;
-    wire [15:0] _781;
-    wire [15:0] _171;
-    wire [14:0] _2846;
-    wire [15:0] _2847;
-    wire [15:0] _3267;
-    wire [15:0] _3268;
-    wire [15:0] _3269;
-    wire [15:0] _3271;
-    wire [15:0] _172;
-    reg [15:0] g_sr;
-    wire [3:0] _3257;
-    wire [3:0] _174;
-    wire _3258;
-    wire [3:0] _3259;
-    wire [7:0] _3261;
-    wire [5:0] _176;
-    wire [7:0] _3255;
-    wire [7:0] _3262;
-    wire [15:0] _3263;
-    wire _3264;
-    wire _3290;
-    wire [5:0] _178;
-    wire [5:0] _3276;
-    wire _3277;
-    wire [9:0] _3272;
-    wire _3274;
-    wire _180;
-    wire _3275;
-    wire _3278;
-    wire _3280;
-    wire _3281;
+    reg _3208;
+    wire _162;
+    wire [31:0] _164;
+    wire [30:0] _3289;
+    wire [31:0] _3291;
     wire _3282;
     wire _3283;
-    wire _3284;
-    wire _3286;
-    wire _3288;
-    wire _181;
-    reg g_len_cap;
-    wire _3291;
-    wire _3293;
+    wire [31:0] _3285;
+    wire [30:0] _3279;
+    wire [31:0] _3281;
+    wire [31:0] _3286;
+    wire [5:0] _3275;
+    wire _3276;
+    wire _3277;
+    wire [9:0] _3270;
+    wire _3272;
+    wire _3273;
+    wire _3269;
+    wire _3274;
+    wire _3278;
+    wire [31:0] _3287;
+    wire [31:0] _3288;
+    wire [5:0] _166;
+    wire [5:0] _3246;
+    wire [5:0] _3247;
+    wire [5:0] _3248;
+    wire [5:0] _3249;
+    wire [5:0] _3240;
+    wire [5:0] _3241;
+    wire [5:0] _3242;
+    wire [5:0] _3243;
+    wire [5:0] _3244;
+    wire [5:0] _3250;
+    wire [5:0] _3251;
+    wire [5:0] _3253;
+    wire [5:0] _167;
+    reg [5:0] g_left;
+    wire _824;
+    wire _825;
+    wire _2873;
+    wire _2872;
+    wire _2874;
+    wire _2875;
+    wire [31:0] _3292;
+    wire [31:0] _3293;
+    wire [31:0] _3294;
+    wire [31:0] _169;
+    wire _3260;
+    wire _3261;
+    wire [31:0] _3263;
+    wire [30:0] _3257;
+    wire [31:0] _3259;
+    wire [31:0] _3264;
+    wire [30:0] _3254;
+    wire [31:0] _3256;
+    wire [31:0] _3265;
+    wire [31:0] _3266;
+    wire [31:0] _3267;
+    wire [31:0] _3268;
+    wire [31:0] _3295;
+    wire [31:0] _3296;
+    wire [31:0] _3298;
+    wire [31:0] _170;
+    reg [31:0] g_crc;
+    wire _2879;
+    wire _2880;
+    wire [7:0] _3314;
+    wire [7:0] _3315;
+    wire [7:0] _171;
+    reg [7:0] g_lim;
+    wire [15:0] _787;
+    wire [15:0] _173;
+    wire [14:0] _2853;
+    wire [15:0] _2854;
+    wire [15:0] _3316;
+    wire [15:0] _3317;
+    wire [15:0] _3318;
+    wire [15:0] _3320;
+    wire [15:0] _174;
+    reg [15:0] g_sr;
+    wire [3:0] _3306;
+    wire [3:0] _176;
+    wire _3307;
+    wire [3:0] _3308;
+    wire [7:0] _3310;
+    wire [5:0] _178;
+    wire [7:0] _3304;
+    wire [7:0] _3311;
+    wire [15:0] _3312;
+    wire _3313;
+    wire _3341;
+    wire [5:0] _180;
+    wire [5:0] _3327;
+    wire _3328;
+    wire [9:0] _3323;
+    wire _3325;
     wire _182;
+    wire _3321;
+    wire _184;
+    wire _3322;
+    wire _3326;
+    wire _3329;
+    wire _3331;
+    wire _3332;
+    wire _3333;
+    wire _3334;
+    wire _3335;
+    wire _3337;
+    wire _3339;
+    wire _185;
+    reg g_len_cap;
+    wire _3342;
+    wire _3344;
+    wire _186;
     reg g_len_known;
-    wire [15:0] _782;
-    wire [15:0] _3313;
-    wire _770;
-    wire _784;
-    wire [15:0] _3314;
-    wire _769;
-    wire [15:0] _3315;
-    wire _3296;
-    wire _3294;
-    wire _3295;
-    wire _3297;
-    wire _3299;
-    wire _183;
+    wire [15:0] _788;
+    wire [15:0] _3364;
+    wire _776;
+    wire _790;
+    wire [15:0] _3365;
+    wire _775;
+    wire [15:0] _3366;
+    wire _3347;
+    wire _3345;
+    wire _3346;
+    wire _3348;
+    wire _3350;
+    wire _187;
     reg g_last;
+    wire _638;
+    wire _635;
+    wire _639;
+    wire _3352;
+    wire _3353;
+    wire _3354;
+    wire _3356;
+    wire _188;
+    reg g_prev;
     wire _632;
     wire _629;
     wire _633;
-    wire _3301;
-    wire _3302;
-    wire _3303;
-    wire _3305;
-    wire _184;
-    reg g_prev;
-    wire _626;
-    wire _623;
-    wire _627;
-    wire _634;
-    wire _635;
-    wire _636;
-    wire [15:0] _3316;
-    wire [15:0] _3307;
-    wire [15:0] _3308;
-    wire [15:0] _3309;
-    wire [15:0] _3310;
-    wire [15:0] _3311;
-    wire [15:0] _3317;
-    wire [15:0] _3319;
-    wire [15:0] _185;
+    wire _640;
+    wire _641;
+    wire _642;
+    wire [15:0] _3367;
+    wire [15:0] _3358;
+    wire [15:0] _3359;
+    wire [15:0] _3360;
+    wire [15:0] _3361;
+    wire [15:0] _3362;
+    wire [15:0] _3368;
+    wire [15:0] _3370;
+    wire [15:0] _189;
     reg [15:0] g_cnt;
     wire g_data_left;
-    wire _3171;
-    wire _3172;
-    wire _3325;
-    wire _3323;
-    wire _3324;
-    wire _3326;
-    wire [2:0] _3330;
-    wire _3321;
-    wire [2:0] _3335;
-    wire [2:0] _3336;
-    wire [2:0] _3337;
-    wire [2:0] _3355;
-    wire [2:0] _3357;
-    wire [2:0] _186;
-    reg [2:0] g_run;
-    wire _620;
-    wire [1:0] _188;
-    wire _615;
-    wire _616;
-    wire _621;
-    wire _813;
-    wire _820;
-    wire _3371;
-    wire _3372;
-    wire _808;
-    wire _806;
-    wire _809;
-    wire _810;
-    wire _811;
-    wire _3364;
-    wire _3361;
-    wire _3358;
-    wire _3359;
-    wire _3362;
-    wire _3363;
-    wire _3365;
-    wire _3373;
+    wire _3209;
+    wire _3210;
+    wire _3376;
+    wire _3374;
     wire _3375;
     wire _3377;
-    wire _3379;
-    wire _3381;
-    wire _189;
-    reg f_lane1_out;
-    wire _604;
-    wire _605;
-    wire _598;
-    wire _599;
-    wire _595;
-    wire _191;
-    wire _592;
-    wire _593;
-    wire _594;
-    wire _596;
-    wire _600;
-    wire _601;
-    wire _606;
-    wire [1:0] _3446;
-    wire _587;
-    wire _588;
-    reg _584;
-    wire _585;
-    wire _577;
-    wire _576;
-    wire _575;
-    wire _574;
-    wire _573;
-    wire _572;
-    wire _571;
-    wire _570;
-    wire [2:0] _193;
-    reg _578;
-    reg _581;
-    wire _586;
-    wire _195;
-    wire _589;
-    wire _568;
-    wire _565;
-    wire _558;
-    wire _556;
-    wire [13:0] _547;
-    wire [15:0] _548;
-    wire [14:0] _544;
-    wire [15:0] _545;
-    wire [15:0] _549;
-    wire [14:0] _541;
-    wire [15:0] _542;
-    wire _539;
-    wire [15:0] _550;
-    reg [15:0] _553;
-    wire _554;
-    wire [13:0] _531;
-    wire [15:0] _532;
-    reg [15:0] _535;
-    wire _3427;
-    wire _3428;
-    wire [15:0] _3429;
-    wire [15:0] _3431;
-    wire [15:0] _3433;
-    wire _3411;
-    wire [14:0] _560;
-    wire [15:0] _561;
-    reg [15:0] _564;
-    wire [16:0] _3407;
-    wire _3408;
-    wire [16:0] _3401;
-    reg [16:0] _3404;
-    wire [16:0] _3396;
-    wire [15:0] _197;
-    wire [16:0] _3395;
-    wire [16:0] _3397;
-    reg [16:0] _3400;
-    wire [7:0] _199;
-    wire [8:0] _3415;
-    wire [7:0] _3417;
-    wire [7:0] _3418;
-    wire [7:0] _3419;
-    wire [7:0] _3421;
-    wire [7:0] _200;
-    reg [7:0] _3389;
-    wire [8:0] _3414;
-    wire [8:0] _3416;
+    wire [2:0] _3381;
+    wire _3372;
+    wire [2:0] _3386;
+    wire [2:0] _3387;
+    wire [2:0] _3388;
+    wire [2:0] _3406;
+    wire [2:0] _3408;
+    wire [2:0] _190;
+    reg [2:0] g_run;
+    wire _626;
+    wire [1:0] _192;
+    wire _621;
+    wire _622;
+    wire _627;
+    wire _819;
+    wire _826;
     wire _3422;
     wire _3423;
+    wire _814;
+    wire _812;
+    wire _815;
+    wire _816;
+    wire _817;
+    wire _3415;
+    wire _3412;
+    wire _3409;
+    wire _3410;
+    wire _3413;
+    wire _3414;
+    wire _3416;
     wire _3424;
     wire _3426;
-    wire _201;
-    reg _3394;
-    wire [16:0] _3405;
-    wire [16:0] _3391;
-    wire _3406;
-    wire _3409;
-    wire _3412;
-    wire _3390;
-    wire _3413;
-    wire [15:0] _3435;
-    wire _3385;
-    wire _3383;
-    wire _645;
-    wire _3382;
-    wire _3384;
-    wire _3386;
-    wire [15:0] _3436;
-    wire [15:0] _3438;
-    wire [15:0] _202;
-    reg [15:0] _529;
-    wire _536;
-    wire _537;
+    wire _3428;
+    wire _3430;
+    wire _3432;
+    wire _193;
+    reg f_lane1_out;
+    wire _610;
+    wire _611;
+    wire _604;
+    wire _605;
+    wire _601;
+    wire _195;
+    wire _598;
+    wire _599;
+    wire _600;
+    wire _602;
+    wire _606;
+    wire _607;
+    wire _612;
+    wire [1:0] _3497;
+    wire _593;
+    wire _594;
+    reg _590;
+    wire _591;
+    wire _583;
+    wire _582;
+    wire _581;
+    wire _580;
+    wire _579;
+    wire _578;
+    wire _577;
+    wire _576;
+    wire [2:0] _197;
+    reg _584;
+    reg _587;
+    wire _592;
+    wire _199;
+    wire _595;
+    wire _574;
+    wire _571;
+    wire _564;
+    wire _562;
+    wire [13:0] _553;
+    wire [15:0] _554;
+    wire [14:0] _550;
+    wire [15:0] _551;
+    wire [15:0] _555;
+    wire [14:0] _547;
+    wire [15:0] _548;
+    wire _545;
+    wire [15:0] _556;
+    reg [15:0] _559;
+    wire _560;
+    wire [13:0] _537;
+    wire [15:0] _538;
+    reg [15:0] _541;
+    wire _3478;
+    wire _3479;
+    wire [15:0] _3480;
+    wire [15:0] _3482;
+    wire [15:0] _3484;
+    wire _3462;
+    wire [14:0] _566;
+    wire [15:0] _567;
+    reg [15:0] _570;
+    wire [16:0] _3458;
+    wire _3459;
+    wire [16:0] _3452;
+    reg [16:0] _3455;
+    wire [16:0] _3447;
+    wire [15:0] _201;
+    wire [16:0] _3446;
+    wire [16:0] _3448;
+    reg [16:0] _3451;
+    wire [7:0] _203;
+    wire [8:0] _3466;
+    wire [7:0] _3468;
+    wire [7:0] _3469;
+    wire [7:0] _3470;
+    wire [7:0] _3472;
+    wire [7:0] _204;
+    reg [7:0] _3440;
+    wire [8:0] _3465;
+    wire [8:0] _3467;
+    wire _3473;
+    wire _3474;
+    wire _3475;
+    wire _3477;
+    wire _205;
+    reg _3445;
+    wire [16:0] _3456;
+    wire [16:0] _3442;
+    wire _3457;
+    wire _3460;
+    wire _3463;
+    wire _3441;
+    wire _3464;
+    wire [15:0] _3486;
+    wire _3436;
+    wire _3434;
+    wire _651;
+    wire _3433;
+    wire _3435;
+    wire _3437;
+    wire [15:0] _3487;
+    wire [15:0] _3489;
+    wire [15:0] _206;
+    reg [15:0] _535;
+    wire _542;
+    wire _543;
+    wire _532;
+    wire _544;
+    wire _561;
+    wire _563;
+    wire _572;
+    wire [1:0] _208;
+    wire _528;
+    wire _529;
     wire _526;
-    wire _538;
-    wire _555;
-    wire _557;
-    wire _566;
-    wire [1:0] _204;
-    wire _522;
+    wire _530;
     wire _523;
-    wire _520;
-    wire _524;
-    wire _517;
-    reg _514;
+    reg _520;
+    wire _513;
+    wire _512;
+    wire _511;
+    wire _510;
+    wire _509;
+    wire _508;
     wire _507;
     wire _506;
-    wire _505;
-    wire _504;
-    wire _503;
-    wire _502;
-    wire _501;
-    wire _500;
-    wire [2:0] _206;
-    reg _508;
-    reg _511;
-    wire _515;
-    wire _516;
-    wire _518;
-    wire _525;
-    wire _569;
-    wire _208;
-    wire _590;
-    wire _210;
-    wire _499;
-    wire _591;
-    wire [1:0] _3498;
-    wire _801;
-    wire [1:0] _3500;
-    wire _3200;
-    wire [1:0] _3507;
-    wire _493;
-    wire [1:0] _3513;
-    wire _490;
-    wire _491;
-    wire [1:0] _3515;
-    wire [1:0] _211;
-    reg [1:0] g_mode;
-    wire _498;
-    wire _804;
-    wire _812;
-    wire _1811;
-    wire _1813;
-    wire _1804;
-    wire _1803;
-    wire _1805;
-    wire _1814;
-    wire _1795;
-    wire _1793;
-    wire _1796;
-    wire _3516;
-    wire _3517;
+    wire [2:0] _210;
+    reg _514;
+    reg _517;
+    wire _521;
+    wire _522;
+    wire _524;
+    wire _531;
+    wire _575;
     wire _212;
-    wire _3519;
-    wire [2:0] _3522;
-    wire [2:0] _213;
-    reg [2:0] _2989;
-    reg [7:0] _3047;
-    wire [7:0] _3049;
-    wire [6:0] _3140;
-    wire [7:0] _3141;
-    wire [6:0] _3138;
-    wire [7:0] _3139;
-    wire [7:0] _3142;
-    wire [7:0] _3527;
-    wire [7:0] _3528;
-    wire [7:0] _3529;
-    wire [7:0] _3530;
-    wire [7:0] _3523;
-    wire [7:0] _3524;
-    wire [7:0] _3525;
-    wire [7:0] _3526;
-    wire [7:0] _3531;
-    wire [7:0] _214;
-    reg [7:0] g_byte_0;
+    wire _596;
+    wire _214;
+    wire _505;
+    wire _597;
+    wire [1:0] _3549;
+    wire _807;
+    wire [1:0] _3551;
+    wire _3238;
+    wire [1:0] _3558;
+    wire _499;
+    wire [1:0] _3564;
+    wire _496;
+    wire _497;
+    wire [1:0] _3566;
+    wire [1:0] _215;
+    reg [1:0] g_mode;
+    wire _504;
+    wire _810;
+    wire _818;
+    wire _1817;
+    wire _1819;
+    wire _1810;
+    wire _1809;
+    wire _1811;
+    wire _1820;
     wire _1801;
-    wire _1798;
     wire _1799;
     wire _1802;
-    wire [7:0] _3050;
-    wire _3051;
-    wire [7:0] _3059;
+    wire _3567;
+    wire _3568;
     wire _216;
-    wire [7:0] _3060;
-    wire _3061;
-    wire [2:0] _3539;
-    wire [2:0] _3540;
-    wire [2:0] _3541;
-    wire [2:0] _3542;
-    wire [2:0] _3543;
-    wire [2:0] _3533;
-    wire [2:0] _3534;
-    wire [2:0] _3535;
-    wire [2:0] _3536;
-    wire [2:0] _3537;
-    wire [2:0] _3544;
-    wire [2:0] _3546;
-    wire [2:0] _217;
-    reg [2:0] g_bitpos_0;
-    reg _3069;
-    wire _219;
-    wire [31:0] _221;
-    wire [30:0] _3588;
-    wire [31:0] _3590;
-    wire _3582;
-    wire _3583;
-    wire [31:0] _3585;
-    wire [30:0] _3579;
-    wire [31:0] _3581;
-    wire [31:0] _3586;
-    wire [31:0] _3587;
-    wire [5:0] _223;
-    wire [5:0] _3556;
-    wire [5:0] _3557;
-    wire [5:0] _3558;
-    wire [5:0] _3559;
-    wire [5:0] _3550;
-    wire [5:0] _3551;
-    wire [5:0] _3552;
-    wire [5:0] _3553;
-    wire [5:0] _3554;
-    wire [5:0] _3560;
-    wire [5:0] _3561;
-    wire [5:0] _3563;
-    wire [5:0] _224;
-    reg [5:0] g_left_0;
-    wire _718;
-    wire _719;
-    wire _2925;
-    wire _2924;
-    wire _2926;
-    wire _2927;
-    wire [31:0] _3591;
-    wire [31:0] _3592;
-    wire [31:0] _3593;
-    wire [31:0] _226;
     wire _3570;
-    wire _3571;
-    wire [31:0] _3573;
-    wire [30:0] _3567;
-    wire [31:0] _3569;
-    wire [31:0] _3574;
-    wire [30:0] _3564;
-    wire [31:0] _3566;
-    wire [31:0] _3575;
-    wire [31:0] _3576;
-    wire [31:0] _3577;
-    wire [31:0] _3578;
-    wire [31:0] _3594;
-    wire [31:0] _3595;
-    wire [31:0] _3597;
-    wire [31:0] _227;
-    reg [31:0] g_crc_0;
-    wire _2931;
-    wire _2932;
-    wire [7:0] _3613;
-    wire [7:0] _3614;
-    wire [7:0] _228;
-    reg [7:0] g_lim_0;
-    wire [15:0] _681;
-    wire [15:0] _230;
-    wire [14:0] _2906;
-    wire [15:0] _2907;
-    wire [15:0] _3615;
-    wire [15:0] _3616;
-    wire [15:0] _3617;
-    wire [15:0] _3619;
-    wire [15:0] _231;
-    reg [15:0] g_sr_0;
-    wire [3:0] _3605;
-    wire [3:0] _233;
-    wire _3606;
-    wire [3:0] _3607;
-    wire [7:0] _3609;
-    wire [5:0] _235;
-    wire [7:0] _3603;
-    wire [7:0] _3610;
-    wire [15:0] _3611;
-    wire _3612;
-    wire _3638;
-    wire [5:0] _237;
-    wire [5:0] _3624;
-    wire _3625;
-    wire [9:0] _3620;
-    wire _3622;
-    wire _239;
-    wire _3623;
-    wire _3626;
-    wire _3628;
-    wire _3629;
-    wire _3630;
-    wire _3631;
-    wire _3632;
-    wire _3634;
-    wire _3636;
-    wire _240;
-    reg g_len_cap_0;
-    wire _3639;
-    wire _3641;
-    wire _241;
-    reg g_len_known_0;
-    wire [15:0] _682;
-    wire [15:0] _3661;
-    wire [15:0] _3662;
-    wire _669;
-    wire [15:0] _3663;
-    wire _3644;
-    wire _3642;
+    wire [2:0] _3573;
+    wire [2:0] _217;
+    reg [2:0] _3027;
+    reg [7:0] _3085;
+    wire [7:0] _3087;
+    wire [6:0] _3178;
+    wire [7:0] _3179;
+    wire [6:0] _3176;
+    wire [7:0] _3177;
+    wire [7:0] _3180;
+    wire [7:0] _3578;
+    wire [7:0] _3579;
+    wire [7:0] _3580;
+    wire [7:0] _3581;
+    wire [7:0] _3574;
+    wire [7:0] _3575;
+    wire [7:0] _3576;
+    wire [7:0] _3577;
+    wire [7:0] _3582;
+    wire [7:0] _218;
+    reg [7:0] g_byte_0;
+    wire _1807;
+    wire _1804;
+    wire _1805;
+    wire _1808;
+    wire [7:0] _3088;
+    wire _3089;
+    wire [7:0] _3097;
+    wire _220;
+    wire [7:0] _3098;
+    wire _3099;
+    wire [2:0] _3590;
+    wire [2:0] _3591;
+    wire [2:0] _3592;
+    wire [2:0] _3593;
+    wire [2:0] _3594;
+    wire [2:0] _3584;
+    wire [2:0] _3585;
+    wire [2:0] _3586;
+    wire [2:0] _3587;
+    wire [2:0] _3588;
+    wire [2:0] _3595;
+    wire [2:0] _3597;
+    wire [2:0] _221;
+    reg [2:0] g_bitpos_0;
+    reg _3107;
+    wire _223;
+    wire [31:0] _225;
+    wire [30:0] _3650;
+    wire [31:0] _3652;
     wire _3643;
-    wire _3645;
-    wire _3647;
-    wire _242;
-    reg g_last_0;
-    wire _477;
-    wire _473;
-    wire _478;
-    wire _3649;
-    wire _3650;
-    wire _3651;
-    wire _3653;
-    wire _243;
-    reg g_prev_0;
-    wire _470;
-    wire _467;
-    wire _471;
-    wire _479;
-    wire _480;
-    wire _481;
-    wire [15:0] _3664;
-    wire [15:0] _3655;
-    wire [15:0] _3656;
-    wire [15:0] _3657;
-    wire [15:0] _3658;
-    wire [15:0] _3659;
-    wire [15:0] _3665;
-    wire [15:0] _3667;
-    wire [15:0] _244;
-    reg [15:0] g_cnt_0;
-    wire g_data_left_0;
-    wire _3070;
-    wire _3071;
-    wire _3673;
-    wire _3671;
-    wire _3672;
+    wire _3644;
+    wire [31:0] _3646;
+    wire [30:0] _3640;
+    wire [31:0] _3642;
+    wire [31:0] _3647;
+    wire [5:0] _3636;
+    wire _3637;
+    wire _3638;
+    wire [9:0] _3631;
+    wire _3633;
+    wire _3634;
+    wire _3630;
+    wire _3635;
+    wire _3639;
+    wire [31:0] _3648;
+    wire [31:0] _3649;
+    wire [5:0] _227;
+    wire [5:0] _3607;
+    wire [5:0] _3608;
+    wire [5:0] _3609;
+    wire [5:0] _3610;
+    wire [5:0] _3601;
+    wire [5:0] _3602;
+    wire [5:0] _3603;
+    wire [5:0] _3604;
+    wire [5:0] _3605;
+    wire [5:0] _3611;
+    wire [5:0] _3612;
+    wire [5:0] _3614;
+    wire [5:0] _228;
+    reg [5:0] g_left_0;
+    wire _724;
+    wire _725;
+    wire _2949;
+    wire _2948;
+    wire _2950;
+    wire _2951;
+    wire [31:0] _3653;
+    wire [31:0] _3654;
+    wire [31:0] _3655;
+    wire [31:0] _230;
+    wire _3621;
+    wire _3622;
+    wire [31:0] _3624;
+    wire [30:0] _3618;
+    wire [31:0] _3620;
+    wire [31:0] _3625;
+    wire [30:0] _3615;
+    wire [31:0] _3617;
+    wire [31:0] _3626;
+    wire [31:0] _3627;
+    wire [31:0] _3628;
+    wire [31:0] _3629;
+    wire [31:0] _3656;
+    wire [31:0] _3657;
+    wire [31:0] _3659;
+    wire [31:0] _231;
+    reg [31:0] g_crc_0;
+    wire _2955;
+    wire _2956;
+    wire [7:0] _3675;
+    wire [7:0] _3676;
+    wire [7:0] _232;
+    reg [7:0] g_lim_0;
+    wire [15:0] _687;
+    wire [15:0] _234;
+    wire [14:0] _2929;
+    wire [15:0] _2930;
+    wire [15:0] _3677;
+    wire [15:0] _3678;
+    wire [15:0] _3679;
+    wire [15:0] _3681;
+    wire [15:0] _235;
+    reg [15:0] g_sr_0;
+    wire [3:0] _3667;
+    wire [3:0] _237;
+    wire _3668;
+    wire [3:0] _3669;
+    wire [7:0] _3671;
+    wire [5:0] _239;
+    wire [7:0] _3665;
+    wire [7:0] _3672;
+    wire [15:0] _3673;
     wire _3674;
-    wire [2:0] _3678;
-    wire _3669;
-    wire [2:0] _3683;
-    wire [2:0] _3684;
-    wire [2:0] _3685;
-    wire [2:0] _3703;
-    wire [2:0] _3705;
-    wire [2:0] _245;
-    reg [2:0] g_run_0;
-    wire _464;
-    wire [1:0] _247;
-    wire _459;
-    wire _460;
-    wire _465;
-    wire _713;
-    wire _720;
-    wire _3719;
-    wire _703;
-    wire _704;
-    wire _712;
-    wire _3720;
-    wire _708;
-    wire _706;
-    wire _709;
-    wire _710;
-    wire _711;
-    wire _3712;
-    wire _3709;
+    wire _3702;
+    wire [5:0] _241;
+    wire [5:0] _3688;
+    wire _3689;
+    wire [9:0] _3684;
+    wire _3686;
+    wire _243;
+    wire _3682;
+    wire _245;
+    wire _3683;
+    wire _3687;
+    wire _3690;
+    wire _3692;
+    wire _3693;
+    wire _3694;
+    wire _3695;
+    wire _3696;
+    wire _3698;
+    wire _3700;
+    wire _246;
+    reg g_len_cap_0;
+    wire _3703;
+    wire _3705;
+    wire _247;
+    reg g_len_known_0;
+    wire [15:0] _688;
+    wire [15:0] _3725;
+    wire [15:0] _3726;
+    wire _675;
+    wire [15:0] _3727;
+    wire _3708;
     wire _3706;
     wire _3707;
-    wire _3710;
+    wire _3709;
     wire _3711;
-    wire _3713;
-    wire _3721;
-    wire _3723;
-    wire _3725;
-    wire _3727;
-    wire _3729;
     wire _248;
-    reg f_lane0_out;
-    wire _448;
-    wire _449;
-    wire _431;
-    wire _432;
-    reg _428;
-    wire _429;
-    wire _421;
-    wire _420;
-    wire _419;
-    wire _418;
-    wire _417;
-    wire _416;
-    wire _415;
-    wire _414;
-    wire [2:0] _250;
-    reg _422;
-    reg _425;
-    wire _430;
-    wire _252;
-    wire _433;
-    wire _412;
-    wire _409;
-    wire _402;
-    wire _400;
-    wire [13:0] _391;
-    wire [15:0] _392;
-    wire [14:0] _388;
-    wire [15:0] _389;
-    wire [15:0] _393;
-    wire [14:0] _385;
-    wire [15:0] _386;
-    wire _383;
-    wire [15:0] _394;
-    reg [15:0] _397;
-    wire _398;
-    wire [13:0] _375;
-    wire [15:0] _376;
-    reg [15:0] _379;
-    wire _3775;
+    reg g_last_0;
+    wire _483;
+    wire _479;
+    wire _484;
+    wire _3713;
+    wire _3714;
+    wire _3715;
+    wire _3717;
+    wire _249;
+    reg g_prev_0;
+    wire _476;
+    wire _473;
+    wire _477;
+    wire _485;
+    wire _486;
+    wire _487;
+    wire [15:0] _3728;
+    wire [15:0] _3719;
+    wire [15:0] _3720;
+    wire [15:0] _3721;
+    wire [15:0] _3722;
+    wire [15:0] _3723;
+    wire [15:0] _3729;
+    wire [15:0] _3731;
+    wire [15:0] _250;
+    reg [15:0] g_cnt_0;
+    wire g_data_left_0;
+    wire _3108;
+    wire _3109;
+    wire _3737;
+    wire _3735;
+    wire _3736;
+    wire _3738;
+    wire [2:0] _3742;
+    wire _3733;
+    wire [2:0] _3747;
+    wire [2:0] _3748;
+    wire [2:0] _3749;
+    wire [2:0] _3767;
+    wire [2:0] _3769;
+    wire [2:0] _251;
+    reg [2:0] g_run_0;
+    wire _470;
+    wire [1:0] _253;
+    wire _465;
+    wire _466;
+    wire _471;
+    wire _719;
+    wire _726;
+    wire _3783;
+    wire _709;
+    wire _710;
+    wire _718;
+    wire _3784;
+    wire _714;
+    wire _712;
+    wire _715;
+    wire _716;
+    wire _717;
     wire _3776;
-    wire [15:0] _3777;
-    wire [15:0] _3779;
-    wire [15:0] _3781;
-    wire _3759;
-    wire [14:0] _404;
-    wire [15:0] _405;
-    reg [15:0] _408;
-    wire [16:0] _3755;
-    wire _3756;
-    wire [16:0] _3749;
-    reg [16:0] _3752;
-    wire [15:0] _254;
-    wire [16:0] _3743;
-    wire [16:0] _3745;
-    reg [16:0] _3748;
-    wire [7:0] _256;
-    wire [8:0] _3763;
-    wire [7:0] _3765;
-    wire [7:0] _3766;
-    wire [7:0] _3767;
-    wire [7:0] _3769;
-    wire [7:0] _257;
-    reg [7:0] _3737;
-    wire [8:0] _3762;
-    wire [8:0] _3764;
+    wire _3773;
     wire _3770;
     wire _3771;
-    wire _3772;
     wire _3774;
-    wire _258;
-    reg _3742;
-    wire [16:0] _3753;
-    wire [16:0] _3739;
-    wire _3754;
-    wire _3757;
-    wire _3760;
-    wire _3738;
-    wire _3761;
-    wire [15:0] _3783;
-    wire _3733;
-    wire _3731;
-    wire _657;
-    wire _3730;
-    wire _3732;
-    wire _3734;
-    wire [15:0] _3784;
-    wire [15:0] _3786;
-    wire [15:0] _259;
-    reg [15:0] _373;
-    wire _380;
-    wire _381;
-    wire _370;
-    wire _382;
-    wire _399;
-    wire _401;
-    wire _410;
-    wire _366;
-    wire _367;
-    wire _364;
-    wire _368;
-    wire _361;
-    reg _358;
-    wire _351;
-    wire _350;
-    wire _349;
-    wire _348;
-    wire _347;
-    wire _346;
-    wire _345;
-    wire _344;
-    wire [2:0] _261;
-    reg _352;
-    reg _355;
-    wire _359;
-    wire _360;
-    wire _362;
-    wire _369;
-    wire _413;
-    wire _434;
-    wire [1:0] _263;
-    wire _442;
-    wire _443;
-    wire _265;
-    wire _439;
-    wire _267;
-    wire _269;
-    wire _436;
+    wire _3775;
+    wire _3777;
+    wire _3785;
+    wire _3787;
+    wire _3789;
+    wire _3791;
+    wire _3793;
+    wire _254;
+    reg f_lane0_out;
+    wire _454;
+    wire _455;
     wire _437;
     wire _438;
-    wire _440;
-    wire _444;
-    wire _445;
-    wire _450;
-    wire [1:0] _3798;
-    wire [1:0] _3850;
-    wire _701;
-    wire [1:0] _3852;
-    wire _3548;
-    wire [1:0] _3859;
-    wire _333;
-    wire [1:0] _3865;
-    wire [2:0] _2589;
-    wire [2:0] _2588;
-    wire [2:0] _2587;
-    wire [2:0] _2586;
-    reg [2:0] _2590;
-    wire _2582;
-    wire _2581;
-    wire _2580;
-    wire _2579;
-    reg _2583;
-    wire _3787;
-    wire _3788;
-    wire [2:0] _3790;
-    wire [2:0] _270;
-    wire _330;
-    wire _331;
-    wire [1:0] _3867;
-    wire [1:0] _271;
-    reg [1:0] g_mode_0;
-    wire _339;
-    wire _340;
+    reg _434;
     wire _435;
-    wire _670;
-    wire _684;
-    wire _693;
-    wire _699;
-    wire _735;
-    wire _2967;
+    wire _427;
+    wire _426;
+    wire _425;
+    wire _424;
+    wire _423;
+    wire _422;
+    wire _421;
+    wire _420;
+    wire [2:0] _256;
+    reg _428;
+    reg _431;
+    wire _436;
+    wire _258;
+    wire _439;
+    wire _418;
+    wire _415;
+    wire _408;
+    wire _406;
+    wire [13:0] _397;
+    wire [15:0] _398;
+    wire [14:0] _394;
+    wire [15:0] _395;
+    wire [15:0] _399;
+    wire [14:0] _391;
+    wire [15:0] _392;
+    wire _389;
+    wire [15:0] _400;
+    reg [15:0] _403;
+    wire _404;
+    wire [13:0] _381;
+    wire [15:0] _382;
+    reg [15:0] _385;
+    wire _3839;
+    wire _3840;
+    wire [15:0] _3841;
+    wire [15:0] _3843;
+    wire [15:0] _3845;
+    wire _3823;
+    wire [14:0] _410;
+    wire [15:0] _411;
+    reg [15:0] _414;
+    wire [16:0] _3819;
+    wire _3820;
+    wire [16:0] _3813;
+    reg [16:0] _3816;
+    wire [15:0] _260;
+    wire [16:0] _3807;
+    wire [16:0] _3809;
+    reg [16:0] _3812;
+    wire [7:0] _262;
+    wire [8:0] _3827;
+    wire [7:0] _3829;
+    wire [7:0] _3830;
+    wire [7:0] _3831;
+    wire [7:0] _3833;
+    wire [7:0] _263;
+    reg [7:0] _3801;
+    wire [8:0] _3826;
+    wire [8:0] _3828;
+    wire _3834;
+    wire _3835;
+    wire _3836;
+    wire _3838;
+    wire _264;
+    reg _3806;
+    wire [16:0] _3817;
+    wire [16:0] _3803;
+    wire _3818;
+    wire _3821;
+    wire _3824;
+    wire _3802;
+    wire _3825;
+    wire [15:0] _3847;
+    wire _3797;
+    wire _3795;
+    wire _663;
+    wire _3794;
+    wire _3796;
+    wire _3798;
+    wire [15:0] _3848;
+    wire [15:0] _3850;
+    wire [15:0] _265;
+    reg [15:0] _379;
+    wire _386;
+    wire _387;
+    wire _376;
+    wire _388;
+    wire _405;
+    wire _407;
+    wire _416;
+    wire _372;
+    wire _373;
+    wire _370;
+    wire _374;
+    wire _367;
+    reg _364;
+    wire _357;
+    wire _356;
+    wire _355;
+    wire _354;
+    wire _353;
+    wire _352;
+    wire _351;
+    wire _350;
+    wire [2:0] _267;
+    reg _358;
+    reg _361;
+    wire _365;
+    wire _366;
+    wire _368;
+    wire _375;
+    wire _419;
+    wire _440;
+    wire [1:0] _269;
+    wire _448;
+    wire _449;
+    wire _271;
+    wire _445;
     wire _273;
-    wire _2968;
-    wire _274;
-    wire _2995;
-    wire _2997;
-    wire _3868;
-    wire [3:0] _3874;
-    reg [3:0] _3877;
-    wire [3:0] _275;
-    wire _1184;
-    wire [7:0] _3879;
-    wire [1:0] _1790;
-    wire [1:0] _1788;
-    wire [1:0] _1787;
-    wire [1:0] _1786;
-    wire [1:0] _1785;
-    reg [1:0] _1789;
-    wire [1:0] _1791;
-    reg [7:0] _3891;
-    wire [7:0] _3892;
-    wire [7:0] _276;
-    reg [7:0] _1177;
-    wire _1178;
-    wire [7:0] _3903;
-    wire [7:0] _3902;
-    wire [7:0] _3901;
-    wire [1:0] _3898;
-    wire [1:0] _3896;
-    wire [1:0] _3895;
-    wire [1:0] _3894;
-    wire [1:0] _3893;
-    reg [1:0] _3897;
-    wire [1:0] _3899;
-    reg [7:0] _3904;
-    wire [7:0] _3905;
-    wire [7:0] _277;
-    reg [7:0] _1172;
-    wire _1174;
-    wire [3:0] _1372;
-    reg _1373;
-    wire _1375;
-    wire [15:0] _1367;
-    wire _1369;
-    wire [15:0] _1358;
-    wire [16:0] _1359;
-    wire [16:0] _1360;
-    reg [16:0] _1363;
-    wire _1364;
-    wire _1365;
-    wire [15:0] _1354;
-    wire _1356;
-    wire [2:0] _1132;
-    wire [2:0] _3920;
-    wire _3916;
-    wire _3917;
-    wire _3914;
-    wire _3918;
-    wire [2:0] _3921;
-    wire _3911;
-    wire _3912;
-    wire _3910;
-    wire _3913;
-    wire [2:0] _3923;
-    wire _3907;
-    wire [2:0] _3909;
-    wire _3906;
-    wire [2:0] _3924;
-    wire [2:0] _278;
-    reg [2:0] _1128;
-    wire _1130;
-    wire [2:0] _1133;
-    wire _1123;
-    wire _1124;
-    wire _1122;
-    wire _1125;
-    wire [2:0] _1135;
-    wire _1119;
-    wire _1120;
-    wire [2:0] _1136;
-    wire _1338;
-    wire [2:0] _1340;
-    wire [2:0] _1111;
-    wire [2:0] _3939;
-    wire _3935;
-    wire _3936;
-    wire _3933;
-    wire _3937;
-    wire [2:0] _3940;
-    wire _3930;
-    wire _3931;
-    wire _3929;
+    wire _275;
+    wire _442;
+    wire _443;
+    wire _444;
+    wire _446;
+    wire _450;
+    wire _451;
+    wire _456;
+    wire [1:0] _3862;
+    wire [1:0] _3914;
+    wire _707;
+    wire [1:0] _3916;
+    wire _3599;
+    wire [1:0] _3923;
+    wire _339;
+    wire [1:0] _3929;
+    wire [2:0] _2595;
+    wire [2:0] _2594;
+    wire [2:0] _2593;
+    wire [2:0] _2592;
+    reg [2:0] _2596;
+    wire _2588;
+    wire _2587;
+    wire _2586;
+    wire _2585;
+    reg _2589;
+    wire _3851;
+    wire _3852;
+    wire [2:0] _3854;
+    wire [2:0] _276;
+    wire _336;
+    wire _337;
+    wire [1:0] _3931;
+    wire [1:0] _277;
+    reg [1:0] g_mode_0;
+    wire _345;
+    wire _346;
+    wire _441;
+    wire _676;
+    wire _690;
+    wire _699;
+    wire _705;
+    wire _741;
+    wire _3005;
+    wire _279;
+    wire _3006;
+    wire _280;
+    wire _3033;
+    wire _3035;
     wire _3932;
-    wire [2:0] _3942;
-    wire _3926;
-    wire [2:0] _3928;
-    wire _3925;
-    wire [2:0] _3943;
-    wire [2:0] _279;
-    reg [2:0] _1107;
-    wire _1109;
-    wire [2:0] _1112;
-    wire _1102;
-    wire _1103;
-    wire _1101;
-    wire _1104;
-    wire [2:0] _1114;
-    wire _1098;
-    wire _1099;
-    wire [2:0] _1115;
-    wire _1335;
-    wire [2:0] _1337;
-    wire _1341;
-    wire [2:0] _1342;
-    wire [2:0] _1088;
-    wire [2:0] _3958;
-    wire _3954;
-    wire _3955;
-    wire _3952;
-    wire _3956;
-    wire [2:0] _3959;
-    wire _3949;
-    wire _3950;
-    wire _3948;
-    wire _3951;
-    wire [2:0] _3961;
-    wire _3945;
-    wire [2:0] _3947;
-    wire _3944;
-    wire [2:0] _3962;
-    wire [2:0] _280;
-    reg [2:0] _1084;
-    wire _1086;
-    wire [2:0] _1089;
-    wire _1079;
-    wire _1080;
-    wire _1078;
-    wire _1081;
-    wire [2:0] _1091;
-    wire _1075;
-    wire _1076;
-    wire [2:0] _1092;
-    wire _1330;
-    wire [2:0] _1332;
-    wire [2:0] _1067;
-    wire [2:0] _3977;
-    wire _3973;
-    wire _3974;
-    wire _3971;
-    wire _3975;
-    wire [2:0] _3978;
-    wire _3968;
-    wire _3969;
-    wire _3967;
-    wire _3970;
-    wire [2:0] _3980;
-    wire _3964;
-    wire [2:0] _3966;
-    wire _3963;
-    wire [2:0] _3981;
-    wire [2:0] _281;
-    reg [2:0] _1063;
-    wire _1065;
-    wire [2:0] _1068;
-    wire _1058;
-    wire _1059;
-    wire _1057;
-    wire _1060;
-    wire [2:0] _1070;
-    wire _1054;
-    wire _1055;
-    wire [2:0] _1071;
-    wire _1327;
-    wire [2:0] _1329;
-    wire _1333;
-    wire [2:0] _1334;
-    wire _1343;
-    wire [2:0] _1344;
-    wire [2:0] _1042;
-    wire [2:0] _3996;
-    wire _3992;
-    wire _3993;
-    wire _3990;
-    wire _3994;
-    wire [2:0] _3997;
-    wire _3987;
-    wire _3988;
-    wire _3986;
-    wire _3989;
-    wire [2:0] _3999;
-    wire _3983;
-    wire [2:0] _3985;
-    wire _3982;
-    wire [2:0] _4000;
-    wire [2:0] _282;
-    reg [2:0] _1038;
-    wire _1040;
-    wire [2:0] _1043;
-    wire _1033;
-    wire _1034;
-    wire _1032;
-    wire _1035;
-    wire [2:0] _1045;
-    wire _1029;
-    wire _1030;
-    wire [2:0] _1046;
-    wire _1320;
-    wire [2:0] _1322;
-    wire [2:0] _1021;
-    wire [2:0] _4015;
-    wire _4011;
-    wire _4012;
-    wire _4009;
-    wire _4013;
-    wire [2:0] _4016;
-    wire _4006;
-    wire _4007;
-    wire _4005;
-    wire _4008;
-    wire [2:0] _4018;
-    wire _4002;
-    wire [2:0] _4004;
-    wire _4001;
-    wire [2:0] _4019;
-    wire [2:0] _283;
-    reg [2:0] _1017;
-    wire _1019;
-    wire [2:0] _1022;
-    wire _1012;
-    wire _1013;
-    wire _1011;
-    wire _1014;
-    wire [2:0] _1024;
-    wire _1008;
-    wire _1009;
-    wire [2:0] _1025;
-    wire _1317;
-    wire [2:0] _1319;
-    wire _1323;
-    wire [2:0] _1324;
-    wire [2:0] _998;
-    wire [2:0] _4034;
-    wire _4030;
-    wire _4031;
-    wire _4028;
-    wire _4032;
-    wire [2:0] _4035;
-    wire _4025;
-    wire _4026;
-    wire _4024;
-    wire _4027;
-    wire [2:0] _4037;
-    wire _4021;
-    wire [2:0] _4023;
-    wire _4020;
-    wire [2:0] _4038;
-    wire [2:0] _284;
-    reg [2:0] _994;
-    wire _996;
-    wire [2:0] _999;
-    wire _989;
-    wire _990;
-    wire _988;
-    wire _991;
-    wire [2:0] _1001;
-    wire _985;
-    wire _986;
-    wire [2:0] _1002;
-    wire _1312;
-    wire [2:0] _1314;
-    wire [2:0] _977;
-    wire [2:0] _4053;
-    wire _4049;
-    wire _4050;
-    wire _4047;
-    wire _4051;
-    wire [2:0] _4054;
-    wire _4044;
-    wire _4045;
-    wire _4043;
-    wire _4046;
-    wire [2:0] _4056;
-    wire _4040;
-    wire [2:0] _4042;
-    wire _4039;
-    wire [2:0] _4057;
-    wire [2:0] _285;
-    reg [2:0] _973;
-    wire _975;
-    wire [2:0] _978;
-    wire _968;
-    wire _969;
-    wire _967;
-    wire _970;
-    wire [2:0] _980;
-    wire _964;
-    wire _965;
-    wire [2:0] _981;
-    wire [7:0] _1308;
-    wire _1309;
-    wire [2:0] _1311;
-    wire _1315;
-    wire [2:0] _1316;
-    wire _1325;
-    wire [2:0] _1326;
-    wire _1345;
-    wire [2:0] _1346;
-    wire [16:0] _1347;
-    wire _4060;
-    wire [127:0] _4061;
-    wire _4058;
-    wire [127:0] _4062;
-    wire [127:0] _286;
-    reg [127:0] _895;
-    wire _953;
-    wire _954;
-    wire [127:0] _955;
-    wire _4065;
-    wire [127:0] _4066;
-    wire _4063;
-    wire [127:0] _4067;
-    wire [127:0] _287;
-    reg [127:0] _892;
-    wire _949;
-    wire _950;
-    wire [127:0] _951;
-    wire _4070;
-    wire [127:0] _4071;
-    wire _4068;
-    wire [127:0] _4072;
-    wire [127:0] _288;
-    reg [127:0] _889;
-    wire _945;
-    wire _946;
-    wire [127:0] _947;
-    wire _4113;
-    wire _4107;
-    wire _290;
-    wire _4106;
-    wire f_store_we;
-    wire [127:0] _292;
-    reg [127:0] _4109[0:255];
-    wire [1:0] _4103;
-    wire [5:0] _294;
-    wire [111:0] _1267;
-    wire [5:0] _4085;
-    wire [111:0] _1261;
-    wire [5:0] _4084;
-    wire [5:0] _4083;
-    wire [5:0] _4082;
-    reg [5:0] _4086;
-    wire _4087;
-    wire _4088;
-    wire [5:0] _4089;
-    wire [5:0] _296;
-    wire [5:0] _4076;
-    wire [5:0] _297;
-    reg [5:0] _4075;
-    wire [1:0] f_policy;
-    wire _4079;
-    wire [5:0] _4080;
-    wire [5:0] _4081;
-    wire [5:0] _4090;
-    wire _4077;
-    wire [5:0] _4091;
-    wire [5:0] _4092;
-    wire [5:0] _298;
-    reg [5:0] _1764;
-    wire [7:0] _4104;
-    wire [12:0] _4096;
-    wire [12:0] _4094;
-    wire [12:0] _4097;
-    wire [12:0] _299;
-    reg [12:0] f_sw_cnt;
-    wire [7:0] _4101;
-    wire [7:0] _301;
-    wire [7:0] _4102;
-    wire _4099;
-    wire _4100;
-    wire [7:0] _4105;
-    wire [127:0] _4110;
-    reg [127:0] _4114;
-    wire [127:0] _302;
-    wire _941;
-    wire _942;
-    wire [127:0] _943;
-    wire [511:0] _956;
-    wire [111:0] _1304;
-    wire [15:0] _1305;
-    wire [16:0] _1306;
-    wire [16:0] _1348;
-    reg [16:0] _1351;
-    wire gnd;
-    wire [16:0] _1303;
-    wire _1352;
-    wire _1353;
-    wire _1357;
-    wire _1366;
-    wire [15:0] _4142;
-    wire _4138;
-    wire _4139;
-    wire _4140;
-    wire [15:0] _4143;
-    wire _4122;
-    wire _4123;
-    wire [15:0] _4145;
-    wire [15:0] _4147;
-    wire [15:0] _303;
-    reg [15:0] _935;
-    wire [15:0] _4159;
-    wire _4155;
-    wire _4156;
-    wire [8:0] _4134;
-    wire _4135;
-    wire [5:0] _4132;
-    wire [5:0] _4131;
-    wire _4133;
-    wire [8:0] _4126;
-    wire [8:0] _4148;
-    wire [8:0] _4149;
-    wire [8:0] _4151;
-    wire [8:0] _304;
-    reg [8:0] _4127;
-    wire [2:0] _4128;
-    wire _4130;
-    wire [1:0] _4124;
-    reg _4136;
-    wire _4157;
-    wire [15:0] _4160;
-    wire _4152;
-    wire _4153;
-    wire [15:0] _4162;
-    wire [15:0] _4164;
-    wire [15:0] _305;
-    reg [15:0] _932;
-    wire [1:0] _1299;
-    reg [15:0] _1300;
-    wire _1302;
+    wire [3:0] _3938;
+    reg [3:0] _3941;
+    wire [3:0] _281;
+    wire _1190;
+    wire [7:0] _3943;
+    wire [1:0] _1796;
+    wire [1:0] _1794;
+    wire [1:0] _1793;
+    wire [1:0] _1792;
+    wire [1:0] _1791;
+    reg [1:0] _1795;
+    wire [1:0] _1797;
+    reg [7:0] _3955;
+    wire [7:0] _3956;
+    wire [7:0] _282;
+    reg [7:0] _1183;
+    wire _1184;
+    wire [7:0] _3967;
+    wire [7:0] _3966;
+    wire [7:0] _3965;
+    wire [1:0] _3962;
+    wire [1:0] _3960;
+    wire [1:0] _3959;
+    wire [1:0] _3958;
+    wire [1:0] _3957;
+    reg [1:0] _3961;
+    wire [1:0] _3963;
+    reg [7:0] _3968;
+    wire [7:0] _3969;
+    wire [7:0] _283;
+    reg [7:0] _1178;
+    wire _1180;
+    wire [3:0] _1378;
+    reg _1379;
+    wire _1381;
+    wire [15:0] _1373;
+    wire _1375;
+    wire [15:0] _1364;
+    wire [16:0] _1365;
+    wire [16:0] _1366;
+    reg [16:0] _1369;
     wire _1370;
-    reg [7:0] _917;
-    wire [7:0] f_chg_now;
-    wire _4166;
+    wire _1371;
+    wire [15:0] _1360;
+    wire _1362;
+    wire [2:0] _1138;
+    wire [2:0] _3984;
+    wire _3980;
+    wire _3981;
+    wire _3978;
+    wire _3982;
+    wire [2:0] _3985;
+    wire _3975;
+    wire _3976;
+    wire _3974;
+    wire _3977;
+    wire [2:0] _3987;
+    wire _3971;
+    wire [2:0] _3973;
+    wire _3970;
+    wire [2:0] _3988;
+    wire [2:0] _284;
+    reg [2:0] _1134;
+    wire _1136;
+    wire [2:0] _1139;
+    wire _1129;
+    wire _1130;
+    wire _1128;
+    wire _1131;
+    wire [2:0] _1141;
+    wire _1125;
+    wire _1126;
+    wire [2:0] _1142;
+    wire _1344;
+    wire [2:0] _1346;
+    wire [2:0] _1117;
+    wire [2:0] _4003;
+    wire _3999;
+    wire _4000;
+    wire _3997;
+    wire _4001;
+    wire [2:0] _4004;
+    wire _3994;
+    wire _3995;
+    wire _3993;
+    wire _3996;
+    wire [2:0] _4006;
+    wire _3990;
+    wire [2:0] _3992;
+    wire _3989;
+    wire [2:0] _4007;
+    wire [2:0] _285;
+    reg [2:0] _1113;
+    wire _1115;
+    wire [2:0] _1118;
+    wire _1108;
+    wire _1109;
+    wire _1107;
+    wire _1110;
+    wire [2:0] _1120;
+    wire _1104;
+    wire _1105;
+    wire [2:0] _1121;
+    wire _1341;
+    wire [2:0] _1343;
+    wire _1347;
+    wire [2:0] _1348;
+    wire [2:0] _1094;
+    wire [2:0] _4022;
+    wire _4018;
+    wire _4019;
+    wire _4016;
+    wire _4020;
+    wire [2:0] _4023;
+    wire _4013;
+    wire _4014;
+    wire _4012;
+    wire _4015;
+    wire [2:0] _4025;
+    wire _4009;
+    wire [2:0] _4011;
+    wire _4008;
+    wire [2:0] _4026;
+    wire [2:0] _286;
+    reg [2:0] _1090;
+    wire _1092;
+    wire [2:0] _1095;
+    wire _1085;
+    wire _1086;
+    wire _1084;
+    wire _1087;
+    wire [2:0] _1097;
+    wire _1081;
+    wire _1082;
+    wire [2:0] _1098;
+    wire _1336;
+    wire [2:0] _1338;
+    wire [2:0] _1073;
+    wire [2:0] _4041;
+    wire _4037;
+    wire _4038;
+    wire _4035;
+    wire _4039;
+    wire [2:0] _4042;
+    wire _4032;
+    wire _4033;
+    wire _4031;
+    wire _4034;
+    wire [2:0] _4044;
+    wire _4028;
+    wire [2:0] _4030;
+    wire _4027;
+    wire [2:0] _4045;
+    wire [2:0] _287;
+    reg [2:0] _1069;
+    wire _1071;
+    wire [2:0] _1074;
+    wire _1064;
+    wire _1065;
+    wire _1063;
+    wire _1066;
+    wire [2:0] _1076;
+    wire _1060;
+    wire _1061;
+    wire [2:0] _1077;
+    wire _1333;
+    wire [2:0] _1335;
+    wire _1339;
+    wire [2:0] _1340;
+    wire _1349;
+    wire [2:0] _1350;
+    wire [2:0] _1048;
+    wire [2:0] _4060;
+    wire _4056;
+    wire _4057;
+    wire _4054;
+    wire _4058;
+    wire [2:0] _4061;
+    wire _4051;
+    wire _4052;
+    wire _4050;
+    wire _4053;
+    wire [2:0] _4063;
+    wire _4047;
+    wire [2:0] _4049;
+    wire _4046;
+    wire [2:0] _4064;
+    wire [2:0] _288;
+    reg [2:0] _1044;
+    wire _1046;
+    wire [2:0] _1049;
+    wire _1039;
+    wire _1040;
+    wire _1038;
+    wire _1041;
+    wire [2:0] _1051;
+    wire _1035;
+    wire _1036;
+    wire [2:0] _1052;
+    wire _1326;
+    wire [2:0] _1328;
+    wire [2:0] _1027;
+    wire [2:0] _4079;
+    wire _4075;
+    wire _4076;
+    wire _4073;
+    wire _4077;
+    wire [2:0] _4080;
+    wire _4070;
+    wire _4071;
+    wire _4069;
+    wire _4072;
+    wire [2:0] _4082;
+    wire _4066;
+    wire [2:0] _4068;
+    wire _4065;
+    wire [2:0] _4083;
+    wire [2:0] _289;
+    reg [2:0] _1023;
+    wire _1025;
+    wire [2:0] _1028;
+    wire _1018;
+    wire _1019;
+    wire _1017;
+    wire _1020;
+    wire [2:0] _1030;
+    wire _1014;
+    wire _1015;
+    wire [2:0] _1031;
+    wire _1323;
+    wire [2:0] _1325;
+    wire _1329;
+    wire [2:0] _1330;
+    wire [2:0] _1004;
+    wire [2:0] _4098;
+    wire _4094;
+    wire _4095;
+    wire _4092;
+    wire _4096;
+    wire [2:0] _4099;
+    wire _4089;
+    wire _4090;
+    wire _4088;
+    wire _4091;
+    wire [2:0] _4101;
+    wire _4085;
+    wire [2:0] _4087;
+    wire _4084;
+    wire [2:0] _4102;
+    wire [2:0] _290;
+    reg [2:0] _1000;
+    wire _1002;
+    wire [2:0] _1005;
+    wire _995;
+    wire _996;
+    wire _994;
+    wire _997;
+    wire [2:0] _1007;
+    wire _991;
+    wire _992;
+    wire [2:0] _1008;
+    wire _1318;
+    wire [2:0] _1320;
+    wire [2:0] _983;
+    wire [2:0] _4117;
+    wire _4113;
+    wire _4114;
+    wire _4111;
+    wire _4115;
+    wire [2:0] _4118;
+    wire _4108;
+    wire _4109;
+    wire _4107;
+    wire _4110;
+    wire [2:0] _4120;
+    wire _4104;
+    wire [2:0] _4106;
+    wire _4103;
+    wire [2:0] _4121;
+    wire [2:0] _291;
+    reg [2:0] _979;
+    wire _981;
+    wire [2:0] _984;
+    wire _974;
+    wire _975;
+    wire _973;
+    wire _976;
+    wire [2:0] _986;
+    wire _970;
+    wire _971;
+    wire [2:0] _987;
+    wire [7:0] _1314;
+    wire _1315;
+    wire [2:0] _1317;
+    wire _1321;
+    wire [2:0] _1322;
+    wire _1331;
+    wire [2:0] _1332;
+    wire _1351;
+    wire [2:0] _1352;
+    wire [16:0] _1353;
+    wire _4124;
+    wire [127:0] _4125;
+    wire _4122;
+    wire [127:0] _4126;
+    wire [127:0] _292;
+    reg [127:0] _901;
+    wire _959;
+    wire _960;
+    wire [127:0] _961;
+    wire _4129;
+    wire [127:0] _4130;
+    wire _4127;
+    wire [127:0] _4131;
+    wire [127:0] _293;
+    reg [127:0] _898;
+    wire _955;
+    wire _956;
+    wire [127:0] _957;
+    wire _4134;
+    wire [127:0] _4135;
+    wire _4132;
+    wire [127:0] _4136;
+    wire [127:0] _294;
+    reg [127:0] _895;
+    wire _951;
+    wire _952;
+    wire [127:0] _953;
+    wire _4177;
+    wire _4171;
+    wire _296;
+    wire _4170;
+    wire f_store_we;
+    wire [127:0] _298;
+    reg [127:0] _4173[0:255];
+    wire [1:0] _4167;
+    wire [5:0] _300;
+    wire [111:0] _1273;
+    wire [5:0] _4149;
+    wire [111:0] _1267;
+    wire [5:0] _4148;
+    wire [5:0] _4147;
+    wire [5:0] _4146;
+    reg [5:0] _4150;
+    wire _4151;
+    wire _4152;
+    wire [5:0] _4153;
+    wire [5:0] _302;
+    wire [5:0] _4140;
+    wire [5:0] _303;
+    reg [5:0] _4139;
+    wire [1:0] f_policy;
+    wire _4143;
+    wire [5:0] _4144;
+    wire [5:0] _4145;
+    wire [5:0] _4154;
+    wire _4141;
+    wire [5:0] _4155;
+    wire [5:0] _4156;
+    wire [5:0] _304;
+    reg [5:0] _1770;
     wire [7:0] _4168;
-    wire _4165;
+    wire [12:0] _4160;
+    wire [12:0] _4158;
+    wire [12:0] _4161;
+    wire [12:0] _305;
+    reg [12:0] f_sw_cnt;
+    wire [7:0] _4165;
+    wire [7:0] _307;
+    wire [7:0] _4166;
+    wire _4163;
+    wire _4164;
     wire [7:0] _4169;
-    wire [7:0] _4171;
-    wire [7:0] _306;
-    reg [7:0] _914;
+    wire [127:0] _4174;
+    reg [127:0] _4178;
+    wire [127:0] _308;
+    wire _947;
+    wire _948;
+    wire [127:0] _949;
+    wire [511:0] _962;
+    wire [111:0] _1310;
+    wire [15:0] _1311;
+    wire [16:0] _1312;
+    wire [16:0] _1354;
+    reg [16:0] _1357;
+    wire gnd;
+    wire [16:0] _1309;
+    wire _1358;
+    wire _1359;
+    wire _1363;
+    wire _1372;
+    wire [15:0] _4206;
+    wire _4202;
+    wire _4203;
+    wire _4204;
+    wire [15:0] _4207;
+    wire _4186;
+    wire _4187;
+    wire [15:0] _4209;
+    wire [15:0] _4211;
+    wire [15:0] _309;
+    reg [15:0] _941;
+    wire [15:0] _4223;
+    wire _4219;
+    wire _4220;
+    wire [8:0] _4198;
+    wire _4199;
+    wire [5:0] _4196;
+    wire [5:0] _4195;
+    wire _4197;
+    wire [8:0] _4190;
+    wire [8:0] _4212;
+    wire [8:0] _4213;
+    wire [8:0] _4215;
+    wire [8:0] _310;
+    reg [8:0] _4191;
+    wire [2:0] _4192;
+    wire _4194;
+    wire [1:0] _4188;
+    reg _4200;
+    wire _4221;
+    wire [15:0] _4224;
+    wire _4216;
+    wire _4217;
+    wire [15:0] _4226;
+    wire [15:0] _4228;
+    wire [15:0] _311;
+    reg [15:0] _938;
+    wire [1:0] _1305;
+    reg [15:0] _1306;
+    wire _1308;
+    wire _1376;
+    reg [7:0] _923;
+    wire [7:0] f_chg_now;
+    wire _4230;
+    wire [7:0] _4232;
+    wire _4229;
+    wire [7:0] _4233;
+    wire [7:0] _4235;
+    wire [7:0] _312;
+    reg [7:0] _920;
     wire [7:0] f_changed_all;
+    wire [7:0] _1299;
+    wire _1301;
+    wire _1302;
+    wire [7:0] f_chgmask1;
+    wire _1298;
+    wire _1303;
+    wire [7:0] _1292;
+    wire [7:0] _1290;
+    wire vdd;
+    wire _314;
+    wire _316;
+    wire [7:0] _318;
+    reg [7:0] _349;
+    reg [7:0] _907;
+    wire [7:0] _1291;
     wire [7:0] _1293;
     wire _1295;
-    wire _1296;
-    wire [7:0] f_chgmask1;
-    wire _1292;
-    wire _1297;
-    wire [7:0] _1286;
-    wire [7:0] _1284;
-    wire vdd;
-    wire _308;
-    wire _310;
-    wire [7:0] _312;
-    reg [7:0] _343;
-    reg [7:0] _901;
-    wire [7:0] _1285;
-    wire [7:0] _1287;
-    wire _1289;
-    wire [111:0] _1255;
+    wire [111:0] _1261;
     wire f_valid1;
-    wire _1290;
-    wire _1298;
-    wire _1371;
-    wire _1376;
-    wire _1415;
-    wire _1416;
-    wire _1420;
-    wire f_fire1;
-    wire [1:0] _1706;
-    wire [1:0] f_winner;
-    reg [2:0] _4119;
-    wire [2:0] _4121;
-    wire _4172;
-    wire _880;
-    wire f_in_fetch;
-    wire _881;
-    wire _1701;
-    wire _4173;
-    wire [15:0] _4182;
-    wire [15:0] _4184;
-    wire [15:0] _313;
-    reg [15:0] _929;
-    wire [1:0] _1941;
-    reg [15:0] _1942;
-    wire [15:0] _1940;
-    wire _1943;
-    wire [63:0] _1250;
-    wire _1938;
-    wire _1936;
-    wire _1937;
-    wire _1939;
-    wire _1944;
-    wire _1949;
-    wire _1957;
-    wire f_viol_now;
-    wire [2:0] _4190;
-    wire [2:0] _4193;
-    wire _4186;
-    wire [2:0] _4194;
-    wire _4185;
-    wire [2:0] _4197;
-    wire [2:0] _4199;
-    wire [2:0] _314;
-    reg [2:0] _878;
-    wire _4202;
-    wire [127:0] _4203;
-    wire _4200;
-    wire [127:0] _4204;
-    wire [127:0] _315;
-    reg [127:0] _886;
-    wire [511:0] _896;
-    wire [111:0] _897;
-    wire f_valid0;
-    wire _908;
-    wire _925;
-    wire _1168;
-    wire _1195;
-    wire _1239;
-    wire f_in_eval;
-    wire _1240;
-    wire _1249;
-    wire f_fire0;
+    wire _1296;
+    wire _1304;
+    wire _1377;
+    wire _1382;
+    wire _1421;
     wire _1422;
-    wire _1561;
-    wire _1700;
-    wire [1:0] _4223;
-    wire _4208;
-    wire [1:0] _4210;
-    wire _4206;
-    wire [1:0] _4224;
-    wire _4205;
-    wire [1:0] _4227;
-    wire _317;
-    wire [1:0] _4229;
-    wire [1:0] _4231;
-    wire [1:0] _318;
-    reg [1:0] _873;
-    wire _1833;
-    wire _320;
-    wire _2696;
-    wire _2698;
-    wire _4233;
-    wire _4243;
-    wire _321;
+    wire _1426;
+    wire f_fire1;
+    wire [1:0] _1712;
+    wire [1:0] f_winner;
+    reg [2:0] _4183;
+    wire [2:0] _4185;
+    wire _4236;
+    wire _886;
+    wire f_in_fetch;
+    wire _887;
+    wire _1707;
+    wire _4237;
+    wire [15:0] _4246;
+    wire [15:0] _4248;
+    wire [15:0] _319;
+    reg [15:0] _935;
+    wire [1:0] _1947;
+    reg [15:0] _1948;
+    wire [15:0] _1946;
+    wire _1949;
+    wire [63:0] _1256;
+    wire _1944;
+    wire _1942;
+    wire _1943;
+    wire _1945;
+    wire _1950;
+    wire _1955;
+    wire _1963;
+    wire f_viol_now;
+    wire [2:0] _4254;
+    wire [2:0] _4257;
+    wire _4250;
+    wire [2:0] _4258;
+    wire _4249;
+    wire [2:0] _4261;
+    wire [2:0] _4263;
+    wire [2:0] _320;
+    reg [2:0] _884;
+    wire _4266;
+    wire [127:0] _4267;
+    wire _4264;
+    wire [127:0] _4268;
+    wire [127:0] _321;
+    reg [127:0] _892;
+    wire [511:0] _902;
+    wire [111:0] _903;
+    wire f_valid0;
+    wire _914;
+    wire _931;
+    wire _1174;
+    wire _1201;
+    wire _1245;
+    wire f_in_eval;
+    wire _1246;
+    wire _1255;
+    wire f_fire0;
+    wire _1428;
+    wire _1567;
+    wire _1706;
+    wire [1:0] _4287;
+    wire _4272;
+    wire [1:0] _4274;
+    wire _4270;
+    wire [1:0] _4288;
+    wire _4269;
+    wire [1:0] _4291;
+    wire _323;
+    wire [1:0] _4293;
+    wire [1:0] _4295;
+    wire [1:0] _324;
+    reg [1:0] _879;
+    wire _1839;
+    wire _326;
+    wire _2702;
+    wire _2704;
+    wire _4297;
+    wire _4307;
+    wire _327;
     reg f_sweeping;
-    wire _4255;
-    wire _322;
+    wire _4319;
+    wire _328;
     reg f_image_valid;
-    wire _324;
-    wire _1893;
-    wire [7:0] _4279;
-    wire [7:0] _325;
+    wire _330;
+    wire _1899;
+    wire [7:0] _4343;
+    wire [7:0] _331;
     reg [7:0] f_pout;
-    wire _2621;
-    wire [23:0] _327;
-    wire [2:0] _2617;
-    reg _2628;
-    wire [7:0] _2692;
-    wire [7:0] _4281;
-    assign _452 = 3'b000;
-    assign _482 = 3'b001;
-    assign _483 = _481 ? _482 : _457;
-    assign _455 = 3'b100;
-    assign _454 = 3'b010;
-    assign _456 = f_lane0_out ? _455 : _454;
-    assign _457 = _450 ? _456 : _453;
-    assign _484 = _435 ? _483 : _457;
-    assign _486 = _333 ? _452 : _484;
-    assign _488 = _331 ? _452 : _486;
-    assign _1 = _488;
-    always @(posedge _310) begin
-        if (_308)
-            _453 <= _452;
+    wire _2627;
+    wire [23:0] _333;
+    wire [2:0] _2623;
+    reg _2634;
+    wire [7:0] _2698;
+    wire [7:0] _4345;
+    assign _458 = 3'b000;
+    assign _488 = 3'b001;
+    assign _489 = _487 ? _488 : _463;
+    assign _461 = 3'b100;
+    assign _460 = 3'b010;
+    assign _462 = f_lane0_out ? _461 : _460;
+    assign _463 = _456 ? _462 : _459;
+    assign _490 = _441 ? _489 : _463;
+    assign _492 = _339 ? _458 : _490;
+    assign _494 = _337 ? _458 : _492;
+    assign _1 = _494;
+    always @(posedge _316) begin
+        if (_314)
+            _459 <= _458;
         else
-            _453 <= _1;
+            _459 <= _1;
     end
-    assign _667 = { _657,
-                    _660,
-                    _663,
+    assign _673 = { _663,
                     _666,
+                    _669,
+                    _672,
                     gnd,
-                    _453 };
-    assign _638 = _636 ? _482 : _613;
-    assign _612 = f_lane1_out ? _455 : _454;
-    assign _613 = _606 ? _612 : _609;
-    assign _639 = _591 ? _638 : _613;
-    assign _641 = _493 ? _452 : _639;
-    assign _643 = _491 ? _452 : _641;
-    assign _2 = _643;
-    always @(posedge _310) begin
-        if (_308)
-            _609 <= _452;
+                    _459 };
+    assign _644 = _642 ? _488 : _619;
+    assign _618 = f_lane1_out ? _461 : _460;
+    assign _619 = _612 ? _618 : _615;
+    assign _645 = _597 ? _644 : _619;
+    assign _647 = _499 ? _458 : _645;
+    assign _649 = _497 ? _458 : _647;
+    assign _2 = _649;
+    always @(posedge _316) begin
+        if (_314)
+            _615 <= _458;
         else
-            _609 <= _2;
+            _615 <= _2;
     end
-    assign _655 = { _645,
-                    _648,
-                    _651,
+    assign _661 = { _651,
                     _654,
+                    _657,
+                    _660,
                     gnd,
-                    _609 };
-    assign _668 = { _655,
-                    _667 };
-    assign _755 = 8'b00000000;
-    assign _761 = 8'b00000001;
-    assign _762 = _756 + _761;
-    assign _757 = 8'b11111111;
-    assign _758 = _756 == _757;
-    assign _759 = ~ _758;
-    assign _751 = ~ _699;
-    assign _748 = _728 == _452;
-    assign _749 = ~ _748;
-    assign _745 = _339 | _657;
-    assign _742 = ~ _701;
-    assign _743 = _331 & _742;
-    assign _744 = _743 & _269;
-    assign _746 = _744 & _745;
-    assign _750 = _746 & _749;
+                    _615 };
+    assign _674 = { _661,
+                    _673 };
+    assign _761 = 8'b00000000;
+    assign _767 = 8'b00000001;
+    assign _768 = _762 + _767;
+    assign _763 = 8'b11111111;
+    assign _764 = _762 == _763;
+    assign _765 = ~ _764;
+    assign _757 = ~ _705;
+    assign _754 = _734 == _458;
+    assign _755 = ~ _754;
+    assign _751 = _345 | _663;
+    assign _748 = ~ _707;
+    assign _749 = _337 & _748;
+    assign _750 = _749 & _275;
     assign _752 = _750 & _751;
-    assign _741 = _735 & _740;
-    assign _753 = _741 | _752;
-    assign _760 = _753 & _759;
-    assign _763 = _760 ? _762 : _756;
-    assign _765 = _9 ? _755 : _763;
-    assign _4 = _765;
-    always @(posedge _310) begin
-        if (_308)
-            _756 <= _755;
+    assign _756 = _752 & _755;
+    assign _758 = _756 & _757;
+    assign _747 = _741 & _746;
+    assign _759 = _747 | _758;
+    assign _766 = _759 & _765;
+    assign _769 = _766 ? _768 : _762;
+    assign _771 = _9 ? _761 : _769;
+    assign _4 = _771;
+    always @(posedge _316) begin
+        if (_314)
+            _762 <= _761;
         else
-            _756 <= _4;
+            _762 <= _4;
     end
-    assign _864 = _858 + _761;
-    assign _860 = _858 == _757;
-    assign _861 = ~ _860;
-    assign _853 = ~ _799;
-    assign _850 = _828 == _452;
-    assign _851 = ~ _850;
-    assign _847 = _498 | _645;
-    assign _844 = ~ _801;
-    assign _845 = _491 & _844;
-    assign _846 = _845 & _210;
-    assign _848 = _846 & _847;
-    assign _852 = _848 & _851;
+    assign _870 = _864 + _767;
+    assign _866 = _864 == _763;
+    assign _867 = ~ _866;
+    assign _859 = ~ _805;
+    assign _856 = _834 == _458;
+    assign _857 = ~ _856;
+    assign _853 = _504 | _651;
+    assign _850 = ~ _807;
+    assign _851 = _497 & _850;
+    assign _852 = _851 & _214;
     assign _854 = _852 & _853;
-    assign _740 = _273 ? _739 : _737;
-    assign _842 = _839 & _740;
-    assign _843 = _841 | _842;
-    assign _855 = _843 | _854;
-    assign _862 = _855 & _861;
-    assign _865 = _862 ? _864 : _858;
-    assign _867 = _9 ? _755 : _865;
-    assign _5 = _867;
-    always @(posedge _310) begin
-        if (_308)
-            _858 <= _755;
+    assign _858 = _854 & _857;
+    assign _860 = _858 & _859;
+    assign _746 = _279 ? _745 : _743;
+    assign _848 = _845 & _746;
+    assign _849 = _847 | _848;
+    assign _861 = _849 | _860;
+    assign _868 = _861 & _867;
+    assign _871 = _868 ? _870 : _864;
+    assign _873 = _9 ? _761 : _871;
+    assign _5 = _873;
+    always @(posedge _316) begin
+        if (_314)
+            _864 <= _761;
         else
-            _858 <= _5;
+            _864 <= _5;
     end
-    assign _1738 = _1732 + _761;
-    assign _1734 = _1732 == _757;
-    assign _1735 = ~ _1734;
-    assign _1728 = _1725 & _737;
-    assign _1729 = _1727 | _1728;
-    assign _1736 = _1729 & _1735;
-    assign _1739 = _1736 ? _1738 : _1732;
-    assign _1741 = _9 ? _755 : _1739;
-    assign _6 = _1741;
-    always @(posedge _310) begin
-        if (_308)
-            _1732 <= _755;
+    assign _1744 = _1738 + _767;
+    assign _1740 = _1738 == _763;
+    assign _1741 = ~ _1740;
+    assign _1734 = _1731 & _743;
+    assign _1735 = _1733 | _1734;
+    assign _1742 = _1735 & _1741;
+    assign _1745 = _1742 ? _1744 : _1738;
+    assign _1747 = _9 ? _761 : _1745;
+    assign _6 = _1747;
+    always @(posedge _316) begin
+        if (_314)
+            _1738 <= _761;
         else
-            _1732 <= _6;
+            _1738 <= _6;
     end
-    assign _1753 = _1747 + _761;
-    assign _1749 = _1747 == _757;
-    assign _1750 = ~ _1749;
-    assign _1751 = _1744 & _1750;
-    assign _1754 = _1751 ? _1753 : _1747;
-    assign _1756 = _9 ? _755 : _1754;
-    assign _7 = _1756;
-    always @(posedge _310) begin
-        if (_308)
-            _1747 <= _755;
+    assign _1759 = _1753 + _767;
+    assign _1755 = _1753 == _763;
+    assign _1756 = ~ _1755;
+    assign _1757 = _1750 & _1756;
+    assign _1760 = _1757 ? _1759 : _1753;
+    assign _1762 = _9 ? _761 : _1760;
+    assign _7 = _1762;
+    always @(posedge _316) begin
+        if (_314)
+            _1753 <= _761;
         else
-            _1747 <= _7;
+            _1753 <= _7;
     end
-    assign _1780 = _1774 + _761;
-    assign _1776 = _1774 == _757;
-    assign _1777 = ~ _1776;
-    assign _1778 = _1771 & _1777;
-    assign _1781 = _1778 ? _1780 : _1774;
+    assign _1786 = _1780 + _767;
+    assign _1782 = _1780 == _763;
+    assign _1783 = ~ _1782;
+    assign _1784 = _1777 & _1783;
+    assign _1787 = _1784 ? _1786 : _1780;
     assign _9 = host_drop_clear;
-    assign _1783 = _9 ? _755 : _1781;
-    assign _10 = _1783;
-    always @(posedge _310) begin
-        if (_308)
-            _1774 <= _755;
+    assign _1789 = _9 ? _761 : _1787;
+    assign _10 = _1789;
+    always @(posedge _316) begin
+        if (_314)
+            _1780 <= _761;
         else
-            _1774 <= _10;
+            _1780 <= _10;
     end
-    assign _1784 = { _1774,
-                     _1747,
-                     _1732,
-                     _858,
-                     _756 };
-    assign _1817 = 1'b0;
-    assign _1819 = 1'b1;
-    assign _1797 = _1701 & _1796;
-    assign _1815 = _1797 & _1814;
-    assign _1820 = _1815 ? _1819 : _1818;
-    assign _1822 = _24 ? _1817 : _1820;
-    assign _12 = _1822;
-    always @(posedge _310) begin
-        if (_308)
-            _1818 <= _1817;
+    assign _1790 = { _1780,
+                     _1753,
+                     _1738,
+                     _864,
+                     _762 };
+    assign _1823 = 1'b0;
+    assign _1825 = 1'b1;
+    assign _1803 = _1707 & _1802;
+    assign _1821 = _1803 & _1820;
+    assign _1826 = _1821 ? _1825 : _1824;
+    assign _1828 = _24 ? _1823 : _1826;
+    assign _12 = _1828;
+    always @(posedge _316) begin
+        if (_314)
+            _1824 <= _1823;
         else
-            _1818 <= _12;
+            _1824 <= _12;
     end
-    assign _1831 = { _1829,
-                     _1830 };
-    assign _1886 = _1882 ? _1874 : _1885;
-    assign _1888 = _24 ? _452 : _1886;
-    assign _17 = _1888;
-    always @(posedge _310) begin
-        if (_308)
-            _1885 <= _452;
+    assign _1837 = { _1835,
+                     _1836 };
+    assign _1892 = _1888 ? _1880 : _1891;
+    assign _1894 = _24 ? _458 : _1892;
+    assign _17 = _1894;
+    always @(posedge _316) begin
+        if (_314)
+            _1891 <= _458;
         else
-            _1885 <= _17;
+            _1891 <= _17;
     end
-    assign _1881 = ~ _1880;
-    assign _1871 = _1835 ? _482 : _454;
-    assign _1867 = 3'b011;
-    assign _1868 = _1851 ? _1867 : _455;
-    assign _1872 = _1846 ? _1871 : _1868;
-    assign _1864 = 3'b101;
-    assign _1863 = 3'b110;
-    assign _1865 = _1858 ? _1864 : _1863;
-    assign _1873 = _1855 ? _1872 : _1865;
-    assign _1859 = _138 & _273;
-    assign _1856 = _290 | _47;
-    assign _1857 = _1856 | _22;
-    assign _1858 = f_sweeping & _1857;
-    assign _1860 = _1858 | _1859;
-    assign _1852 = ~ f_image_valid;
-    assign _1853 = _324 & _1852;
-    assign _1829 = _520 | _498;
-    assign _1849 = _20[1:1];
-    assign _1850 = _1849 & _1829;
-    assign _1830 = _364 | _339;
+    assign _1887 = ~ _1886;
+    assign _1877 = _1841 ? _488 : _460;
+    assign _1873 = 3'b011;
+    assign _1874 = _1857 ? _1873 : _461;
+    assign _1878 = _1852 ? _1877 : _1874;
+    assign _1870 = 3'b101;
+    assign _1869 = 3'b110;
+    assign _1871 = _1864 ? _1870 : _1869;
+    assign _1879 = _1861 ? _1878 : _1871;
+    assign _1865 = _140 & _279;
+    assign _1862 = _296 | _47;
+    assign _1863 = _1862 | _22;
+    assign _1864 = f_sweeping & _1863;
+    assign _1866 = _1864 | _1865;
+    assign _1858 = ~ f_image_valid;
+    assign _1859 = _330 & _1858;
+    assign _1835 = _526 | _504;
+    assign _1855 = _20[1:1];
+    assign _1856 = _1855 & _1835;
+    assign _1836 = _370 | _345;
     assign _20 = host_lane_we;
-    assign _1847 = _20[0:0];
-    assign _1848 = _1847 & _1830;
-    assign _1851 = _1848 | _1850;
-    assign _1854 = _1851 | _1853;
-    assign _1843 = _1760 | _1842;
-    assign _1839 = _47 & _1833;
-    assign _1844 = _1839 & _1843;
-    assign _1837 = ~ _1833;
+    assign _1853 = _20[0:0];
+    assign _1854 = _1853 & _1836;
+    assign _1857 = _1854 | _1856;
+    assign _1860 = _1857 | _1859;
+    assign _1849 = _1766 | _1848;
+    assign _1845 = _47 & _1839;
+    assign _1850 = _1845 & _1849;
+    assign _1843 = ~ _1839;
     assign _22 = host_cov_re;
-    assign _1836 = _47 | _22;
-    assign _1838 = _1836 & _1837;
-    assign _1845 = _1838 | _1844;
-    assign _1834 = ~ _1833;
-    assign _1835 = _290 & _1834;
-    assign _1846 = _1835 | _1845;
-    assign _1855 = _1846 | _1854;
-    assign _1861 = _1855 | _1860;
-    assign _1874 = _1861 ? _1873 : _452;
-    assign _1876 = _1874 == _452;
-    assign _1877 = ~ _1876;
-    assign _1882 = _1877 & _1881;
-    assign _1890 = _1882 ? _1819 : _1880;
+    assign _1842 = _47 | _22;
+    assign _1844 = _1842 & _1843;
+    assign _1851 = _1844 | _1850;
+    assign _1840 = ~ _1839;
+    assign _1841 = _296 & _1840;
+    assign _1852 = _1841 | _1851;
+    assign _1861 = _1852 | _1860;
+    assign _1867 = _1861 | _1866;
+    assign _1880 = _1867 ? _1879 : _458;
+    assign _1882 = _1880 == _458;
+    assign _1883 = ~ _1882;
+    assign _1888 = _1883 & _1887;
+    assign _1896 = _1888 ? _1825 : _1886;
     assign _24 = host_err_clear;
-    assign _1892 = _24 ? _1817 : _1890;
-    assign _25 = _1892;
-    always @(posedge _310) begin
-        if (_308)
-            _1880 <= _1817;
+    assign _1898 = _24 ? _1823 : _1896;
+    assign _25 = _1898;
+    always @(posedge _316) begin
+        if (_314)
+            _1886 <= _1823;
         else
-            _1880 <= _25;
+            _1886 <= _25;
     end
-    assign _1769 = _1765 == _1768;
-    assign _1770 = ~ _1769;
-    assign _1761 = _1757 & _1760;
-    assign _1771 = _1761 & _1770;
-    assign _1898 = _1771 ? _1819 : _1896;
-    assign _1900 = _1893 ? _1817 : _1898;
-    assign _27 = _1900;
-    always @(posedge _310) begin
-        if (_308)
-            _1896 <= _1817;
+    assign _1775 = _1771 == _1774;
+    assign _1776 = ~ _1775;
+    assign _1767 = _1763 & _1766;
+    assign _1777 = _1767 & _1776;
+    assign _1904 = _1777 ? _1825 : _1902;
+    assign _1906 = _1899 ? _1823 : _1904;
+    assign _27 = _1906;
+    always @(posedge _316) begin
+        if (_314)
+            _1902 <= _1823;
         else
-            _1896 <= _27;
+            _1902 <= _27;
     end
-    assign _1744 = _78 & _1743;
-    assign _1905 = _1744 ? _1819 : _1903;
-    assign _1907 = _1893 ? _1817 : _1905;
-    assign _29 = _1907;
-    always @(posedge _310) begin
-        if (_308)
-            _1903 <= _1817;
+    assign _1750 = _78 & _1749;
+    assign _1911 = _1750 ? _1825 : _1909;
+    assign _1913 = _1899 ? _1823 : _1911;
+    assign _29 = _1913;
+    always @(posedge _316) begin
+        if (_314)
+            _1909 <= _1823;
         else
-            _1903 <= _29;
+            _1909 <= _29;
     end
-    assign _1911 = _274 & _739;
-    assign _1726 = ~ _1725;
-    assign _1719 = _870 & _1718;
-    assign _1727 = _1719 & _1726;
-    assign _840 = ~ _839;
-    assign _836 = _768 & _835;
-    assign _841 = _836 & _840;
-    assign _1908 = _841 | _1727;
-    assign _31 = _1908;
-    assign _1909 = f_rx_push & _737;
-    assign _1910 = _1909 | _31;
-    assign _1912 = _1910 | _1911;
-    assign _1917 = _1912 ? _1819 : _1915;
-    assign _1919 = _1893 ? _1817 : _1917;
-    assign _32 = _1919;
-    always @(posedge _310) begin
-        if (_308)
-            _1915 <= _1817;
+    assign _1917 = _280 & _745;
+    assign _1732 = ~ _1731;
+    assign _1725 = _876 & _1724;
+    assign _1733 = _1725 & _1732;
+    assign _846 = ~ _845;
+    assign _842 = _774 & _841;
+    assign _847 = _842 & _846;
+    assign _1914 = _847 | _1733;
+    assign _31 = _1914;
+    assign _1915 = f_rx_push & _743;
+    assign _1916 = _1915 | _31;
+    assign _1918 = _1916 | _1917;
+    assign _1923 = _1918 ? _1825 : _1921;
+    assign _1925 = _1899 ? _1823 : _1923;
+    assign _32 = _1925;
+    always @(posedge _316) begin
+        if (_314)
+            _1921 <= _1823;
         else
-            _1915 <= _32;
+            _1921 <= _32;
     end
-    assign _1923 = _1250[61:61];
-    assign _1924 = _881 & _1923;
-    assign _1929 = _1924 ? _1819 : _1927;
+    assign _1929 = _1256[61:61];
+    assign _1930 = _887 & _1929;
+    assign _1935 = _1930 ? _1825 : _1933;
     assign _36 = host_irq_ack;
-    assign _1931 = _36 ? _1817 : _1929;
-    assign _1933 = _1893 ? _1817 : _1931;
-    assign _37 = _1933;
-    always @(posedge _310) begin
-        if (_308)
-            _1927 <= _1817;
+    assign _1937 = _36 ? _1823 : _1935;
+    assign _1939 = _1899 ? _1823 : _1937;
+    assign _37 = _1939;
+    always @(posedge _316) begin
+        if (_314)
+            _1933 <= _1823;
         else
-            _1927 <= _37;
+            _1933 <= _37;
     end
-    assign _1962 = f_policy == _1961;
-    assign _1964 = _1962 ? _1819 : _1922;
-    assign _1960 = f_policy == _2539;
-    assign _1966 = _1960 ? _1819 : _1964;
-    assign _1967 = f_viol_now ? _1966 : _1922;
-    assign _1968 = _1700 ? _1922 : _1967;
-    assign _1935 = _873 == _2046;
-    assign _1969 = _1935 ? _1968 : _1922;
-    assign _1971 = _1893 ? _1817 : _1969;
-    assign _38 = _1971;
-    always @(posedge _310) begin
-        if (_308)
-            _1922 <= _1817;
+    assign _1968 = f_policy == _1967;
+    assign _1970 = _1968 ? _1825 : _1928;
+    assign _1966 = f_policy == _2545;
+    assign _1972 = _1966 ? _1825 : _1970;
+    assign _1973 = f_viol_now ? _1972 : _1928;
+    assign _1974 = _1706 ? _1928 : _1973;
+    assign _1941 = _879 == _2052;
+    assign _1975 = _1941 ? _1974 : _1928;
+    assign _1977 = _1899 ? _1823 : _1975;
+    assign _38 = _1977;
+    always @(posedge _316) begin
+        if (_314)
+            _1928 <= _1823;
         else
-            _1922 <= _38;
+            _1928 <= _38;
     end
-    assign _1986 = ~ _1985;
+    assign _1992 = ~ _1991;
     assign _40 = host_tx_wm;
-    assign _1979 = { gnd,
+    assign _1985 = { gnd,
                      _40 };
-    assign _1980 = _1979 < _275;
-    assign _1981 = ~ _1980;
+    assign _1986 = _1985 < _281;
+    assign _1987 = ~ _1986;
     assign _42 = host_tx_wm_en;
-    assign _1982 = _42 & _1981;
+    assign _1988 = _42 & _1987;
     assign _44 = host_rx_wm;
-    assign _1973 = _44 == _452;
-    assign _1975 = _1973 ? _482 : _44;
-    assign _1976 = { gnd,
-                     _1975 };
-    assign _1977 = _136 < _1976;
-    assign _1978 = ~ _1977;
-    assign _1983 = _1978 | _1982;
-    assign _1987 = _1983 | _1986;
-    assign _1988 = _1987 | _1922;
-    assign _1989 = _1988 | _1927;
-    assign _2091 = ~ f_host_cov_we;
-    assign _2090 = ~ _1842;
-    assign _2092 = _2090 & _2091;
-    assign _2089 = 32'b00000000000000000000000000000000;
-    assign _2083 = ~ f_sweeping;
-    assign _2081 = ~ _1760;
-    assign _2079 = ~ _1842;
+    assign _1979 = _44 == _458;
+    assign _1981 = _1979 ? _488 : _44;
+    assign _1982 = { gnd,
+                     _1981 };
+    assign _1983 = _138 < _1982;
+    assign _1984 = ~ _1983;
+    assign _1989 = _1984 | _1988;
+    assign _1993 = _1989 | _1992;
+    assign _1994 = _1993 | _1928;
+    assign _1995 = _1994 | _1933;
+    assign _2097 = ~ f_host_cov_we;
+    assign _2096 = ~ _1848;
+    assign _2098 = _2096 & _2097;
+    assign _2095 = 32'b00000000000000000000000000000000;
+    assign _2089 = ~ f_sweeping;
+    assign _2087 = ~ _1766;
+    assign _2085 = ~ _1848;
     assign _47 = host_cov_we;
-    assign _2078 = _47 & _1833;
-    assign _2080 = _2078 & _2079;
-    assign _2082 = _2080 & _2081;
-    assign f_host_cov_we = _2082 & _2083;
-    assign _2085 = _1842 | f_host_cov_we;
-    assign _2072 = _64[11:0];
-    assign _2069 = _2062 < _2059;
-    assign _2070 = _2044 & _2069;
-    assign _2071 = _2070 ? _2059 : _2062;
-    assign _2073 = _2071 < _2072;
-    assign _2074 = _2073 ? _2072 : _2071;
-    assign _2075 = _2055 ? _2071 : _2074;
-    assign _2061 = 12'b000000000000;
-    assign _2022 = 12'b111111111111;
-    assign _2019 = _2017[11:0];
-    assign _2016 = 13'b0000000000000;
-    assign _2013 = 10'b0000000000;
-    assign _2014 = { _2013,
-                     _2010 };
-    assign _2015 = _2006 - _2014;
+    assign _2084 = _47 & _1839;
+    assign _2086 = _2084 & _2085;
+    assign _2088 = _2086 & _2087;
+    assign f_host_cov_we = _2088 & _2089;
+    assign _2091 = _1848 | f_host_cov_we;
+    assign _2078 = _64[11:0];
+    assign _2075 = _2068 < _2065;
+    assign _2076 = _2050 & _2075;
+    assign _2077 = _2076 ? _2065 : _2068;
+    assign _2079 = _2077 < _2078;
+    assign _2080 = _2079 ? _2078 : _2077;
+    assign _2081 = _2061 ? _2077 : _2080;
+    assign _2067 = 12'b000000000000;
+    assign _2028 = 12'b111111111111;
+    assign _2025 = _2023[11:0];
+    assign _2022 = 13'b0000000000000;
+    assign _2019 = 10'b0000000000;
+    assign _2020 = { _2019,
+                     _2016 };
+    assign _2021 = _2012 - _2020;
     always @* begin
         case (f_winner)
         0:
-            _1990 <= _1209;
+            _1996 <= _1215;
         1:
-            _1990 <= _1385;
+            _1996 <= _1391;
         2:
-            _1990 <= _1524;
+            _1996 <= _1530;
         default:
-            _1990 <= _1663;
+            _1996 <= _1669;
         endcase
     end
-    assign _48 = _1990;
-    always @(posedge _310) begin
-        if (_308)
-            _2010 <= _452;
+    assign _48 = _1996;
+    always @(posedge _316) begin
+        if (_314)
+            _2016 <= _458;
         else
-            _2010 <= _48;
+            _2016 <= _48;
     end
-    assign _2011 = { _2013,
-                     _2010 };
-    assign _1996 = 13'b1111111111111;
-    assign _1995 = _1993[12:0];
-    assign _1991 = 16'b0001111111111111;
-    assign _1994 = _1991 < _1993;
-    assign _1997 = _1994 ? _1996 : _1995;
-    assign _49 = _1997;
-    always @(posedge _310) begin
-        if (_308)
-            _2006 <= _2016;
+    assign _2017 = { _2019,
+                     _2016 };
+    assign _2002 = 13'b1111111111111;
+    assign _2001 = _1999[12:0];
+    assign _1997 = 16'b0001111111111111;
+    assign _2000 = _1997 < _1999;
+    assign _2003 = _2000 ? _2002 : _2001;
+    assign _49 = _2003;
+    always @(posedge _316) begin
+        if (_314)
+            _2012 <= _2022;
         else
-            _2006 <= _49;
+            _2012 <= _49;
     end
-    assign _2012 = _2006 < _2011;
-    assign _2017 = _2012 ? _2016 : _2015;
-    assign _2003 = 13'b0111111111111;
-    assign _2018 = _2003 < _2017;
-    assign _2021 = _2018 ? _2022 : _2019;
-    assign _1998 = 16'b1111111111111111;
-    assign _1999 = _1993 == _1998;
-    assign _50 = _1999;
-    always @(posedge _310) begin
-        if (_308)
-            _2002 <= _1817;
+    assign _2018 = _2012 < _2017;
+    assign _2023 = _2018 ? _2022 : _2021;
+    assign _2009 = 13'b0111111111111;
+    assign _2024 = _2009 < _2023;
+    assign _2027 = _2024 ? _2028 : _2025;
+    assign _2004 = 16'b1111111111111111;
+    assign _2005 = _1999 == _2004;
+    assign _50 = _2005;
+    always @(posedge _316) begin
+        if (_314)
+            _2008 <= _1823;
         else
-            _2002 <= _50;
+            _2008 <= _50;
     end
-    assign _2023 = _2002 ? _2022 : _2021;
-    assign _51 = _2023;
-    always @(posedge _310) begin
-        if (_308)
-            _2062 <= _2061;
+    assign _2029 = _2008 ? _2028 : _2027;
+    assign _51 = _2029;
+    always @(posedge _316) begin
+        if (_314)
+            _2068 <= _2067;
         else
-            _2062 <= _51;
+            _2068 <= _51;
     end
-    assign _2026 = _1993[11:0];
+    assign _2032 = _1999[11:0];
     always @* begin
         case (f_winner)
         0:
-            _1992 <= _926;
+            _1998 <= _932;
         1:
-            _1992 <= _1299;
+            _1998 <= _1305;
         2:
-            _1992 <= _1438;
+            _1998 <= _1444;
         default:
-            _1992 <= _1577;
+            _1998 <= _1583;
         endcase
     end
     always @* begin
-        case (_1992)
+        case (_1998)
         0:
-            _1993 <= _929;
+            _1999 <= _935;
         1:
-            _1993 <= _932;
+            _1999 <= _938;
         2:
-            _1993 <= _935;
+            _1999 <= _941;
         default:
-            _1993 <= _935;
+            _1999 <= _941;
         endcase
     end
-    assign _2024 = 16'b0000111111111111;
-    assign _2025 = _2024 < _1993;
-    assign _2028 = _2025 ? _2022 : _2026;
-    assign _52 = _2028;
-    always @(posedge _310) begin
-        if (_308)
-            _2059 <= _2061;
+    assign _2030 = 16'b0000111111111111;
+    assign _2031 = _2030 < _1999;
+    assign _2034 = _2031 ? _2028 : _2032;
+    assign _52 = _2034;
+    always @(posedge _316) begin
+        if (_314)
+            _2065 <= _2067;
         else
-            _2059 <= _52;
+            _2065 <= _52;
     end
-    assign _2063 = _2059 < _2062;
-    assign _2064 = _2044 & _2063;
-    assign _2065 = _2064 ? _2059 : _2062;
-    assign _2056 = _64[23:12];
-    assign _2066 = _2056 < _2065;
-    assign _2067 = _2066 ? _2056 : _2065;
-    assign _2055 = _2039 == _755;
-    assign _2068 = _2055 ? _2065 : _2067;
-    assign _2051 = _2049[7:0];
-    assign _2046 = 2'b10;
-    assign _2045 = 2'b01;
-    assign _2030 = _1765 == _1768;
-    assign _2029 = _1757 & _1760;
-    assign _2031 = _2029 & _2030;
-    assign _53 = _2031;
-    always @(posedge _310) begin
-        if (_308)
-            _2044 <= _1817;
+    assign _2069 = _2065 < _2068;
+    assign _2070 = _2050 & _2069;
+    assign _2071 = _2070 ? _2065 : _2068;
+    assign _2062 = _64[23:12];
+    assign _2072 = _2062 < _2071;
+    assign _2073 = _2072 ? _2062 : _2071;
+    assign _2061 = _2045 == _761;
+    assign _2074 = _2061 ? _2071 : _2073;
+    assign _2057 = _2055[7:0];
+    assign _2052 = 2'b10;
+    assign _2051 = 2'b01;
+    assign _2036 = _1771 == _1774;
+    assign _2035 = _1763 & _1766;
+    assign _2037 = _2035 & _2036;
+    assign _53 = _2037;
+    always @(posedge _316) begin
+        if (_314)
+            _2050 <= _1823;
         else
-            _2044 <= _53;
+            _2050 <= _53;
     end
-    assign _2047 = _2044 ? _2046 : _2045;
-    assign _2041 = 7'b0000000;
-    assign _2048 = { _2041,
-                     _2047 };
-    assign _2039 = _64[31:24];
-    assign _2040 = { gnd,
-                     _2039 };
-    assign _2049 = _2040 + _2048;
-    assign _2050 = _2049[8:8];
-    assign _2053 = _2050 ? _757 : _2051;
-    assign _2076 = { _2053,
-                     _2068,
-                     _2075 };
+    assign _2053 = _2050 ? _2052 : _2051;
+    assign _2047 = 7'b0000000;
+    assign _2054 = { _2047,
+                     _2053 };
+    assign _2045 = _64[31:24];
+    assign _2046 = { gnd,
+                     _2045 };
+    assign _2055 = _2046 + _2054;
+    assign _2056 = _2055[8:8];
+    assign _2059 = _2056 ? _763 : _2057;
+    assign _2082 = { _2059,
+                     _2074,
+                     _2081 };
     assign _55 = host_cov_wdata;
-    assign _2077 = _1842 ? _2076 : _55;
-    always @(posedge _310) begin
-        if (_2085)
-            _2086[_2038] <= _2077;
+    assign _2083 = _1848 ? _2082 : _55;
+    always @(posedge _316) begin
+        if (_2091)
+            _2092[_2044] <= _2083;
     end
-    assign _56 = _1768;
-    always @(posedge _310) begin
-        if (_308)
-            _2037 <= _755;
+    assign _56 = _1774;
+    always @(posedge _316) begin
+        if (_314)
+            _2043 <= _761;
         else
-            _2037 <= _56;
+            _2043 <= _56;
     end
-    assign _1765 = { _1764,
+    assign _1771 = { _1770,
                      f_winner };
-    assign _57 = _1765;
-    always @(posedge _310) begin
-        if (_308)
-            _1768 <= _755;
+    assign _57 = _1771;
+    always @(posedge _316) begin
+        if (_314)
+            _1774 <= _761;
         else
-            _1768 <= _57;
+            _1774 <= _57;
     end
     assign _59 = host_cov_addr;
-    assign _2034 = _1760 ? _1768 : _59;
-    assign _2032 = ~ _1760;
+    assign _2040 = _1766 ? _1774 : _59;
+    assign _2038 = ~ _1766;
     assign _61 = host_cover_en;
-    assign _1757 = _1700 & _61;
-    assign _2033 = _1757 & _2032;
-    assign _62 = _2033;
-    always @(posedge _310) begin
-        if (_308)
-            _1760 <= _1817;
+    assign _1763 = _1706 & _61;
+    assign _2039 = _1763 & _2038;
+    assign _62 = _2039;
+    always @(posedge _316) begin
+        if (_314)
+            _1766 <= _1823;
         else
-            _1760 <= _62;
+            _1766 <= _62;
     end
-    assign _63 = _1760;
-    always @(posedge _310) begin
-        if (_308)
-            _1842 <= _1817;
+    assign _63 = _1766;
+    always @(posedge _316) begin
+        if (_314)
+            _1848 <= _1823;
         else
-            _1842 <= _63;
+            _1848 <= _63;
     end
-    assign _2038 = _1842 ? _2037 : _2034;
-    assign _2087 = _2086[_2038];
-    always @(posedge _310) begin
-        if (_2092)
-            _2093 <= _2087;
+    assign _2044 = _1848 ? _2043 : _2040;
+    assign _2093 = _2092[_2044];
+    always @(posedge _316) begin
+        if (_2098)
+            _2099 <= _2093;
     end
-    assign _64 = _2093;
-    assign _2094 = ~ f_sweeping;
-    assign _2095 = _1833 & _2094;
-    assign _2097 = _2095 ? _64 : _2089;
-    assign _2464 = 3'b111;
-    assign _2465 = _2102 == _2464;
-    assign _2466 = _2099 & _2465;
-    assign _2463 = 48'b000000000000000000000000000000000000000000000000;
-    always @(posedge _310) begin
-        if (_308)
-            _2467 <= _2463;
+    assign _64 = _2099;
+    assign _2100 = ~ f_sweeping;
+    assign _2101 = _1839 & _2100;
+    assign _2103 = _2101 ? _64 : _2095;
+    assign _2470 = 3'b111;
+    assign _2471 = _2108 == _2470;
+    assign _2472 = _2105 & _2471;
+    assign _2469 = 48'b000000000000000000000000000000000000000000000000;
+    always @(posedge _316) begin
+        if (_314)
+            _2473 <= _2469;
+        else
+            if (_2472)
+                _2473 <= _77;
+    end
+    assign _2465 = _2108 == _1869;
+    assign _2466 = _2105 & _2465;
+    always @(posedge _316) begin
+        if (_314)
+            _2467 <= _2469;
         else
             if (_2466)
                 _2467 <= _77;
     end
-    assign _2459 = _2102 == _1863;
-    assign _2460 = _2099 & _2459;
-    always @(posedge _310) begin
-        if (_308)
-            _2461 <= _2463;
+    assign _2459 = _2108 == _1870;
+    assign _2460 = _2105 & _2459;
+    always @(posedge _316) begin
+        if (_314)
+            _2461 <= _2469;
         else
             if (_2460)
                 _2461 <= _77;
     end
-    assign _2453 = _2102 == _1864;
-    assign _2454 = _2099 & _2453;
-    always @(posedge _310) begin
-        if (_308)
-            _2455 <= _2463;
+    assign _2453 = _2108 == _461;
+    assign _2454 = _2105 & _2453;
+    always @(posedge _316) begin
+        if (_314)
+            _2455 <= _2469;
         else
             if (_2454)
                 _2455 <= _77;
     end
-    assign _2447 = _2102 == _455;
-    assign _2448 = _2099 & _2447;
-    always @(posedge _310) begin
-        if (_308)
-            _2449 <= _2463;
+    assign _2447 = _2108 == _1873;
+    assign _2448 = _2105 & _2447;
+    always @(posedge _316) begin
+        if (_314)
+            _2449 <= _2469;
         else
             if (_2448)
                 _2449 <= _77;
     end
-    assign _2441 = _2102 == _1867;
-    assign _2442 = _2099 & _2441;
-    always @(posedge _310) begin
-        if (_308)
-            _2443 <= _2463;
+    assign _2441 = _2108 == _460;
+    assign _2442 = _2105 & _2441;
+    always @(posedge _316) begin
+        if (_314)
+            _2443 <= _2469;
         else
             if (_2442)
                 _2443 <= _77;
     end
-    assign _2435 = _2102 == _454;
-    assign _2436 = _2099 & _2435;
-    always @(posedge _310) begin
-        if (_308)
-            _2437 <= _2463;
+    assign _2435 = _2108 == _488;
+    assign _2436 = _2105 & _2435;
+    always @(posedge _316) begin
+        if (_314)
+            _2437 <= _2469;
         else
             if (_2436)
                 _2437 <= _77;
     end
-    assign _2429 = _2102 == _482;
-    assign _2430 = _2099 & _2429;
-    always @(posedge _310) begin
-        if (_308)
-            _2431 <= _2463;
+    assign _2110 = _2108 + _488;
+    assign _2111 = _2105 ? _2110 : _2108;
+    assign _67 = _2111;
+    always @(posedge _316) begin
+        if (_314)
+            _2108 <= _458;
+        else
+            _2108 <= _67;
+    end
+    assign _2429 = _2108 == _458;
+    assign _2430 = _2105 & _2429;
+    assign _2402 = _2293 - _2398;
+    assign _2119 = 29'b11111111111111111111111111111;
+    assign _2118 = 29'b00000000000000000000000000000;
+    assign _2121 = 29'b00000000000000000000000000001;
+    assign _2122 = ts_hi_m1 + _2121;
+    assign _2115 = ts_reg[2:0];
+    assign _2117 = _2115 == _2470;
+    assign _2123 = _2117 ? _2122 : ts_hi_m1;
+    assign _68 = _2123;
+    always @(posedge _316) begin
+        if (_314)
+            ts_hi_m1 <= _2119;
+        else
+            ts_hi_m1 <= _68;
+    end
+    assign _2400 = ts_reg[31:3];
+    assign _2141 = _2128 + _488;
+    assign _2137 = _2128 == _2470;
+    assign _2138 = ~ _2137;
+    assign _2135 = _1249[0:0];
+    assign _2139 = _2135 & _2138;
+    assign _2142 = _2139 ? _2141 : _2128;
+    assign _2132 = _1249[0:0];
+    assign _2133 = ~ _2132;
+    assign _2130 = _920[0:0];
+    assign _2129 = f_chg_now[0:0];
+    assign _2131 = _2129 & _2130;
+    assign _2134 = _2131 & _2133;
+    assign _2144 = _2134 ? _488 : _2142;
+    assign _2125 = _879 == _2051;
+    assign _2145 = _2125 ? _2144 : _2128;
+    assign _69 = _2145;
+    always @(posedge _316) begin
+        if (_314)
+            _2128 <= _458;
+        else
+            _2128 <= _69;
+    end
+    assign _2391 = _1249[0:0];
+    assign _2393 = _2391 ? _2128 : _458;
+    assign _2162 = _2149 + _488;
+    assign _2158 = _2149 == _2470;
+    assign _2159 = ~ _2158;
+    assign _2156 = _1249[1:1];
+    assign _2160 = _2156 & _2159;
+    assign _2163 = _2160 ? _2162 : _2149;
+    assign _2153 = _1249[1:1];
+    assign _2154 = ~ _2153;
+    assign _2151 = _920[1:1];
+    assign _2150 = f_chg_now[1:1];
+    assign _2152 = _2150 & _2151;
+    assign _2155 = _2152 & _2154;
+    assign _2165 = _2155 ? _488 : _2163;
+    assign _2146 = _879 == _2051;
+    assign _2166 = _2146 ? _2165 : _2149;
+    assign _70 = _2166;
+    always @(posedge _316) begin
+        if (_314)
+            _2149 <= _458;
+        else
+            _2149 <= _70;
+    end
+    assign _2388 = _1249[1:1];
+    assign _2390 = _2388 ? _2149 : _458;
+    assign _2394 = _2350 ? _2393 : _2390;
+    assign _2183 = _2170 + _488;
+    assign _2179 = _2170 == _2470;
+    assign _2180 = ~ _2179;
+    assign _2177 = _1249[2:2];
+    assign _2181 = _2177 & _2180;
+    assign _2184 = _2181 ? _2183 : _2170;
+    assign _2174 = _1249[2:2];
+    assign _2175 = ~ _2174;
+    assign _2172 = _920[2:2];
+    assign _2171 = f_chg_now[2:2];
+    assign _2173 = _2171 & _2172;
+    assign _2176 = _2173 & _2175;
+    assign _2186 = _2176 ? _488 : _2184;
+    assign _2167 = _879 == _2051;
+    assign _2187 = _2167 ? _2186 : _2170;
+    assign _71 = _2187;
+    always @(posedge _316) begin
+        if (_314)
+            _2170 <= _458;
+        else
+            _2170 <= _71;
+    end
+    assign _2384 = _1249[2:2];
+    assign _2386 = _2384 ? _2170 : _458;
+    assign _2204 = _2191 + _488;
+    assign _2200 = _2191 == _2470;
+    assign _2201 = ~ _2200;
+    assign _2198 = _1249[3:3];
+    assign _2202 = _2198 & _2201;
+    assign _2205 = _2202 ? _2204 : _2191;
+    assign _2195 = _1249[3:3];
+    assign _2196 = ~ _2195;
+    assign _2193 = _920[3:3];
+    assign _2192 = f_chg_now[3:3];
+    assign _2194 = _2192 & _2193;
+    assign _2197 = _2194 & _2196;
+    assign _2207 = _2197 ? _488 : _2205;
+    assign _2188 = _879 == _2051;
+    assign _2208 = _2188 ? _2207 : _2191;
+    assign _72 = _2208;
+    always @(posedge _316) begin
+        if (_314)
+            _2191 <= _458;
+        else
+            _2191 <= _72;
+    end
+    assign _2381 = _1249[3:3];
+    assign _2383 = _2381 ? _2191 : _458;
+    assign _2387 = _2353 ? _2386 : _2383;
+    assign _2395 = _2352 ? _2394 : _2387;
+    assign _2225 = _2212 + _488;
+    assign _2221 = _2212 == _2470;
+    assign _2222 = ~ _2221;
+    assign _2219 = _1249[4:4];
+    assign _2223 = _2219 & _2222;
+    assign _2226 = _2223 ? _2225 : _2212;
+    assign _2216 = _1249[4:4];
+    assign _2217 = ~ _2216;
+    assign _2214 = _920[4:4];
+    assign _2213 = f_chg_now[4:4];
+    assign _2215 = _2213 & _2214;
+    assign _2218 = _2215 & _2217;
+    assign _2228 = _2218 ? _488 : _2226;
+    assign _2209 = _879 == _2051;
+    assign _2229 = _2209 ? _2228 : _2212;
+    assign _73 = _2229;
+    always @(posedge _316) begin
+        if (_314)
+            _2212 <= _458;
+        else
+            _2212 <= _73;
+    end
+    assign _2376 = _1249[4:4];
+    assign _2378 = _2376 ? _2212 : _458;
+    assign _2246 = _2233 + _488;
+    assign _2242 = _2233 == _2470;
+    assign _2243 = ~ _2242;
+    assign _2240 = _1249[5:5];
+    assign _2244 = _2240 & _2243;
+    assign _2247 = _2244 ? _2246 : _2233;
+    assign _2237 = _1249[5:5];
+    assign _2238 = ~ _2237;
+    assign _2235 = _920[5:5];
+    assign _2234 = f_chg_now[5:5];
+    assign _2236 = _2234 & _2235;
+    assign _2239 = _2236 & _2238;
+    assign _2249 = _2239 ? _488 : _2247;
+    assign _2230 = _879 == _2051;
+    assign _2250 = _2230 ? _2249 : _2233;
+    assign _74 = _2250;
+    always @(posedge _316) begin
+        if (_314)
+            _2233 <= _458;
+        else
+            _2233 <= _74;
+    end
+    assign _2373 = _1249[5:5];
+    assign _2375 = _2373 ? _2233 : _458;
+    assign _2379 = _2357 ? _2378 : _2375;
+    assign _2267 = _2254 + _488;
+    assign _2263 = _2254 == _2470;
+    assign _2264 = ~ _2263;
+    assign _2261 = _1249[6:6];
+    assign _2265 = _2261 & _2264;
+    assign _2268 = _2265 ? _2267 : _2254;
+    assign _2258 = _1249[6:6];
+    assign _2259 = ~ _2258;
+    assign _2256 = _920[6:6];
+    assign _2255 = f_chg_now[6:6];
+    assign _2257 = _2255 & _2256;
+    assign _2260 = _2257 & _2259;
+    assign _2270 = _2260 ? _488 : _2268;
+    assign _2251 = _879 == _2051;
+    assign _2271 = _2251 ? _2270 : _2254;
+    assign _75 = _2271;
+    always @(posedge _316) begin
+        if (_314)
+            _2254 <= _458;
+        else
+            _2254 <= _75;
+    end
+    assign _2369 = _1249[6:6];
+    assign _2371 = _2369 ? _2254 : _458;
+    assign _2288 = _2275 + _488;
+    assign _2284 = _2275 == _2470;
+    assign _2285 = ~ _2284;
+    assign _2282 = _1249[7:7];
+    assign _2286 = _2282 & _2285;
+    assign _2289 = _2286 ? _2288 : _2275;
+    assign _2279 = _1249[7:7];
+    assign _2280 = ~ _2279;
+    assign _2277 = _920[7:7];
+    assign _2276 = f_chg_now[7:7];
+    assign _2278 = _2276 & _2277;
+    assign _2281 = _2278 & _2280;
+    assign _2291 = _2281 ? _488 : _2289;
+    assign _2272 = _879 == _2051;
+    assign _2292 = _2272 ? _2291 : _2275;
+    assign _76 = _2292;
+    always @(posedge _316) begin
+        if (_314)
+            _2275 <= _458;
+        else
+            _2275 <= _76;
+    end
+    assign _2366 = _1249[7:7];
+    assign _2368 = _2366 ? _2275 : _458;
+    assign _2372 = _2360 ? _2371 : _2368;
+    assign _2380 = _2359 ? _2379 : _2372;
+    assign _2396 = _2356 ? _2395 : _2380;
+    assign _2361 = _1279[7:7];
+    assign _2360 = _1279[6:6];
+    assign _2362 = _2360 | _2361;
+    assign _2358 = _1279[5:5];
+    assign _2357 = _1279[4:4];
+    assign _2359 = _2357 | _2358;
+    assign _2363 = _2359 | _2362;
+    assign _2354 = _1279[3:3];
+    assign _2353 = _1279[2:2];
+    assign _2355 = _2353 | _2354;
+    assign _2351 = _1279[1:1];
+    assign _2350 = _1279[0:0];
+    assign _2352 = _2350 | _2351;
+    assign _2356 = _2352 | _2355;
+    assign _2364 = _2356 | _2363;
+    assign _2397 = _2364 ? _2396 : _458;
+    assign _2339 = f_watch[0:0];
+    assign _2338 = _920[0:0];
+    assign _2340 = _2338 & _2339;
+    assign _2342 = _2340 ? _1134 : _458;
+    assign _2334 = f_watch[1:1];
+    assign _2333 = _920[1:1];
+    assign _2335 = _2333 & _2334;
+    assign _2337 = _2335 ? _1113 : _458;
+    assign _2343 = _2337 < _2342;
+    assign _2344 = _2343 ? _2342 : _2337;
+    assign _2327 = f_watch[2:2];
+    assign _2326 = _920[2:2];
+    assign _2328 = _2326 & _2327;
+    assign _2330 = _2328 ? _1090 : _458;
+    assign _2322 = f_watch[3:3];
+    assign _2321 = _920[3:3];
+    assign _2323 = _2321 & _2322;
+    assign _2325 = _2323 ? _1069 : _458;
+    assign _2331 = _2325 < _2330;
+    assign _2332 = _2331 ? _2330 : _2325;
+    assign _2345 = _2332 < _2344;
+    assign _2346 = _2345 ? _2344 : _2332;
+    assign _2313 = f_watch[4:4];
+    assign _2312 = _920[4:4];
+    assign _2314 = _2312 & _2313;
+    assign _2316 = _2314 ? _1044 : _458;
+    assign _2308 = f_watch[5:5];
+    assign _2307 = _920[5:5];
+    assign _2309 = _2307 & _2308;
+    assign _2311 = _2309 ? _1023 : _458;
+    assign _2317 = _2311 < _2316;
+    assign _2318 = _2317 ? _2316 : _2311;
+    assign _2301 = f_watch[6:6];
+    assign _2300 = _920[6:6];
+    assign _2302 = _2300 & _2301;
+    assign _2304 = _2302 ? _1000 : _458;
+    assign _2296 = f_watch[7:7];
+    assign _2295 = _920[7:7];
+    assign _2297 = _2295 & _2296;
+    assign _2299 = _2297 ? _979 : _458;
+    assign _2305 = _2299 < _2304;
+    assign _2306 = _2305 ? _2304 : _2299;
+    assign _2319 = _2306 < _2318;
+    assign _2320 = _2319 ? _2318 : _2306;
+    assign _2347 = _2320 < _2346;
+    assign _2348 = _2347 ? _2346 : _2320;
+    assign _2349 = f_unexp_now ? _2348 : _458;
+    assign _2398 = f_amb_now ? _2397 : _2349;
+    assign _2293 = ts_reg[2:0];
+    assign _2399 = _2293 < _2398;
+    assign _2401 = _2399 ? ts_hi_m1 : _2400;
+    assign _2403 = { _2401,
+                     _2402 };
+    assign _2407 = { _2403,
+                     _1770,
+                     _2406,
+                     _907 };
+    assign _77 = _2407;
+    always @(posedge _316) begin
+        if (_314)
+            _2431 <= _2469;
         else
             if (_2430)
                 _2431 <= _77;
     end
-    assign _2104 = _2102 + _482;
-    assign _2105 = _2099 ? _2104 : _2102;
-    assign _67 = _2105;
-    always @(posedge _310) begin
-        if (_308)
-            _2102 <= _452;
-        else
-            _2102 <= _67;
-    end
-    assign _2423 = _2102 == _452;
-    assign _2424 = _2099 & _2423;
-    assign _2396 = _2287 - _2392;
-    assign _2113 = 29'b11111111111111111111111111111;
-    assign _2112 = 29'b00000000000000000000000000000;
-    assign _2115 = 29'b00000000000000000000000000001;
-    assign _2116 = ts_hi_m1 + _2115;
-    assign _2109 = ts_reg[2:0];
-    assign _2111 = _2109 == _2464;
-    assign _2117 = _2111 ? _2116 : ts_hi_m1;
-    assign _68 = _2117;
-    always @(posedge _310) begin
-        if (_308)
-            ts_hi_m1 <= _2113;
-        else
-            ts_hi_m1 <= _68;
-    end
-    assign _2394 = ts_reg[31:3];
-    assign _2135 = _2122 + _482;
-    assign _2131 = _2122 == _2464;
-    assign _2132 = ~ _2131;
-    assign _2129 = _1243[0:0];
-    assign _2133 = _2129 & _2132;
-    assign _2136 = _2133 ? _2135 : _2122;
-    assign _2126 = _1243[0:0];
-    assign _2127 = ~ _2126;
-    assign _2124 = _914[0:0];
-    assign _2123 = f_chg_now[0:0];
-    assign _2125 = _2123 & _2124;
-    assign _2128 = _2125 & _2127;
-    assign _2138 = _2128 ? _482 : _2136;
-    assign _2119 = _873 == _2045;
-    assign _2139 = _2119 ? _2138 : _2122;
-    assign _69 = _2139;
-    always @(posedge _310) begin
-        if (_308)
-            _2122 <= _452;
-        else
-            _2122 <= _69;
-    end
-    assign _2385 = _1243[0:0];
-    assign _2387 = _2385 ? _2122 : _452;
-    assign _2156 = _2143 + _482;
-    assign _2152 = _2143 == _2464;
-    assign _2153 = ~ _2152;
-    assign _2150 = _1243[1:1];
-    assign _2154 = _2150 & _2153;
-    assign _2157 = _2154 ? _2156 : _2143;
-    assign _2147 = _1243[1:1];
-    assign _2148 = ~ _2147;
-    assign _2145 = _914[1:1];
-    assign _2144 = f_chg_now[1:1];
-    assign _2146 = _2144 & _2145;
-    assign _2149 = _2146 & _2148;
-    assign _2159 = _2149 ? _482 : _2157;
-    assign _2140 = _873 == _2045;
-    assign _2160 = _2140 ? _2159 : _2143;
-    assign _70 = _2160;
-    always @(posedge _310) begin
-        if (_308)
-            _2143 <= _452;
-        else
-            _2143 <= _70;
-    end
-    assign _2382 = _1243[1:1];
-    assign _2384 = _2382 ? _2143 : _452;
-    assign _2388 = _2344 ? _2387 : _2384;
-    assign _2177 = _2164 + _482;
-    assign _2173 = _2164 == _2464;
-    assign _2174 = ~ _2173;
-    assign _2171 = _1243[2:2];
-    assign _2175 = _2171 & _2174;
-    assign _2178 = _2175 ? _2177 : _2164;
-    assign _2168 = _1243[2:2];
-    assign _2169 = ~ _2168;
-    assign _2166 = _914[2:2];
-    assign _2165 = f_chg_now[2:2];
-    assign _2167 = _2165 & _2166;
-    assign _2170 = _2167 & _2169;
-    assign _2180 = _2170 ? _482 : _2178;
-    assign _2161 = _873 == _2045;
-    assign _2181 = _2161 ? _2180 : _2164;
-    assign _71 = _2181;
-    always @(posedge _310) begin
-        if (_308)
-            _2164 <= _452;
-        else
-            _2164 <= _71;
-    end
-    assign _2378 = _1243[2:2];
-    assign _2380 = _2378 ? _2164 : _452;
-    assign _2198 = _2185 + _482;
-    assign _2194 = _2185 == _2464;
-    assign _2195 = ~ _2194;
-    assign _2192 = _1243[3:3];
-    assign _2196 = _2192 & _2195;
-    assign _2199 = _2196 ? _2198 : _2185;
-    assign _2189 = _1243[3:3];
-    assign _2190 = ~ _2189;
-    assign _2187 = _914[3:3];
-    assign _2186 = f_chg_now[3:3];
-    assign _2188 = _2186 & _2187;
-    assign _2191 = _2188 & _2190;
-    assign _2201 = _2191 ? _482 : _2199;
-    assign _2182 = _873 == _2045;
-    assign _2202 = _2182 ? _2201 : _2185;
-    assign _72 = _2202;
-    always @(posedge _310) begin
-        if (_308)
-            _2185 <= _452;
-        else
-            _2185 <= _72;
-    end
-    assign _2375 = _1243[3:3];
-    assign _2377 = _2375 ? _2185 : _452;
-    assign _2381 = _2347 ? _2380 : _2377;
-    assign _2389 = _2346 ? _2388 : _2381;
-    assign _2219 = _2206 + _482;
-    assign _2215 = _2206 == _2464;
-    assign _2216 = ~ _2215;
-    assign _2213 = _1243[4:4];
-    assign _2217 = _2213 & _2216;
-    assign _2220 = _2217 ? _2219 : _2206;
-    assign _2210 = _1243[4:4];
-    assign _2211 = ~ _2210;
-    assign _2208 = _914[4:4];
-    assign _2207 = f_chg_now[4:4];
-    assign _2209 = _2207 & _2208;
-    assign _2212 = _2209 & _2211;
-    assign _2222 = _2212 ? _482 : _2220;
-    assign _2203 = _873 == _2045;
-    assign _2223 = _2203 ? _2222 : _2206;
-    assign _73 = _2223;
-    always @(posedge _310) begin
-        if (_308)
-            _2206 <= _452;
-        else
-            _2206 <= _73;
-    end
-    assign _2370 = _1243[4:4];
-    assign _2372 = _2370 ? _2206 : _452;
-    assign _2240 = _2227 + _482;
-    assign _2236 = _2227 == _2464;
-    assign _2237 = ~ _2236;
-    assign _2234 = _1243[5:5];
-    assign _2238 = _2234 & _2237;
-    assign _2241 = _2238 ? _2240 : _2227;
-    assign _2231 = _1243[5:5];
-    assign _2232 = ~ _2231;
-    assign _2229 = _914[5:5];
-    assign _2228 = f_chg_now[5:5];
-    assign _2230 = _2228 & _2229;
-    assign _2233 = _2230 & _2232;
-    assign _2243 = _2233 ? _482 : _2241;
-    assign _2224 = _873 == _2045;
-    assign _2244 = _2224 ? _2243 : _2227;
-    assign _74 = _2244;
-    always @(posedge _310) begin
-        if (_308)
-            _2227 <= _452;
-        else
-            _2227 <= _74;
-    end
-    assign _2367 = _1243[5:5];
-    assign _2369 = _2367 ? _2227 : _452;
-    assign _2373 = _2351 ? _2372 : _2369;
-    assign _2261 = _2248 + _482;
-    assign _2257 = _2248 == _2464;
-    assign _2258 = ~ _2257;
-    assign _2255 = _1243[6:6];
-    assign _2259 = _2255 & _2258;
-    assign _2262 = _2259 ? _2261 : _2248;
-    assign _2252 = _1243[6:6];
-    assign _2253 = ~ _2252;
-    assign _2250 = _914[6:6];
-    assign _2249 = f_chg_now[6:6];
-    assign _2251 = _2249 & _2250;
-    assign _2254 = _2251 & _2253;
-    assign _2264 = _2254 ? _482 : _2262;
-    assign _2245 = _873 == _2045;
-    assign _2265 = _2245 ? _2264 : _2248;
-    assign _75 = _2265;
-    always @(posedge _310) begin
-        if (_308)
-            _2248 <= _452;
-        else
-            _2248 <= _75;
-    end
-    assign _2363 = _1243[6:6];
-    assign _2365 = _2363 ? _2248 : _452;
-    assign _2282 = _2269 + _482;
-    assign _2278 = _2269 == _2464;
-    assign _2279 = ~ _2278;
-    assign _2276 = _1243[7:7];
-    assign _2280 = _2276 & _2279;
-    assign _2283 = _2280 ? _2282 : _2269;
-    assign _2273 = _1243[7:7];
-    assign _2274 = ~ _2273;
-    assign _2271 = _914[7:7];
-    assign _2270 = f_chg_now[7:7];
-    assign _2272 = _2270 & _2271;
-    assign _2275 = _2272 & _2274;
-    assign _2285 = _2275 ? _482 : _2283;
-    assign _2266 = _873 == _2045;
-    assign _2286 = _2266 ? _2285 : _2269;
-    assign _76 = _2286;
-    always @(posedge _310) begin
-        if (_308)
-            _2269 <= _452;
-        else
-            _2269 <= _76;
-    end
-    assign _2360 = _1243[7:7];
-    assign _2362 = _2360 ? _2269 : _452;
-    assign _2366 = _2354 ? _2365 : _2362;
-    assign _2374 = _2353 ? _2373 : _2366;
-    assign _2390 = _2350 ? _2389 : _2374;
-    assign _2355 = _1273[7:7];
-    assign _2354 = _1273[6:6];
-    assign _2356 = _2354 | _2355;
-    assign _2352 = _1273[5:5];
-    assign _2351 = _1273[4:4];
-    assign _2353 = _2351 | _2352;
-    assign _2357 = _2353 | _2356;
-    assign _2348 = _1273[3:3];
-    assign _2347 = _1273[2:2];
-    assign _2349 = _2347 | _2348;
-    assign _2345 = _1273[1:1];
-    assign _2344 = _1273[0:0];
-    assign _2346 = _2344 | _2345;
-    assign _2350 = _2346 | _2349;
-    assign _2358 = _2350 | _2357;
-    assign _2391 = _2358 ? _2390 : _452;
-    assign _2333 = f_watch[0:0];
-    assign _2332 = _914[0:0];
-    assign _2334 = _2332 & _2333;
-    assign _2336 = _2334 ? _1128 : _452;
-    assign _2328 = f_watch[1:1];
-    assign _2327 = _914[1:1];
-    assign _2329 = _2327 & _2328;
-    assign _2331 = _2329 ? _1107 : _452;
-    assign _2337 = _2331 < _2336;
-    assign _2338 = _2337 ? _2336 : _2331;
-    assign _2321 = f_watch[2:2];
-    assign _2320 = _914[2:2];
-    assign _2322 = _2320 & _2321;
-    assign _2324 = _2322 ? _1084 : _452;
-    assign _2316 = f_watch[3:3];
-    assign _2315 = _914[3:3];
-    assign _2317 = _2315 & _2316;
-    assign _2319 = _2317 ? _1063 : _452;
-    assign _2325 = _2319 < _2324;
-    assign _2326 = _2325 ? _2324 : _2319;
-    assign _2339 = _2326 < _2338;
-    assign _2340 = _2339 ? _2338 : _2326;
-    assign _2307 = f_watch[4:4];
-    assign _2306 = _914[4:4];
-    assign _2308 = _2306 & _2307;
-    assign _2310 = _2308 ? _1038 : _452;
-    assign _2302 = f_watch[5:5];
-    assign _2301 = _914[5:5];
-    assign _2303 = _2301 & _2302;
-    assign _2305 = _2303 ? _1017 : _452;
-    assign _2311 = _2305 < _2310;
-    assign _2312 = _2311 ? _2310 : _2305;
-    assign _2295 = f_watch[6:6];
-    assign _2294 = _914[6:6];
-    assign _2296 = _2294 & _2295;
-    assign _2298 = _2296 ? _994 : _452;
-    assign _2290 = f_watch[7:7];
-    assign _2289 = _914[7:7];
-    assign _2291 = _2289 & _2290;
-    assign _2293 = _2291 ? _973 : _452;
-    assign _2299 = _2293 < _2298;
-    assign _2300 = _2299 ? _2298 : _2293;
-    assign _2313 = _2300 < _2312;
-    assign _2314 = _2313 ? _2312 : _2300;
-    assign _2341 = _2314 < _2340;
-    assign _2342 = _2341 ? _2340 : _2314;
-    assign _2343 = f_unexp_now ? _2342 : _452;
-    assign _2392 = f_amb_now ? _2391 : _2343;
-    assign _2287 = ts_reg[2:0];
-    assign _2393 = _2287 < _2392;
-    assign _2395 = _2393 ? ts_hi_m1 : _2394;
-    assign _2397 = { _2395,
-                     _2396 };
-    assign _2401 = { _2397,
-                     _1764,
-                     _2400,
-                     _901 };
-    assign _77 = _2401;
-    always @(posedge _310) begin
-        if (_308)
-            _2425 <= _2463;
-        else
-            if (_2424)
-                _2425 <= _77;
-    end
-    assign _2418 = _2416 + _482;
-    assign _1984 = 4'b0000;
-    assign _2407 = 4'b0001;
-    assign _2408 = _79 + _2407;
-    assign _2406 = _79 - _2407;
-    assign _2409 = _2099 ? _2408 : _2406;
-    assign _1742 = 4'b1000;
-    assign _1743 = _79 == _1742;
-    assign _2098 = ~ _1743;
+    assign _2424 = _2422 + _488;
+    assign _1990 = 4'b0000;
+    assign _2413 = 4'b0001;
+    assign _2414 = _79 + _2413;
+    assign _2412 = _79 - _2413;
+    assign _2415 = _2105 ? _2414 : _2412;
+    assign _1748 = 4'b1000;
+    assign _1749 = _79 == _1748;
+    assign _2104 = ~ _1749;
     assign _78 = f_viol_now;
-    assign _2099 = _78 & _2098;
-    assign _2404 = _2099 ^ _2403;
-    assign _2410 = _2404 ? _2409 : _79;
-    always @(posedge _310) begin
-        if (_308)
-            _2413 <= _1984;
+    assign _2105 = _78 & _2104;
+    assign _2410 = _2105 ^ _2409;
+    assign _2416 = _2410 ? _2415 : _79;
+    always @(posedge _316) begin
+        if (_314)
+            _2419 <= _1990;
         else
-            _2413 <= _2410;
+            _2419 <= _2416;
     end
-    assign _79 = _2413;
-    assign _1985 = _79 == _1984;
-    assign _2402 = ~ _1985;
+    assign _79 = _2419;
+    assign _1991 = _79 == _1990;
+    assign _2408 = ~ _1991;
     assign _81 = host_vlog_pop;
-    assign _2403 = _81 & _2402;
-    assign _2419 = _2403 ? _2418 : _2416;
-    assign _82 = _2419;
-    always @(posedge _310) begin
-        if (_308)
-            _2416 <= _452;
+    assign _2409 = _81 & _2408;
+    assign _2425 = _2409 ? _2424 : _2422;
+    assign _82 = _2425;
+    always @(posedge _316) begin
+        if (_314)
+            _2422 <= _458;
         else
-            _2416 <= _82;
+            _2422 <= _82;
     end
     always @* begin
-        case (_2416)
+        case (_2422)
         0:
-            _2468 <= _2425;
+            _2474 <= _2431;
         1:
-            _2468 <= _2431;
+            _2474 <= _2437;
         2:
-            _2468 <= _2437;
+            _2474 <= _2443;
         3:
-            _2468 <= _2443;
+            _2474 <= _2449;
         4:
-            _2468 <= _2449;
+            _2474 <= _2455;
         5:
-            _2468 <= _2455;
+            _2474 <= _2461;
         6:
-            _2468 <= _2461;
+            _2474 <= _2467;
         default:
-            _2468 <= _2467;
+            _2474 <= _2473;
         endcase
     end
-    assign _2532 = _2475 == _2464;
-    assign _2533 = _2472 & _2532;
-    always @(posedge _310) begin
-        if (_308)
-            _2534 <= _755;
+    assign _2538 = _2481 == _2470;
+    assign _2539 = _2478 & _2538;
+    always @(posedge _316) begin
+        if (_314)
+            _2540 <= _761;
+        else
+            if (_2539)
+                _2540 <= _150;
+    end
+    assign _2532 = _2481 == _1869;
+    assign _2533 = _2478 & _2532;
+    always @(posedge _316) begin
+        if (_314)
+            _2534 <= _761;
         else
             if (_2533)
-                _2534 <= _148;
+                _2534 <= _150;
     end
-    assign _2526 = _2475 == _1863;
-    assign _2527 = _2472 & _2526;
-    always @(posedge _310) begin
-        if (_308)
-            _2528 <= _755;
+    assign _2526 = _2481 == _1870;
+    assign _2527 = _2478 & _2526;
+    always @(posedge _316) begin
+        if (_314)
+            _2528 <= _761;
         else
             if (_2527)
-                _2528 <= _148;
+                _2528 <= _150;
     end
-    assign _2520 = _2475 == _1864;
-    assign _2521 = _2472 & _2520;
-    always @(posedge _310) begin
-        if (_308)
-            _2522 <= _755;
+    assign _2520 = _2481 == _461;
+    assign _2521 = _2478 & _2520;
+    always @(posedge _316) begin
+        if (_314)
+            _2522 <= _761;
         else
             if (_2521)
-                _2522 <= _148;
+                _2522 <= _150;
     end
-    assign _2514 = _2475 == _455;
-    assign _2515 = _2472 & _2514;
-    always @(posedge _310) begin
-        if (_308)
-            _2516 <= _755;
+    assign _2514 = _2481 == _1873;
+    assign _2515 = _2478 & _2514;
+    always @(posedge _316) begin
+        if (_314)
+            _2516 <= _761;
         else
             if (_2515)
-                _2516 <= _148;
+                _2516 <= _150;
     end
-    assign _2508 = _2475 == _1867;
-    assign _2509 = _2472 & _2508;
-    always @(posedge _310) begin
-        if (_308)
-            _2510 <= _755;
+    assign _2508 = _2481 == _460;
+    assign _2509 = _2478 & _2508;
+    always @(posedge _316) begin
+        if (_314)
+            _2510 <= _761;
         else
             if (_2509)
-                _2510 <= _148;
+                _2510 <= _150;
     end
-    assign _2502 = _2475 == _454;
-    assign _2503 = _2472 & _2502;
-    always @(posedge _310) begin
-        if (_308)
-            _2504 <= _755;
+    assign _2502 = _2481 == _488;
+    assign _2503 = _2478 & _2502;
+    always @(posedge _316) begin
+        if (_314)
+            _2504 <= _761;
         else
             if (_2503)
-                _2504 <= _148;
+                _2504 <= _150;
     end
-    assign _2496 = _2475 == _482;
-    assign _2497 = _2472 & _2496;
-    always @(posedge _310) begin
-        if (_308)
-            _2498 <= _755;
+    assign _2483 = _2481 + _488;
+    assign _2484 = _2478 ? _2483 : _2481;
+    assign _85 = _2484;
+    always @(posedge _316) begin
+        if (_314)
+            _2481 <= _458;
+        else
+            _2481 <= _85;
+    end
+    assign _2496 = _2481 == _458;
+    assign _2497 = _2478 & _2496;
+    always @(posedge _316) begin
+        if (_314)
+            _2498 <= _761;
         else
             if (_2497)
-                _2498 <= _148;
+                _2498 <= _150;
     end
-    assign _2477 = _2475 + _482;
-    assign _2478 = _2472 ? _2477 : _2475;
-    assign _85 = _2478;
-    always @(posedge _310) begin
-        if (_308)
-            _2475 <= _452;
+    assign _2491 = _2489 + _488;
+    assign _2492 = _2486 ? _2491 : _2489;
+    assign _86 = _2492;
+    always @(posedge _316) begin
+        if (_314)
+            _2489 <= _458;
         else
-            _2475 <= _85;
-    end
-    assign _2490 = _2475 == _452;
-    assign _2491 = _2472 & _2490;
-    always @(posedge _310) begin
-        if (_308)
-            _2492 <= _755;
-        else
-            if (_2491)
-                _2492 <= _148;
-    end
-    assign _2485 = _2483 + _482;
-    assign _2486 = _2480 ? _2485 : _2483;
-    assign _86 = _2486;
-    always @(posedge _310) begin
-        if (_308)
-            _2483 <= _452;
-        else
-            _2483 <= _86;
+            _2489 <= _86;
     end
     always @* begin
-        case (_2483)
+        case (_2489)
         0:
-            _2535 <= _2492;
+            _2541 <= _2498;
         1:
-            _2535 <= _2498;
+            _2541 <= _2504;
         2:
-            _2535 <= _2504;
+            _2541 <= _2510;
         3:
-            _2535 <= _2510;
+            _2541 <= _2516;
         4:
-            _2535 <= _2516;
+            _2541 <= _2522;
         5:
-            _2535 <= _2522;
+            _2541 <= _2528;
         6:
-            _2535 <= _2528;
+            _2541 <= _2534;
         default:
-            _2535 <= _2534;
+            _2541 <= _2540;
         endcase
     end
-    assign _2536 = 32'b00000000000000000000000000000001;
-    assign _2537 = ts_reg + _2536;
-    assign _90 = _2537;
-    always @(posedge _310) begin
-        if (_308)
-            ts_reg <= _2089;
+    assign _2542 = 32'b00000000000000000000000000000001;
+    assign _2543 = ts_reg + _2542;
+    assign _90 = _2543;
+    always @(posedge _316) begin
+        if (_314)
+            ts_reg <= _2095;
         else
             ts_reg <= _90;
     end
-    assign _2539 = 2'b00;
-    assign _2398 = { _1949,
+    assign _2545 = 2'b00;
+    assign _2404 = { _1955,
                      f_unexp_now };
-    assign _2400 = f_amb_now ? _2539 : _2398;
-    always @(posedge _310) begin
-        if (_308)
-            _2540 <= _2539;
+    assign _2406 = f_amb_now ? _2545 : _2404;
+    always @(posedge _316) begin
+        if (_314)
+            _2546 <= _2545;
         else
-            _2540 <= _2400;
+            _2546 <= _2406;
     end
-    always @(posedge _310) begin
-        if (_308)
-            _2543 <= _1817;
+    always @(posedge _316) begin
+        if (_314)
+            _2549 <= _1823;
         else
-            _2543 <= f_viol_now;
+            _2549 <= f_viol_now;
     end
-    always @(posedge _310) begin
-        if (_308)
-            _2546 <= _2539;
+    always @(posedge _316) begin
+        if (_314)
+            _2552 <= _2545;
         else
-            _2546 <= f_winner;
+            _2552 <= f_winner;
     end
-    always @(posedge _310) begin
-        if (_308)
-            _2549 <= _1817;
+    always @(posedge _316) begin
+        if (_314)
+            _2555 <= _1823;
         else
-            _2549 <= _1700;
+            _2555 <= _1706;
     end
-    assign _2550 = _1250[60:60];
-    assign _2551 = f_in_eval & _2550;
-    assign _2552 = ~ _1833;
-    assign _2693 = _103 & _2692;
-    assign _2694 = ~ _2693;
-    assign _2574 = _1250[23:16];
-    assign _2572 = _1267[86:79];
-    assign _2571 = _1261[86:79];
-    assign _2570 = _1255[86:79];
-    assign _2569 = _897[86:79];
+    assign _2556 = _1256[60:60];
+    assign _2557 = f_in_eval & _2556;
+    assign _2558 = ~ _1839;
+    assign _2699 = _103 & _2698;
+    assign _2700 = ~ _2699;
+    assign _2580 = _1256[23:16];
+    assign _2578 = _1273[86:79];
+    assign _2577 = _1267[86:79];
+    assign _2576 = _1261[86:79];
+    assign _2575 = _903[86:79];
     always @* begin
         case (f_winner)
         0:
-            _2573 <= _2569;
+            _2579 <= _2575;
         1:
-            _2573 <= _2570;
+            _2579 <= _2576;
         2:
-            _2573 <= _2571;
+            _2579 <= _2577;
         default:
-            _2573 <= _2572;
+            _2579 <= _2578;
         endcase
     end
-    assign _2575 = _881 ? _2574 : _2573;
-    assign _2576 = _2575 & _2566;
-    assign _2567 = ~ _2566;
-    assign _2568 = f_poe & _2567;
-    assign _2577 = _2568 | _2576;
-    assign _2611 = _2577 | _2610;
-    assign _2612 = _2556 ? _2611 : f_poe;
-    assign _2614 = _317 ? _755 : _2612;
-    assign _2616 = _1893 ? _755 : _2614;
-    assign _100 = _2616;
-    always @(posedge _310) begin
-        if (_308)
-            f_poe <= _755;
+    assign _2581 = _887 ? _2580 : _2579;
+    assign _2582 = _2581 & _2572;
+    assign _2573 = ~ _2572;
+    assign _2574 = f_poe & _2573;
+    assign _2583 = _2574 | _2582;
+    assign _2617 = _2583 | _2616;
+    assign _2618 = _2562 ? _2617 : f_poe;
+    assign _2620 = _323 ? _761 : _2618;
+    assign _2622 = _1899 ? _761 : _2620;
+    assign _100 = _2622;
+    always @(posedge _316) begin
+        if (_314)
+            f_poe <= _761;
         else
             f_poe <= _100;
     end
-    assign _2695 = f_poe & _2694;
+    assign _2701 = f_poe & _2700;
     assign _103 = host_open_drain;
-    assign _4280 = ~ _103;
-    assign _2690 = f_lane1_out & _2684;
-    assign _2689 = ~ f_lane1_out;
-    assign _2687 = ~ f_lane0_out;
-    assign _2688 = _2687 & _2684;
-    assign _2686 = f_lane0_out & _2684;
-    assign _2685 = ~ f_lane0_out;
-    assign _2684 = f_pout[0:0];
-    assign _2683 = _327[2:0];
+    assign _4344 = ~ _103;
+    assign _2696 = f_lane1_out & _2690;
+    assign _2695 = ~ f_lane1_out;
+    assign _2693 = ~ f_lane0_out;
+    assign _2694 = _2693 & _2690;
+    assign _2692 = f_lane0_out & _2690;
+    assign _2691 = ~ f_lane0_out;
+    assign _2690 = f_pout[0:0];
+    assign _2689 = _333[2:0];
     always @* begin
-        case (_2683)
+        case (_2689)
         0:
-            _2691 <= _2684;
+            _2697 <= _2690;
         1:
-            _2691 <= f_lane0_out;
+            _2697 <= f_lane0_out;
         2:
-            _2691 <= _2685;
+            _2697 <= _2691;
         3:
-            _2691 <= _2686;
+            _2697 <= _2692;
         4:
-            _2691 <= _2688;
+            _2697 <= _2694;
         5:
-            _2691 <= f_lane1_out;
+            _2697 <= f_lane1_out;
         6:
-            _2691 <= _2689;
+            _2697 <= _2695;
         default:
-            _2691 <= _2690;
+            _2697 <= _2696;
         endcase
     end
-    assign _2681 = f_lane1_out & _2675;
-    assign _2680 = ~ f_lane1_out;
-    assign _2678 = ~ f_lane0_out;
-    assign _2679 = _2678 & _2675;
-    assign _2677 = f_lane0_out & _2675;
-    assign _2676 = ~ f_lane0_out;
-    assign _2675 = f_pout[1:1];
-    assign _2674 = _327[5:3];
+    assign _2687 = f_lane1_out & _2681;
+    assign _2686 = ~ f_lane1_out;
+    assign _2684 = ~ f_lane0_out;
+    assign _2685 = _2684 & _2681;
+    assign _2683 = f_lane0_out & _2681;
+    assign _2682 = ~ f_lane0_out;
+    assign _2681 = f_pout[1:1];
+    assign _2680 = _333[5:3];
     always @* begin
-        case (_2674)
+        case (_2680)
         0:
-            _2682 <= _2675;
+            _2688 <= _2681;
         1:
-            _2682 <= f_lane0_out;
+            _2688 <= f_lane0_out;
         2:
-            _2682 <= _2676;
+            _2688 <= _2682;
         3:
-            _2682 <= _2677;
+            _2688 <= _2683;
         4:
-            _2682 <= _2679;
+            _2688 <= _2685;
         5:
-            _2682 <= f_lane1_out;
+            _2688 <= f_lane1_out;
         6:
-            _2682 <= _2680;
+            _2688 <= _2686;
         default:
-            _2682 <= _2681;
+            _2688 <= _2687;
         endcase
     end
-    assign _2672 = f_lane1_out & _2666;
-    assign _2671 = ~ f_lane1_out;
-    assign _2669 = ~ f_lane0_out;
-    assign _2670 = _2669 & _2666;
-    assign _2668 = f_lane0_out & _2666;
-    assign _2667 = ~ f_lane0_out;
-    assign _2666 = f_pout[2:2];
-    assign _2665 = _327[8:6];
+    assign _2678 = f_lane1_out & _2672;
+    assign _2677 = ~ f_lane1_out;
+    assign _2675 = ~ f_lane0_out;
+    assign _2676 = _2675 & _2672;
+    assign _2674 = f_lane0_out & _2672;
+    assign _2673 = ~ f_lane0_out;
+    assign _2672 = f_pout[2:2];
+    assign _2671 = _333[8:6];
     always @* begin
-        case (_2665)
+        case (_2671)
         0:
-            _2673 <= _2666;
+            _2679 <= _2672;
         1:
-            _2673 <= f_lane0_out;
+            _2679 <= f_lane0_out;
         2:
-            _2673 <= _2667;
+            _2679 <= _2673;
         3:
-            _2673 <= _2668;
+            _2679 <= _2674;
         4:
-            _2673 <= _2670;
+            _2679 <= _2676;
         5:
-            _2673 <= f_lane1_out;
+            _2679 <= f_lane1_out;
         6:
-            _2673 <= _2671;
+            _2679 <= _2677;
         default:
-            _2673 <= _2672;
+            _2679 <= _2678;
         endcase
     end
-    assign _2663 = f_lane1_out & _2657;
-    assign _2662 = ~ f_lane1_out;
-    assign _2660 = ~ f_lane0_out;
-    assign _2661 = _2660 & _2657;
-    assign _2659 = f_lane0_out & _2657;
-    assign _2658 = ~ f_lane0_out;
-    assign _2657 = f_pout[3:3];
-    assign _2656 = _327[11:9];
+    assign _2669 = f_lane1_out & _2663;
+    assign _2668 = ~ f_lane1_out;
+    assign _2666 = ~ f_lane0_out;
+    assign _2667 = _2666 & _2663;
+    assign _2665 = f_lane0_out & _2663;
+    assign _2664 = ~ f_lane0_out;
+    assign _2663 = f_pout[3:3];
+    assign _2662 = _333[11:9];
     always @* begin
-        case (_2656)
+        case (_2662)
         0:
-            _2664 <= _2657;
+            _2670 <= _2663;
         1:
-            _2664 <= f_lane0_out;
+            _2670 <= f_lane0_out;
         2:
-            _2664 <= _2658;
+            _2670 <= _2664;
         3:
-            _2664 <= _2659;
+            _2670 <= _2665;
         4:
-            _2664 <= _2661;
+            _2670 <= _2667;
         5:
-            _2664 <= f_lane1_out;
+            _2670 <= f_lane1_out;
         6:
-            _2664 <= _2662;
+            _2670 <= _2668;
         default:
-            _2664 <= _2663;
+            _2670 <= _2669;
         endcase
     end
-    assign _2654 = f_lane1_out & _2648;
-    assign _2653 = ~ f_lane1_out;
-    assign _2651 = ~ f_lane0_out;
-    assign _2652 = _2651 & _2648;
-    assign _2650 = f_lane0_out & _2648;
-    assign _2649 = ~ f_lane0_out;
-    assign _2648 = f_pout[4:4];
-    assign _2647 = _327[14:12];
+    assign _2660 = f_lane1_out & _2654;
+    assign _2659 = ~ f_lane1_out;
+    assign _2657 = ~ f_lane0_out;
+    assign _2658 = _2657 & _2654;
+    assign _2656 = f_lane0_out & _2654;
+    assign _2655 = ~ f_lane0_out;
+    assign _2654 = f_pout[4:4];
+    assign _2653 = _333[14:12];
     always @* begin
-        case (_2647)
+        case (_2653)
         0:
-            _2655 <= _2648;
+            _2661 <= _2654;
         1:
-            _2655 <= f_lane0_out;
+            _2661 <= f_lane0_out;
         2:
-            _2655 <= _2649;
+            _2661 <= _2655;
         3:
-            _2655 <= _2650;
+            _2661 <= _2656;
         4:
-            _2655 <= _2652;
+            _2661 <= _2658;
         5:
-            _2655 <= f_lane1_out;
+            _2661 <= f_lane1_out;
         6:
-            _2655 <= _2653;
+            _2661 <= _2659;
         default:
-            _2655 <= _2654;
+            _2661 <= _2660;
         endcase
     end
-    assign _2645 = f_lane1_out & _2639;
-    assign _2644 = ~ f_lane1_out;
-    assign _2642 = ~ f_lane0_out;
-    assign _2643 = _2642 & _2639;
-    assign _2641 = f_lane0_out & _2639;
-    assign _2640 = ~ f_lane0_out;
-    assign _2639 = f_pout[5:5];
-    assign _2638 = _327[17:15];
+    assign _2651 = f_lane1_out & _2645;
+    assign _2650 = ~ f_lane1_out;
+    assign _2648 = ~ f_lane0_out;
+    assign _2649 = _2648 & _2645;
+    assign _2647 = f_lane0_out & _2645;
+    assign _2646 = ~ f_lane0_out;
+    assign _2645 = f_pout[5:5];
+    assign _2644 = _333[17:15];
     always @* begin
-        case (_2638)
+        case (_2644)
         0:
-            _2646 <= _2639;
+            _2652 <= _2645;
         1:
-            _2646 <= f_lane0_out;
+            _2652 <= f_lane0_out;
         2:
-            _2646 <= _2640;
+            _2652 <= _2646;
         3:
-            _2646 <= _2641;
+            _2652 <= _2647;
         4:
-            _2646 <= _2643;
+            _2652 <= _2649;
         5:
-            _2646 <= f_lane1_out;
+            _2652 <= f_lane1_out;
         6:
-            _2646 <= _2644;
+            _2652 <= _2650;
         default:
-            _2646 <= _2645;
+            _2652 <= _2651;
         endcase
     end
-    assign _2636 = f_lane1_out & _2630;
-    assign _2635 = ~ f_lane1_out;
-    assign _2633 = ~ f_lane0_out;
-    assign _2634 = _2633 & _2630;
-    assign _2632 = f_lane0_out & _2630;
-    assign _2631 = ~ f_lane0_out;
-    assign _2630 = f_pout[6:6];
-    assign _2629 = _327[20:18];
+    assign _2642 = f_lane1_out & _2636;
+    assign _2641 = ~ f_lane1_out;
+    assign _2639 = ~ f_lane0_out;
+    assign _2640 = _2639 & _2636;
+    assign _2638 = f_lane0_out & _2636;
+    assign _2637 = ~ f_lane0_out;
+    assign _2636 = f_pout[6:6];
+    assign _2635 = _333[20:18];
     always @* begin
-        case (_2629)
+        case (_2635)
         0:
-            _2637 <= _2630;
+            _2643 <= _2636;
         1:
-            _2637 <= f_lane0_out;
+            _2643 <= f_lane0_out;
         2:
-            _2637 <= _2631;
+            _2643 <= _2637;
         3:
-            _2637 <= _2632;
+            _2643 <= _2638;
         4:
-            _2637 <= _2634;
+            _2643 <= _2640;
         5:
-            _2637 <= f_lane1_out;
+            _2643 <= f_lane1_out;
         6:
-            _2637 <= _2635;
+            _2643 <= _2641;
         default:
-            _2637 <= _2636;
+            _2643 <= _2642;
         endcase
     end
-    assign _2627 = f_lane1_out & _2621;
-    assign _2626 = ~ f_lane1_out;
-    assign _2624 = ~ f_lane0_out;
-    assign _2625 = _2624 & _2621;
-    assign _2623 = f_lane0_out & _2621;
-    assign _2622 = ~ f_lane0_out;
-    assign _4272 = { _4270,
-                     _4269 };
-    assign _4269 = _1177[0:0];
-    assign _4270 = { _4269,
-                     _4269 };
-    assign _4271 = { _4270,
-                     _4270 };
-    assign _4273 = { _4271,
-                     _4272 };
-    assign _4274 = { _4273,
-                     _4269 };
-    assign _4275 = _4274 & _2610;
-    assign _2608 = _2604 & _2602;
-    assign _2607 = _2604 & _2600;
-    assign _2606 = _2604 & _2597;
-    assign _2604 = ~ _2591;
-    assign _2605 = _2604 & _2594;
-    assign _2602 = _2599 & _2596;
-    assign _2603 = _2591 & _2602;
-    assign _2599 = ~ _2592;
-    assign _2600 = _2599 & _2593;
-    assign _2601 = _2591 & _2600;
-    assign _2596 = ~ _2593;
-    assign _2597 = _2592 & _2596;
-    assign _2598 = _2591 & _2597;
-    assign _2593 = _2590[0:0];
-    assign _2592 = _2590[1:1];
-    assign _2594 = _2592 & _2593;
-    assign _2591 = _2590[2:2];
-    assign _2595 = _2591 & _2594;
-    assign _2609 = { _2595,
-                     _2598,
-                     _2601,
-                     _2603,
-                     _2605,
-                     _2606,
+    assign _2633 = f_lane1_out & _2627;
+    assign _2632 = ~ f_lane1_out;
+    assign _2630 = ~ f_lane0_out;
+    assign _2631 = _2630 & _2627;
+    assign _2629 = f_lane0_out & _2627;
+    assign _2628 = ~ f_lane0_out;
+    assign _4336 = { _4334,
+                     _4333 };
+    assign _4333 = _1183[0:0];
+    assign _4334 = { _4333,
+                     _4333 };
+    assign _4335 = { _4334,
+                     _4334 };
+    assign _4337 = { _4335,
+                     _4336 };
+    assign _4338 = { _4337,
+                     _4333 };
+    assign _4339 = _4338 & _2616;
+    assign _2614 = _2610 & _2608;
+    assign _2613 = _2610 & _2606;
+    assign _2612 = _2610 & _2603;
+    assign _2610 = ~ _2597;
+    assign _2611 = _2610 & _2600;
+    assign _2608 = _2605 & _2602;
+    assign _2609 = _2597 & _2608;
+    assign _2605 = ~ _2598;
+    assign _2606 = _2605 & _2599;
+    assign _2607 = _2597 & _2606;
+    assign _2602 = ~ _2599;
+    assign _2603 = _2598 & _2602;
+    assign _2604 = _2597 & _2603;
+    assign _2599 = _2596[0:0];
+    assign _2598 = _2596[1:1];
+    assign _2600 = _2598 & _2599;
+    assign _2597 = _2596[2:2];
+    assign _2601 = _2597 & _2600;
+    assign _2615 = { _2601,
+                     _2604,
                      _2607,
-                     _2608 };
-    assign _2578 = ~ _881;
-    assign _2584 = _2578 & _2583;
-    assign _2610 = _2584 ? _2609 : _755;
-    assign _4267 = ~ _2610;
-    assign _4263 = _1250[15:8];
-    assign _4261 = _1267[78:71];
-    assign _4260 = _1261[78:71];
-    assign _4259 = _1255[78:71];
-    assign _4258 = _897[78:71];
+                     _2609,
+                     _2611,
+                     _2612,
+                     _2613,
+                     _2614 };
+    assign _2584 = ~ _887;
+    assign _2590 = _2584 & _2589;
+    assign _2616 = _2590 ? _2615 : _761;
+    assign _4331 = ~ _2616;
+    assign _4327 = _1256[15:8];
+    assign _4325 = _1273[78:71];
+    assign _4324 = _1267[78:71];
+    assign _4323 = _1261[78:71];
+    assign _4322 = _903[78:71];
     always @* begin
         case (f_winner)
         0:
-            _4262 <= _4258;
+            _4326 <= _4322;
         1:
-            _4262 <= _4259;
+            _4326 <= _4323;
         2:
-            _4262 <= _4260;
+            _4326 <= _4324;
         default:
-            _4262 <= _4261;
+            _4326 <= _4325;
         endcase
     end
-    assign _4264 = _881 ? _4263 : _4262;
-    assign _4265 = _4264 & _2566;
-    assign _2565 = _1250[7:0];
-    assign _2563 = _1267[70:63];
-    assign _2562 = _1261[70:63];
-    assign _2561 = _1255[70:63];
-    assign _2560 = _897[70:63];
+    assign _4328 = _887 ? _4327 : _4326;
+    assign _4329 = _4328 & _2572;
+    assign _2571 = _1256[7:0];
+    assign _2569 = _1273[70:63];
+    assign _2568 = _1267[70:63];
+    assign _2567 = _1261[70:63];
+    assign _2566 = _903[70:63];
     always @* begin
         case (f_winner)
         0:
-            _2564 <= _2560;
+            _2570 <= _2566;
         1:
-            _2564 <= _2561;
+            _2570 <= _2567;
         2:
-            _2564 <= _2562;
+            _2570 <= _2568;
         default:
-            _2564 <= _2563;
+            _2570 <= _2569;
         endcase
     end
-    assign _2566 = _881 ? _2565 : _2564;
-    assign _4256 = ~ _2566;
-    assign _4257 = f_pout & _4256;
-    assign _4266 = _4257 | _4265;
-    assign _4268 = _4266 & _4267;
-    assign _4276 = _4268 | _4275;
-    assign _2554 = _1198 == _2539;
-    assign _2555 = _2554 | _1200;
-    assign _2556 = _1701 & _2555;
-    assign _4277 = _2556 ? _4276 : f_pout;
+    assign _2572 = _887 ? _2571 : _2570;
+    assign _4320 = ~ _2572;
+    assign _4321 = f_pout & _4320;
+    assign _4330 = _4321 | _4329;
+    assign _4332 = _4330 & _4331;
+    assign _4340 = _4332 | _4339;
+    assign _2560 = _1204 == _2545;
+    assign _2561 = _2560 | _1206;
+    assign _2562 = _1707 & _2561;
+    assign _4341 = _2562 ? _4340 : f_pout;
     assign _105 = host_crc_expect;
-    assign _4249 = 32'b11111111111111111111111111111111;
-    assign _2810 = 32'b11101101101110001000001100100000;
-    assign _2808 = _2802[31:1];
-    assign _2809 = { _1817,
-                     _2808 };
-    assign _2811 = _2809 ^ _2810;
-    assign _2805 = _2802[31:1];
-    assign _2806 = { _1817,
-                     _2805 };
-    assign _2798 = _2792[31:1];
-    assign _2799 = { _1817,
-                     _2798 };
-    assign _2801 = _2799 ^ _2810;
-    assign _2795 = _2792[31:1];
-    assign _2796 = { _1817,
-                     _2795 };
-    assign _2788 = _2782[31:1];
-    assign _2789 = { _1817,
-                     _2788 };
-    assign _2791 = _2789 ^ _2810;
-    assign _2785 = _2782[31:1];
-    assign _2786 = { _1817,
-                     _2785 };
-    assign _2778 = _2772[31:1];
-    assign _2779 = { _1817,
-                     _2778 };
-    assign _2781 = _2779 ^ _2810;
-    assign _2775 = _2772[31:1];
-    assign _2776 = { _1817,
-                     _2775 };
-    assign _2768 = _2762[31:1];
-    assign _2769 = { _1817,
-                     _2768 };
-    assign _2771 = _2769 ^ _2810;
-    assign _2765 = _2762[31:1];
-    assign _2766 = { _1817,
-                     _2765 };
-    assign _2758 = _2752[31:1];
-    assign _2759 = { _1817,
-                     _2758 };
-    assign _2761 = _2759 ^ _2810;
-    assign _2755 = _2752[31:1];
-    assign _2756 = { _1817,
-                     _2755 };
-    assign _2748 = _2742[31:1];
-    assign _2749 = { _1817,
-                     _2748 };
-    assign _2751 = _2749 ^ _2810;
-    assign _2745 = _2742[31:1];
-    assign _2746 = { _1817,
-                     _2745 };
-    assign _2738 = _2732[31:1];
-    assign _2739 = { _1817,
-                     _2738 };
-    assign _2741 = _2739 ^ _2810;
-    assign _2735 = _2732[31:1];
-    assign _2736 = { _1817,
-                     _2735 };
-    assign _2729 = _302[127:120];
-    assign _2728 = _302[119:112];
-    assign _2727 = _302[111:104];
-    assign _2726 = _302[103:96];
-    assign _2725 = _302[95:88];
-    assign _2724 = _302[87:80];
-    assign _2723 = _302[79:72];
-    assign _2722 = _302[71:64];
-    assign _2721 = _302[63:56];
-    assign _2720 = _302[55:48];
-    assign _2719 = _302[47:40];
-    assign _2718 = _302[39:32];
-    assign _2717 = _302[31:24];
-    assign _2716 = _302[23:16];
-    assign _2715 = _302[15:8];
-    assign _2714 = _302[7:0];
-    assign _2711 = 13'b0000000000001;
-    assign _2712 = f_sw_cnt - _2711;
-    assign _2713 = _2712[3:0];
+    assign _4313 = 32'b11111111111111111111111111111111;
+    assign _2816 = 32'b11101101101110001000001100100000;
+    assign _2814 = _2808[31:1];
+    assign _2815 = { _1823,
+                     _2814 };
+    assign _2817 = _2815 ^ _2816;
+    assign _2811 = _2808[31:1];
+    assign _2812 = { _1823,
+                     _2811 };
+    assign _2804 = _2798[31:1];
+    assign _2805 = { _1823,
+                     _2804 };
+    assign _2807 = _2805 ^ _2816;
+    assign _2801 = _2798[31:1];
+    assign _2802 = { _1823,
+                     _2801 };
+    assign _2794 = _2788[31:1];
+    assign _2795 = { _1823,
+                     _2794 };
+    assign _2797 = _2795 ^ _2816;
+    assign _2791 = _2788[31:1];
+    assign _2792 = { _1823,
+                     _2791 };
+    assign _2784 = _2778[31:1];
+    assign _2785 = { _1823,
+                     _2784 };
+    assign _2787 = _2785 ^ _2816;
+    assign _2781 = _2778[31:1];
+    assign _2782 = { _1823,
+                     _2781 };
+    assign _2774 = _2768[31:1];
+    assign _2775 = { _1823,
+                     _2774 };
+    assign _2777 = _2775 ^ _2816;
+    assign _2771 = _2768[31:1];
+    assign _2772 = { _1823,
+                     _2771 };
+    assign _2764 = _2758[31:1];
+    assign _2765 = { _1823,
+                     _2764 };
+    assign _2767 = _2765 ^ _2816;
+    assign _2761 = _2758[31:1];
+    assign _2762 = { _1823,
+                     _2761 };
+    assign _2754 = _2748[31:1];
+    assign _2755 = { _1823,
+                     _2754 };
+    assign _2757 = _2755 ^ _2816;
+    assign _2751 = _2748[31:1];
+    assign _2752 = { _1823,
+                     _2751 };
+    assign _2744 = _2738[31:1];
+    assign _2745 = { _1823,
+                     _2744 };
+    assign _2747 = _2745 ^ _2816;
+    assign _2741 = _2738[31:1];
+    assign _2742 = { _1823,
+                     _2741 };
+    assign _2735 = _308[127:120];
+    assign _2734 = _308[119:112];
+    assign _2733 = _308[111:104];
+    assign _2732 = _308[103:96];
+    assign _2731 = _308[95:88];
+    assign _2730 = _308[87:80];
+    assign _2729 = _308[79:72];
+    assign _2728 = _308[71:64];
+    assign _2727 = _308[63:56];
+    assign _2726 = _308[55:48];
+    assign _2725 = _308[47:40];
+    assign _2724 = _308[39:32];
+    assign _2723 = _308[31:24];
+    assign _2722 = _308[23:16];
+    assign _2721 = _308[15:8];
+    assign _2720 = _308[7:0];
+    assign _2717 = 13'b0000000000001;
+    assign _2718 = f_sw_cnt - _2717;
+    assign _2719 = _2718[3:0];
     always @* begin
-        case (_2713)
+        case (_2719)
         0:
-            _2730 <= _2714;
+            _2736 <= _2720;
         1:
-            _2730 <= _2715;
+            _2736 <= _2721;
         2:
-            _2730 <= _2716;
+            _2736 <= _2722;
         3:
-            _2730 <= _2717;
+            _2736 <= _2723;
         4:
-            _2730 <= _2718;
+            _2736 <= _2724;
         5:
-            _2730 <= _2719;
+            _2736 <= _2725;
         6:
-            _2730 <= _2720;
+            _2736 <= _2726;
         7:
-            _2730 <= _2721;
+            _2736 <= _2727;
         8:
-            _2730 <= _2722;
+            _2736 <= _2728;
         9:
-            _2730 <= _2723;
+            _2736 <= _2729;
         10:
-            _2730 <= _2724;
+            _2736 <= _2730;
         11:
-            _2730 <= _2725;
+            _2736 <= _2731;
         12:
-            _2730 <= _2726;
+            _2736 <= _2732;
         13:
-            _2730 <= _2727;
+            _2736 <= _2733;
         14:
-            _2730 <= _2728;
+            _2736 <= _2734;
         default:
-            _2730 <= _2729;
+            _2736 <= _2735;
         endcase
     end
-    assign _2710 = 24'b000000000000000000000000;
-    assign _2731 = { _2710,
-                     _2730 };
-    assign _2708 = f_sw_cnt == _2016;
-    assign _2709 = ~ _2708;
-    assign _2813 = _2709 ? _2812 : _2703;
-    assign _2703 = _2698 ? _4249 : _2701;
-    assign _2814 = f_sweeping ? _2813 : _2703;
-    assign _106 = _2814;
-    always @(posedge _310) begin
-        if (_308)
-            _2701 <= _4249;
+    assign _2716 = 24'b000000000000000000000000;
+    assign _2737 = { _2716,
+                     _2736 };
+    assign _2714 = f_sw_cnt == _2022;
+    assign _2715 = ~ _2714;
+    assign _2819 = _2715 ? _2818 : _2709;
+    assign _2709 = _2704 ? _4313 : _2707;
+    assign _2820 = f_sweeping ? _2819 : _2709;
+    assign _106 = _2820;
+    always @(posedge _316) begin
+        if (_314)
+            _2707 <= _4313;
         else
-            _2701 <= _106;
+            _2707 <= _106;
     end
-    assign _2732 = _2701 ^ _2731;
-    assign _2733 = _2732[0:0];
-    assign _2742 = _2733 ? _2741 : _2736;
-    assign _2743 = _2742[0:0];
-    assign _2752 = _2743 ? _2751 : _2746;
-    assign _2753 = _2752[0:0];
-    assign _2762 = _2753 ? _2761 : _2756;
-    assign _2763 = _2762[0:0];
-    assign _2772 = _2763 ? _2771 : _2766;
-    assign _2773 = _2772[0:0];
-    assign _2782 = _2773 ? _2781 : _2776;
-    assign _2783 = _2782[0:0];
-    assign _2792 = _2783 ? _2791 : _2786;
-    assign _2793 = _2792[0:0];
-    assign _2802 = _2793 ? _2801 : _2796;
-    assign _2803 = _2802[0:0];
-    assign _2812 = _2803 ? _2811 : _2806;
-    assign _4250 = _2812 ^ _4249;
-    assign f_sw_match = _4250 == _105;
-    assign _4252 = f_sw_last ? f_sw_match : _4248;
-    assign _4254 = _4236 ? _1817 : _4252;
-    assign _4244 = f_store_we | _108;
-    assign _4246 = _4244 ? _1817 : f_image_valid;
-    assign _4248 = _2698 ? _1817 : _4246;
-    assign _4237 = 13'b1000000000000;
-    assign f_sw_last = f_sw_cnt == _4237;
-    assign _4240 = f_sw_last ? _1817 : _4233;
+    assign _2738 = _2707 ^ _2737;
+    assign _2739 = _2738[0:0];
+    assign _2748 = _2739 ? _2747 : _2742;
+    assign _2749 = _2748[0:0];
+    assign _2758 = _2749 ? _2757 : _2752;
+    assign _2759 = _2758[0:0];
+    assign _2768 = _2759 ? _2767 : _2762;
+    assign _2769 = _2768[0:0];
+    assign _2778 = _2769 ? _2777 : _2772;
+    assign _2779 = _2778[0:0];
+    assign _2788 = _2779 ? _2787 : _2782;
+    assign _2789 = _2788[0:0];
+    assign _2798 = _2789 ? _2797 : _2792;
+    assign _2799 = _2798[0:0];
+    assign _2808 = _2799 ? _2807 : _2802;
+    assign _2809 = _2808[0:0];
+    assign _2818 = _2809 ? _2817 : _2812;
+    assign _4314 = _2818 ^ _4313;
+    assign f_sw_match = _4314 == _105;
+    assign _4316 = f_sw_last ? f_sw_match : _4312;
+    assign _4318 = _4300 ? _1823 : _4316;
+    assign _4308 = f_store_we | _108;
+    assign _4310 = _4308 ? _1823 : f_image_valid;
+    assign _4312 = _2704 ? _1823 : _4310;
+    assign _4301 = 13'b1000000000000;
+    assign f_sw_last = f_sw_cnt == _4301;
+    assign _4304 = f_sw_last ? _1823 : _4297;
     assign _108 = host_crc_expect_we;
-    assign _4234 = _324 | _290;
-    assign _4235 = _4234 | _108;
-    assign _4236 = f_sweeping & _4235;
-    assign _4242 = _4236 ? _1817 : _4240;
-    assign _2697 = ~ f_sweeping;
-    assign _4226 = _881 ? _2046 : _873;
-    assign _4222 = _4088 ? _2045 : _873;
-    assign _1961 = 2'b11;
-    assign _4213 = f_policy == _1961;
-    assign _4215 = _4213 ? _2539 : _873;
-    assign _4212 = f_policy == _2046;
-    assign _4217 = _4212 ? _2045 : _4215;
-    assign _4211 = f_policy == _2539;
-    assign _4219 = _4211 ? _2539 : _4217;
-    assign _4220 = f_viol_now ? _4219 : _873;
-    assign _1695 = f_chgmask3 & f_multi_eff;
-    assign _1697 = _1695 == _755;
-    assign _1688 = _1645 == _1998;
-    assign _1683 = 16'b0000000000000000;
-    assign _1684 = _1645 == _1683;
-    assign _1685 = _1684 & _1665;
-    assign _1682 = _1581 == _1641;
-    assign _1686 = _1682 | _1685;
-    assign _1689 = _1580 ? _1688 : _1686;
-    assign _1679 = _1187[3:0];
-    assign _1681 = _1679 == _1984;
-    assign _1690 = _1681 | _1689;
-    assign _1677 = _1645 == _1998;
-    assign _1673 = _1645 == _1683;
-    assign _1674 = _1673 & _1665;
-    assign _1671 = _1581 == _1641;
-    assign _1675 = _1671 | _1674;
-    assign _1678 = _1580 ? _1677 : _1675;
-    assign _1669 = _1632 == _1998;
-    always @(posedge _310) begin
-        if (_308)
-            _1663 <= _452;
+    assign _4298 = _330 | _296;
+    assign _4299 = _4298 | _108;
+    assign _4300 = f_sweeping & _4299;
+    assign _4306 = _4300 ? _1823 : _4304;
+    assign _2703 = ~ f_sweeping;
+    assign _4290 = _887 ? _2052 : _879;
+    assign _4286 = _4152 ? _2051 : _879;
+    assign _1967 = 2'b11;
+    assign _4277 = f_policy == _1967;
+    assign _4279 = _4277 ? _2545 : _879;
+    assign _4276 = f_policy == _2052;
+    assign _4281 = _4276 ? _2051 : _4279;
+    assign _4275 = f_policy == _2545;
+    assign _4283 = _4275 ? _2545 : _4281;
+    assign _4284 = f_viol_now ? _4283 : _879;
+    assign _1701 = f_chgmask3 & f_multi_eff;
+    assign _1703 = _1701 == _761;
+    assign _1694 = _1651 == _2004;
+    assign _1689 = 16'b0000000000000000;
+    assign _1690 = _1651 == _1689;
+    assign _1691 = _1690 & _1671;
+    assign _1688 = _1587 == _1647;
+    assign _1692 = _1688 | _1691;
+    assign _1695 = _1586 ? _1694 : _1692;
+    assign _1685 = _1193[3:0];
+    assign _1687 = _1685 == _1990;
+    assign _1696 = _1687 | _1695;
+    assign _1683 = _1651 == _2004;
+    assign _1679 = _1651 == _1689;
+    assign _1680 = _1679 & _1671;
+    assign _1677 = _1587 == _1647;
+    assign _1681 = _1677 | _1680;
+    assign _1684 = _1586 ? _1683 : _1681;
+    assign _1675 = _1638 == _2004;
+    always @(posedge _316) begin
+        if (_314)
+            _1669 <= _458;
         else
-            _1663 <= _1624;
+            _1669 <= _1630;
     end
-    assign _1664 = { _2016,
-                     _1663 };
-    assign _1665 = _1578 < _1664;
-    assign _1659 = _1632 == _1683;
-    assign _1666 = _1659 & _1665;
-    assign _1657 = _1581 == _1629;
-    assign _1667 = _1657 | _1666;
-    assign _1670 = _1580 ? _1669 : _1667;
-    assign _1656 = _1267[104:103];
+    assign _1670 = { _2022,
+                     _1669 };
+    assign _1671 = _1584 < _1670;
+    assign _1665 = _1638 == _1689;
+    assign _1672 = _1665 & _1671;
+    assign _1663 = _1587 == _1635;
+    assign _1673 = _1663 | _1672;
+    assign _1676 = _1586 ? _1675 : _1673;
+    assign _1662 = _1273[104:103];
+    always @* begin
+        case (_1662)
+        0:
+            _1697 <= vdd;
+        1:
+            _1697 <= _1676;
+        2:
+            _1697 <= _1684;
+        default:
+            _1697 <= _1696;
+        endcase
+    end
+    assign _1661 = ~ _1206;
+    assign _1698 = _1661 | _1697;
+    assign _1658 = _1273[62:62];
+    assign _1656 = _1273[61:58];
     always @* begin
         case (_1656)
         0:
-            _1691 <= vdd;
+            _1657 <= vdd;
         1:
-            _1691 <= _1670;
+            _1657 <= _1180;
         2:
-            _1691 <= _1678;
-        default:
-            _1691 <= _1690;
-        endcase
-    end
-    assign _1655 = ~ _1200;
-    assign _1692 = _1655 | _1691;
-    assign _1652 = _1267[62:62];
-    assign _1650 = _1267[61:58];
-    always @* begin
-        case (_1650)
-        0:
-            _1651 <= vdd;
-        1:
-            _1651 <= _1174;
-        2:
-            _1651 <= _1178;
+            _1657 <= _1184;
         3:
-            _1651 <= _1182;
+            _1657 <= _1188;
         4:
-            _1651 <= _1184;
+            _1657 <= _1190;
         5:
-            _1651 <= _737;
+            _1657 <= _743;
         6:
-            _1651 <= _1188;
+            _1657 <= _1194;
         7:
-            _1651 <= _1191;
+            _1657 <= _1197;
         8:
-            _1651 <= _657;
+            _1657 <= _663;
         9:
-            _1651 <= _660;
+            _1657 <= _666;
         10:
-            _1651 <= _663;
+            _1657 <= _669;
         11:
-            _1651 <= _666;
+            _1657 <= _672;
         12:
-            _1651 <= _645;
+            _1657 <= _651;
         13:
-            _1651 <= _648;
+            _1657 <= _654;
         14:
-            _1651 <= _651;
+            _1657 <= _657;
         default:
-            _1651 <= _654;
+            _1657 <= _660;
         endcase
     end
-    assign _1653 = _1651 ^ _1652;
-    assign _1645 = _1267[57:42];
-    assign _1647 = _1645 == _1998;
-    assign _1640 = 17'b00000000000000000;
-    assign _1636 = _1582[57:42];
-    assign _1637 = { gnd,
-                     _1636 };
-    assign _1638 = _1637 + _1625;
-    always @(posedge _310) begin
-        if (_308)
-            _1641 <= _1640;
+    assign _1659 = _1657 ^ _1658;
+    assign _1651 = _1273[57:42];
+    assign _1653 = _1651 == _2004;
+    assign _1646 = 17'b00000000000000000;
+    assign _1642 = _1588[57:42];
+    assign _1643 = { gnd,
+                     _1642 };
+    assign _1644 = _1643 + _1631;
+    always @(posedge _316) begin
+        if (_314)
+            _1647 <= _1646;
         else
-            _1641 <= _1638;
+            _1647 <= _1644;
     end
-    assign _1642 = _1641 < _1581;
-    assign _1643 = ~ _1642;
-    assign _1632 = _1267[41:26];
-    assign _1634 = _1632 == _1683;
-    assign _1616 = _1586[0:0];
-    assign _1618 = _1616 ? _1136 : _452;
-    assign _1613 = _1586[1:1];
-    assign _1615 = _1613 ? _1115 : _452;
-    assign _1619 = _1615 < _1618;
-    assign _1620 = _1619 ? _1618 : _1615;
-    assign _1608 = _1586[2:2];
-    assign _1610 = _1608 ? _1092 : _452;
-    assign _1605 = _1586[3:3];
-    assign _1607 = _1605 ? _1071 : _452;
-    assign _1611 = _1607 < _1610;
-    assign _1612 = _1611 ? _1610 : _1607;
-    assign _1621 = _1612 < _1620;
-    assign _1622 = _1621 ? _1620 : _1612;
-    assign _1598 = _1586[4:4];
-    assign _1600 = _1598 ? _1046 : _452;
-    assign _1595 = _1586[5:5];
-    assign _1597 = _1595 ? _1025 : _452;
-    assign _1601 = _1597 < _1600;
-    assign _1602 = _1601 ? _1600 : _1597;
-    assign _1590 = _1586[6:6];
-    assign _1592 = _1590 ? _1002 : _452;
-    assign _1586 = _1582[23:16];
-    assign _1587 = _1586[7:7];
-    assign _1589 = _1587 ? _981 : _452;
-    assign _1593 = _1589 < _1592;
-    assign _1594 = _1593 ? _1592 : _1589;
-    assign _1603 = _1594 < _1602;
-    assign _1604 = _1603 ? _1602 : _1594;
-    assign _1623 = _1604 < _1622;
-    assign _1624 = _1623 ? _1622 : _1604;
-    assign _1585 = 14'b00000000000000;
-    assign _1625 = { _1585,
-                     _1624 };
-    assign _1582 = _956[511:400];
-    assign _1583 = _1582[41:26];
-    assign _1584 = { gnd,
-                     _1583 };
-    assign _1626 = _1584 + _1625;
-    always @(posedge _310) begin
-        if (_308)
-            _1629 <= _1640;
+    assign _1648 = _1647 < _1587;
+    assign _1649 = ~ _1648;
+    assign _1638 = _1273[41:26];
+    assign _1640 = _1638 == _1689;
+    assign _1622 = _1592[0:0];
+    assign _1624 = _1622 ? _1142 : _458;
+    assign _1619 = _1592[1:1];
+    assign _1621 = _1619 ? _1121 : _458;
+    assign _1625 = _1621 < _1624;
+    assign _1626 = _1625 ? _1624 : _1621;
+    assign _1614 = _1592[2:2];
+    assign _1616 = _1614 ? _1098 : _458;
+    assign _1611 = _1592[3:3];
+    assign _1613 = _1611 ? _1077 : _458;
+    assign _1617 = _1613 < _1616;
+    assign _1618 = _1617 ? _1616 : _1613;
+    assign _1627 = _1618 < _1626;
+    assign _1628 = _1627 ? _1626 : _1618;
+    assign _1604 = _1592[4:4];
+    assign _1606 = _1604 ? _1052 : _458;
+    assign _1601 = _1592[5:5];
+    assign _1603 = _1601 ? _1031 : _458;
+    assign _1607 = _1603 < _1606;
+    assign _1608 = _1607 ? _1606 : _1603;
+    assign _1596 = _1592[6:6];
+    assign _1598 = _1596 ? _1008 : _458;
+    assign _1592 = _1588[23:16];
+    assign _1593 = _1592[7:7];
+    assign _1595 = _1593 ? _987 : _458;
+    assign _1599 = _1595 < _1598;
+    assign _1600 = _1599 ? _1598 : _1595;
+    assign _1609 = _1600 < _1608;
+    assign _1610 = _1609 ? _1608 : _1600;
+    assign _1629 = _1610 < _1628;
+    assign _1630 = _1629 ? _1628 : _1610;
+    assign _1591 = 14'b00000000000000;
+    assign _1631 = { _1591,
+                     _1630 };
+    assign _1588 = _962[511:400];
+    assign _1589 = _1588[41:26];
+    assign _1590 = { gnd,
+                     _1589 };
+    assign _1632 = _1590 + _1631;
+    always @(posedge _316) begin
+        if (_314)
+            _1635 <= _1646;
         else
-            _1629 <= _1626;
+            _1635 <= _1632;
     end
-    assign _1581 = { gnd,
-                     _1578 };
-    assign _1630 = _1581 < _1629;
-    assign _1631 = ~ _1630;
-    assign _1635 = _1631 | _1634;
-    assign _1644 = _1635 & _1643;
-    assign _1577 = _1267[25:24];
+    assign _1587 = { gnd,
+                     _1584 };
+    assign _1636 = _1587 < _1635;
+    assign _1637 = ~ _1636;
+    assign _1641 = _1637 | _1640;
+    assign _1650 = _1641 & _1649;
+    assign _1583 = _1273[25:24];
     always @* begin
-        case (_1577)
+        case (_1583)
         0:
-            _1578 <= _929;
+            _1584 <= _935;
         1:
-            _1578 <= _932;
+            _1584 <= _938;
         2:
-            _1578 <= _935;
+            _1584 <= _941;
         default:
-            _1578 <= _935;
+            _1584 <= _941;
         endcase
     end
-    assign _1580 = _1578 == _1998;
-    assign _1648 = _1580 ? _1647 : _1644;
-    assign _1571 = f_changed_all & f_chgmask3;
-    assign _1573 = _1571 == _755;
-    assign _1574 = ~ _1573;
-    assign _1570 = f_chgmask3 == _755;
-    assign _1575 = _1570 | _1574;
-    assign _1564 = _1267[7:0];
-    assign _1562 = _1267[15:8];
-    assign _1563 = _901 ^ _1562;
-    assign _1565 = _1563 & _1564;
-    assign _1567 = _1565 == _755;
-    assign _1568 = f_valid3 & _1567;
-    assign _1576 = _1568 & _1575;
-    assign _1649 = _1576 & _1648;
-    assign _1654 = _1649 & _1653;
-    assign _1693 = _1654 & _1692;
-    assign _1694 = f_in_eval & _1693;
-    assign _1698 = _1694 & _1697;
-    assign f_fire3 = _1698 & _1282;
-    assign _1246 = f_chgmask0 & f_multi_eff;
-    assign _1248 = _1246 == _755;
-    assign _1234 = _1164 == _1998;
-    assign _1230 = _1164 == _1683;
-    assign _1231 = _1230 & _1211;
-    assign _1228 = _939 == _1160;
-    assign _1232 = _1228 | _1231;
-    assign _1235 = _938 ? _1234 : _1232;
-    assign _1225 = _1187[3:0];
-    assign _1227 = _1225 == _1984;
-    assign _1236 = _1227 | _1235;
-    assign _1223 = _1164 == _1998;
-    assign _1219 = _1164 == _1683;
-    assign _1220 = _1219 & _1211;
-    assign _1217 = _939 == _1160;
-    assign _1221 = _1217 | _1220;
-    assign _1224 = _938 ? _1223 : _1221;
-    assign _1215 = _1151 == _1998;
-    always @(posedge _310) begin
-        if (_308)
-            _1209 <= _452;
+    assign _1586 = _1584 == _2004;
+    assign _1654 = _1586 ? _1653 : _1650;
+    assign _1577 = f_changed_all & f_chgmask3;
+    assign _1579 = _1577 == _761;
+    assign _1580 = ~ _1579;
+    assign _1576 = f_chgmask3 == _761;
+    assign _1581 = _1576 | _1580;
+    assign _1570 = _1273[7:0];
+    assign _1568 = _1273[15:8];
+    assign _1569 = _907 ^ _1568;
+    assign _1571 = _1569 & _1570;
+    assign _1573 = _1571 == _761;
+    assign _1574 = f_valid3 & _1573;
+    assign _1582 = _1574 & _1581;
+    assign _1655 = _1582 & _1654;
+    assign _1660 = _1655 & _1659;
+    assign _1699 = _1660 & _1698;
+    assign _1700 = f_in_eval & _1699;
+    assign _1704 = _1700 & _1703;
+    assign f_fire3 = _1704 & _1288;
+    assign _1252 = f_chgmask0 & f_multi_eff;
+    assign _1254 = _1252 == _761;
+    assign _1240 = _1170 == _2004;
+    assign _1236 = _1170 == _1689;
+    assign _1237 = _1236 & _1217;
+    assign _1234 = _945 == _1166;
+    assign _1238 = _1234 | _1237;
+    assign _1241 = _944 ? _1240 : _1238;
+    assign _1231 = _1193[3:0];
+    assign _1233 = _1231 == _1990;
+    assign _1242 = _1233 | _1241;
+    assign _1229 = _1170 == _2004;
+    assign _1225 = _1170 == _1689;
+    assign _1226 = _1225 & _1217;
+    assign _1223 = _945 == _1166;
+    assign _1227 = _1223 | _1226;
+    assign _1230 = _944 ? _1229 : _1227;
+    assign _1221 = _1157 == _2004;
+    always @(posedge _316) begin
+        if (_314)
+            _1215 <= _458;
         else
-            _1209 <= _1143;
+            _1215 <= _1149;
     end
-    assign _1210 = { _2016,
-                     _1209 };
-    assign _1211 = _936 < _1210;
-    assign _1205 = _1151 == _1683;
-    assign _1212 = _1205 & _1211;
-    assign _1203 = _939 == _1148;
-    assign _1213 = _1203 | _1212;
-    assign _1216 = _938 ? _1215 : _1213;
-    assign _1202 = _897[104:103];
+    assign _1216 = { _2022,
+                     _1215 };
+    assign _1217 = _942 < _1216;
+    assign _1211 = _1157 == _1689;
+    assign _1218 = _1211 & _1217;
+    assign _1209 = _945 == _1154;
+    assign _1219 = _1209 | _1218;
+    assign _1222 = _944 ? _1221 : _1219;
+    assign _1208 = _903[104:103];
     always @* begin
-        case (_1202)
+        case (_1208)
         0:
-            _1237 <= vdd;
+            _1243 <= vdd;
         1:
-            _1237 <= _1216;
+            _1243 <= _1222;
         2:
-            _1237 <= _1224;
+            _1243 <= _1230;
         default:
-            _1237 <= _1236;
+            _1243 <= _1242;
         endcase
     end
-    assign _1201 = ~ _1200;
-    assign _1238 = _1201 | _1237;
-    assign _1193 = _897[62:62];
-    assign _1169 = _897[61:58];
+    assign _1207 = ~ _1206;
+    assign _1244 = _1207 | _1243;
+    assign _1199 = _903[62:62];
+    assign _1175 = _903[61:58];
     always @* begin
-        case (_1169)
+        case (_1175)
         0:
-            _1192 <= vdd;
+            _1198 <= vdd;
         1:
-            _1192 <= _1174;
+            _1198 <= _1180;
         2:
-            _1192 <= _1178;
+            _1198 <= _1184;
         3:
-            _1192 <= _1182;
+            _1198 <= _1188;
         4:
-            _1192 <= _1184;
+            _1198 <= _1190;
         5:
-            _1192 <= _737;
+            _1198 <= _743;
         6:
-            _1192 <= _1188;
+            _1198 <= _1194;
         7:
-            _1192 <= _1191;
+            _1198 <= _1197;
         8:
-            _1192 <= _657;
+            _1198 <= _663;
         9:
-            _1192 <= _660;
+            _1198 <= _666;
         10:
-            _1192 <= _663;
+            _1198 <= _669;
         11:
-            _1192 <= _666;
+            _1198 <= _672;
         12:
-            _1192 <= _645;
+            _1198 <= _651;
         13:
-            _1192 <= _648;
+            _1198 <= _654;
         14:
-            _1192 <= _651;
+            _1198 <= _657;
         default:
-            _1192 <= _654;
+            _1198 <= _660;
         endcase
     end
-    assign _1194 = _1192 ^ _1193;
-    assign _1164 = _897[57:42];
-    assign _1166 = _1164 == _1998;
-    assign _1155 = _957[57:42];
-    assign _1156 = { gnd,
-                     _1155 };
-    assign _1157 = _1156 + _1144;
-    always @(posedge _310) begin
-        if (_308)
-            _1160 <= _1640;
+    assign _1200 = _1198 ^ _1199;
+    assign _1170 = _903[57:42];
+    assign _1172 = _1170 == _2004;
+    assign _1161 = _963[57:42];
+    assign _1162 = { gnd,
+                     _1161 };
+    assign _1163 = _1162 + _1150;
+    always @(posedge _316) begin
+        if (_314)
+            _1166 <= _1646;
         else
-            _1160 <= _1157;
+            _1166 <= _1163;
     end
-    assign _1161 = _1160 < _939;
-    assign _1162 = ~ _1161;
-    assign _1151 = _897[41:26];
-    assign _1153 = _1151 == _1683;
-    assign _1117 = _961[0:0];
-    assign _1137 = _1117 ? _1136 : _452;
-    assign _1096 = _961[1:1];
-    assign _1116 = _1096 ? _1115 : _452;
-    assign _1138 = _1116 < _1137;
-    assign _1139 = _1138 ? _1137 : _1116;
-    assign _1073 = _961[2:2];
-    assign _1093 = _1073 ? _1092 : _452;
-    assign _1052 = _961[3:3];
-    assign _1072 = _1052 ? _1071 : _452;
-    assign _1094 = _1072 < _1093;
-    assign _1095 = _1094 ? _1093 : _1072;
-    assign _1140 = _1095 < _1139;
-    assign _1141 = _1140 ? _1139 : _1095;
-    assign _1027 = _961[4:4];
-    assign _1047 = _1027 ? _1046 : _452;
-    assign _1006 = _961[5:5];
-    assign _1026 = _1006 ? _1025 : _452;
-    assign _1048 = _1026 < _1047;
-    assign _1049 = _1048 ? _1047 : _1026;
-    assign _983 = _961[6:6];
-    assign _1003 = _983 ? _1002 : _452;
-    assign _961 = _957[23:16];
-    assign _962 = _961[7:7];
-    assign _982 = _962 ? _981 : _452;
-    assign _1004 = _982 < _1003;
-    assign _1005 = _1004 ? _1003 : _982;
-    assign _1050 = _1005 < _1049;
-    assign _1051 = _1050 ? _1049 : _1005;
-    assign _1142 = _1051 < _1141;
-    assign _1143 = _1142 ? _1141 : _1051;
-    assign _1144 = { _1585,
-                     _1143 };
-    assign _957 = _956[175:64];
-    assign _958 = _957[41:26];
-    assign _959 = { gnd,
-                    _958 };
-    assign _1145 = _959 + _1144;
-    always @(posedge _310) begin
-        if (_308)
-            _1148 <= _1640;
+    assign _1167 = _1166 < _945;
+    assign _1168 = ~ _1167;
+    assign _1157 = _903[41:26];
+    assign _1159 = _1157 == _1689;
+    assign _1123 = _967[0:0];
+    assign _1143 = _1123 ? _1142 : _458;
+    assign _1102 = _967[1:1];
+    assign _1122 = _1102 ? _1121 : _458;
+    assign _1144 = _1122 < _1143;
+    assign _1145 = _1144 ? _1143 : _1122;
+    assign _1079 = _967[2:2];
+    assign _1099 = _1079 ? _1098 : _458;
+    assign _1058 = _967[3:3];
+    assign _1078 = _1058 ? _1077 : _458;
+    assign _1100 = _1078 < _1099;
+    assign _1101 = _1100 ? _1099 : _1078;
+    assign _1146 = _1101 < _1145;
+    assign _1147 = _1146 ? _1145 : _1101;
+    assign _1033 = _967[4:4];
+    assign _1053 = _1033 ? _1052 : _458;
+    assign _1012 = _967[5:5];
+    assign _1032 = _1012 ? _1031 : _458;
+    assign _1054 = _1032 < _1053;
+    assign _1055 = _1054 ? _1053 : _1032;
+    assign _989 = _967[6:6];
+    assign _1009 = _989 ? _1008 : _458;
+    assign _967 = _963[23:16];
+    assign _968 = _967[7:7];
+    assign _988 = _968 ? _987 : _458;
+    assign _1010 = _988 < _1009;
+    assign _1011 = _1010 ? _1009 : _988;
+    assign _1056 = _1011 < _1055;
+    assign _1057 = _1056 ? _1055 : _1011;
+    assign _1148 = _1057 < _1147;
+    assign _1149 = _1148 ? _1147 : _1057;
+    assign _1150 = { _1591,
+                     _1149 };
+    assign _963 = _962[175:64];
+    assign _964 = _963[41:26];
+    assign _965 = { gnd,
+                    _964 };
+    assign _1151 = _965 + _1150;
+    always @(posedge _316) begin
+        if (_314)
+            _1154 <= _1646;
         else
-            _1148 <= _1145;
+            _1154 <= _1151;
     end
-    assign _939 = { gnd,
-                    _936 };
-    assign _1149 = _939 < _1148;
-    assign _1150 = ~ _1149;
-    assign _1154 = _1150 | _1153;
-    assign _1163 = _1154 & _1162;
-    assign _926 = _897[25:24];
+    assign _945 = { gnd,
+                    _942 };
+    assign _1155 = _945 < _1154;
+    assign _1156 = ~ _1155;
+    assign _1160 = _1156 | _1159;
+    assign _1169 = _1160 & _1168;
+    assign _932 = _903[25:24];
     always @* begin
-        case (_926)
+        case (_932)
         0:
-            _936 <= _929;
+            _942 <= _935;
         1:
-            _936 <= _932;
+            _942 <= _938;
         2:
-            _936 <= _935;
+            _942 <= _941;
         default:
-            _936 <= _935;
+            _942 <= _941;
         endcase
     end
-    assign _938 = _936 == _1998;
-    assign _1167 = _938 ? _1166 : _1163;
-    assign _920 = f_changed_all & f_chgmask0;
-    assign _922 = _920 == _755;
-    assign _923 = ~ _922;
-    assign _911 = f_chgmask0 == _755;
-    assign _924 = _911 | _923;
-    assign _904 = _897[7:0];
-    assign _902 = _897[15:8];
-    assign _903 = _901 ^ _902;
-    assign _905 = _903 & _904;
-    assign _907 = _905 == _755;
-    assign _885 = 128'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
-    assign _4196 = _878 + _482;
-    assign _4192 = _4088 ? _452 : _878;
-    assign _4187 = f_policy == _2046;
-    assign _4189 = _4187 ? _452 : _878;
-    assign _1952 = f_changed_all & f_watch;
-    assign _1954 = _1952 == _755;
-    assign _1955 = ~ _1954;
-    assign _1950 = ~ _1700;
-    assign _1951 = f_in_eval & _1950;
-    assign f_unexp_now = _1951 & _1955;
-    assign _2818 = ~ f_amb_now;
-    assign _2819 = _1949 & _2818;
-    assign _2821 = _2819 ? _1819 : _2817;
-    assign _2822 = _1700 ? _2817 : _2821;
-    assign _2817 = _1701 ? _1817 : _1947;
-    assign _2815 = _873 == _2046;
-    assign _2823 = _2815 ? _2822 : _2817;
-    assign _109 = _2823;
-    always @(posedge _310) begin
-        if (_308)
-            _1947 <= _1817;
+    assign _944 = _942 == _2004;
+    assign _1173 = _944 ? _1172 : _1169;
+    assign _926 = f_changed_all & f_chgmask0;
+    assign _928 = _926 == _761;
+    assign _929 = ~ _928;
+    assign _917 = f_chgmask0 == _761;
+    assign _930 = _917 | _929;
+    assign _910 = _903[7:0];
+    assign _908 = _903[15:8];
+    assign _909 = _907 ^ _908;
+    assign _911 = _909 & _910;
+    assign _913 = _911 == _761;
+    assign _891 = 128'b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    assign _4260 = _884 + _488;
+    assign _4256 = _4152 ? _458 : _884;
+    assign _4251 = f_policy == _2052;
+    assign _4253 = _4251 ? _458 : _884;
+    assign _1958 = f_changed_all & f_watch;
+    assign _1960 = _1958 == _761;
+    assign _1961 = ~ _1960;
+    assign _1956 = ~ _1706;
+    assign _1957 = f_in_eval & _1956;
+    assign f_unexp_now = _1957 & _1961;
+    assign _2824 = ~ f_amb_now;
+    assign _2825 = _1955 & _2824;
+    assign _2827 = _2825 ? _1825 : _2823;
+    assign _2828 = _1706 ? _2823 : _2827;
+    assign _2823 = _1707 ? _1823 : _1953;
+    assign _2821 = _879 == _2052;
+    assign _2829 = _2821 ? _2828 : _2823;
+    assign _109 = _2829;
+    always @(posedge _316) begin
+        if (_314)
+            _1953 <= _1823;
         else
-            _1947 <= _109;
+            _1953 <= _109;
     end
-    assign _1948 = ~ _1947;
-    assign _4178 = 16'b0000000000000001;
-    assign _4179 = _929 + _4178;
-    assign _4175 = _929 == _1998;
-    assign _4176 = ~ _4175;
-    assign _4177 = _4136 & _4176;
-    assign _4180 = _4177 ? _4179 : _929;
-    assign _4120 = _1250[26:24];
-    assign _4118 = _1267[93:91];
-    assign _4117 = _1261[93:91];
-    assign _4116 = _1255[93:91];
-    assign _4115 = _897[93:91];
-    assign _1556 = f_chgmask2 & f_multi_eff;
-    assign _1558 = _1556 == _755;
-    assign _1549 = _1506 == _1998;
-    assign _1545 = _1506 == _1683;
-    assign _1546 = _1545 & _1526;
-    assign _1543 = _1442 == _1502;
-    assign _1547 = _1543 | _1546;
-    assign _1550 = _1441 ? _1549 : _1547;
-    assign _1540 = _1187[3:0];
-    assign _1542 = _1540 == _1984;
-    assign _1551 = _1542 | _1550;
-    assign _1538 = _1506 == _1998;
-    assign _1534 = _1506 == _1683;
-    assign _1535 = _1534 & _1526;
-    assign _1532 = _1442 == _1502;
-    assign _1536 = _1532 | _1535;
-    assign _1539 = _1441 ? _1538 : _1536;
-    assign _1530 = _1493 == _1998;
-    always @(posedge _310) begin
-        if (_308)
-            _1524 <= _452;
+    assign _1954 = ~ _1953;
+    assign _4242 = 16'b0000000000000001;
+    assign _4243 = _935 + _4242;
+    assign _4239 = _935 == _2004;
+    assign _4240 = ~ _4239;
+    assign _4241 = _4200 & _4240;
+    assign _4244 = _4241 ? _4243 : _935;
+    assign _4184 = _1256[26:24];
+    assign _4182 = _1273[93:91];
+    assign _4181 = _1267[93:91];
+    assign _4180 = _1261[93:91];
+    assign _4179 = _903[93:91];
+    assign _1562 = f_chgmask2 & f_multi_eff;
+    assign _1564 = _1562 == _761;
+    assign _1555 = _1512 == _2004;
+    assign _1551 = _1512 == _1689;
+    assign _1552 = _1551 & _1532;
+    assign _1549 = _1448 == _1508;
+    assign _1553 = _1549 | _1552;
+    assign _1556 = _1447 ? _1555 : _1553;
+    assign _1546 = _1193[3:0];
+    assign _1548 = _1546 == _1990;
+    assign _1557 = _1548 | _1556;
+    assign _1544 = _1512 == _2004;
+    assign _1540 = _1512 == _1689;
+    assign _1541 = _1540 & _1532;
+    assign _1538 = _1448 == _1508;
+    assign _1542 = _1538 | _1541;
+    assign _1545 = _1447 ? _1544 : _1542;
+    assign _1536 = _1499 == _2004;
+    always @(posedge _316) begin
+        if (_314)
+            _1530 <= _458;
         else
-            _1524 <= _1485;
+            _1530 <= _1491;
     end
-    assign _1525 = { _2016,
-                     _1524 };
-    assign _1526 = _1439 < _1525;
-    assign _1520 = _1493 == _1683;
-    assign _1527 = _1520 & _1526;
-    assign _1518 = _1442 == _1490;
-    assign _1528 = _1518 | _1527;
-    assign _1531 = _1441 ? _1530 : _1528;
-    assign _1517 = _1261[104:103];
+    assign _1531 = { _2022,
+                     _1530 };
+    assign _1532 = _1445 < _1531;
+    assign _1526 = _1499 == _1689;
+    assign _1533 = _1526 & _1532;
+    assign _1524 = _1448 == _1496;
+    assign _1534 = _1524 | _1533;
+    assign _1537 = _1447 ? _1536 : _1534;
+    assign _1523 = _1267[104:103];
+    always @* begin
+        case (_1523)
+        0:
+            _1558 <= vdd;
+        1:
+            _1558 <= _1537;
+        2:
+            _1558 <= _1545;
+        default:
+            _1558 <= _1557;
+        endcase
+    end
+    assign _1522 = ~ _1206;
+    assign _1559 = _1522 | _1558;
+    assign _1519 = _1267[62:62];
+    assign _1517 = _1267[61:58];
     always @* begin
         case (_1517)
         0:
-            _1552 <= vdd;
+            _1518 <= vdd;
         1:
-            _1552 <= _1531;
+            _1518 <= _1180;
         2:
-            _1552 <= _1539;
-        default:
-            _1552 <= _1551;
-        endcase
-    end
-    assign _1516 = ~ _1200;
-    assign _1553 = _1516 | _1552;
-    assign _1513 = _1261[62:62];
-    assign _1511 = _1261[61:58];
-    always @* begin
-        case (_1511)
-        0:
-            _1512 <= vdd;
-        1:
-            _1512 <= _1174;
-        2:
-            _1512 <= _1178;
+            _1518 <= _1184;
         3:
-            _1512 <= _1182;
+            _1518 <= _1188;
         4:
-            _1512 <= _1184;
+            _1518 <= _1190;
         5:
-            _1512 <= _737;
+            _1518 <= _743;
         6:
-            _1512 <= _1188;
+            _1518 <= _1194;
         7:
-            _1512 <= _1191;
+            _1518 <= _1197;
         8:
-            _1512 <= _657;
+            _1518 <= _663;
         9:
-            _1512 <= _660;
+            _1518 <= _666;
         10:
-            _1512 <= _663;
+            _1518 <= _669;
         11:
-            _1512 <= _666;
+            _1518 <= _672;
         12:
-            _1512 <= _645;
+            _1518 <= _651;
         13:
-            _1512 <= _648;
+            _1518 <= _654;
         14:
-            _1512 <= _651;
+            _1518 <= _657;
         default:
-            _1512 <= _654;
+            _1518 <= _660;
         endcase
     end
-    assign _1514 = _1512 ^ _1513;
-    assign _1506 = _1261[57:42];
-    assign _1508 = _1506 == _1998;
-    assign _1497 = _1443[57:42];
-    assign _1498 = { gnd,
-                     _1497 };
-    assign _1499 = _1498 + _1486;
-    always @(posedge _310) begin
-        if (_308)
-            _1502 <= _1640;
+    assign _1520 = _1518 ^ _1519;
+    assign _1512 = _1267[57:42];
+    assign _1514 = _1512 == _2004;
+    assign _1503 = _1449[57:42];
+    assign _1504 = { gnd,
+                     _1503 };
+    assign _1505 = _1504 + _1492;
+    always @(posedge _316) begin
+        if (_314)
+            _1508 <= _1646;
         else
-            _1502 <= _1499;
+            _1508 <= _1505;
     end
-    assign _1503 = _1502 < _1442;
-    assign _1504 = ~ _1503;
-    assign _1493 = _1261[41:26];
-    assign _1495 = _1493 == _1683;
-    assign _1477 = _1447[0:0];
-    assign _1479 = _1477 ? _1136 : _452;
-    assign _1474 = _1447[1:1];
-    assign _1476 = _1474 ? _1115 : _452;
-    assign _1480 = _1476 < _1479;
-    assign _1481 = _1480 ? _1479 : _1476;
-    assign _1469 = _1447[2:2];
-    assign _1471 = _1469 ? _1092 : _452;
-    assign _1466 = _1447[3:3];
-    assign _1468 = _1466 ? _1071 : _452;
-    assign _1472 = _1468 < _1471;
-    assign _1473 = _1472 ? _1471 : _1468;
-    assign _1482 = _1473 < _1481;
-    assign _1483 = _1482 ? _1481 : _1473;
-    assign _1459 = _1447[4:4];
-    assign _1461 = _1459 ? _1046 : _452;
-    assign _1456 = _1447[5:5];
-    assign _1458 = _1456 ? _1025 : _452;
-    assign _1462 = _1458 < _1461;
-    assign _1463 = _1462 ? _1461 : _1458;
-    assign _1451 = _1447[6:6];
-    assign _1453 = _1451 ? _1002 : _452;
-    assign _1447 = _1443[23:16];
-    assign _1448 = _1447[7:7];
-    assign _1450 = _1448 ? _981 : _452;
-    assign _1454 = _1450 < _1453;
-    assign _1455 = _1454 ? _1453 : _1450;
-    assign _1464 = _1455 < _1463;
-    assign _1465 = _1464 ? _1463 : _1455;
-    assign _1484 = _1465 < _1483;
-    assign _1485 = _1484 ? _1483 : _1465;
-    assign _1486 = { _1585,
-                     _1485 };
-    assign _1443 = _956[399:288];
-    assign _1444 = _1443[41:26];
-    assign _1445 = { gnd,
-                     _1444 };
-    assign _1487 = _1445 + _1486;
-    always @(posedge _310) begin
-        if (_308)
-            _1490 <= _1640;
+    assign _1509 = _1508 < _1448;
+    assign _1510 = ~ _1509;
+    assign _1499 = _1267[41:26];
+    assign _1501 = _1499 == _1689;
+    assign _1483 = _1453[0:0];
+    assign _1485 = _1483 ? _1142 : _458;
+    assign _1480 = _1453[1:1];
+    assign _1482 = _1480 ? _1121 : _458;
+    assign _1486 = _1482 < _1485;
+    assign _1487 = _1486 ? _1485 : _1482;
+    assign _1475 = _1453[2:2];
+    assign _1477 = _1475 ? _1098 : _458;
+    assign _1472 = _1453[3:3];
+    assign _1474 = _1472 ? _1077 : _458;
+    assign _1478 = _1474 < _1477;
+    assign _1479 = _1478 ? _1477 : _1474;
+    assign _1488 = _1479 < _1487;
+    assign _1489 = _1488 ? _1487 : _1479;
+    assign _1465 = _1453[4:4];
+    assign _1467 = _1465 ? _1052 : _458;
+    assign _1462 = _1453[5:5];
+    assign _1464 = _1462 ? _1031 : _458;
+    assign _1468 = _1464 < _1467;
+    assign _1469 = _1468 ? _1467 : _1464;
+    assign _1457 = _1453[6:6];
+    assign _1459 = _1457 ? _1008 : _458;
+    assign _1453 = _1449[23:16];
+    assign _1454 = _1453[7:7];
+    assign _1456 = _1454 ? _987 : _458;
+    assign _1460 = _1456 < _1459;
+    assign _1461 = _1460 ? _1459 : _1456;
+    assign _1470 = _1461 < _1469;
+    assign _1471 = _1470 ? _1469 : _1461;
+    assign _1490 = _1471 < _1489;
+    assign _1491 = _1490 ? _1489 : _1471;
+    assign _1492 = { _1591,
+                     _1491 };
+    assign _1449 = _962[399:288];
+    assign _1450 = _1449[41:26];
+    assign _1451 = { gnd,
+                     _1450 };
+    assign _1493 = _1451 + _1492;
+    always @(posedge _316) begin
+        if (_314)
+            _1496 <= _1646;
         else
-            _1490 <= _1487;
+            _1496 <= _1493;
     end
-    assign _1442 = { gnd,
-                     _1439 };
-    assign _1491 = _1442 < _1490;
-    assign _1492 = ~ _1491;
-    assign _1496 = _1492 | _1495;
-    assign _1505 = _1496 & _1504;
-    assign _1438 = _1261[25:24];
+    assign _1448 = { gnd,
+                     _1445 };
+    assign _1497 = _1448 < _1496;
+    assign _1498 = ~ _1497;
+    assign _1502 = _1498 | _1501;
+    assign _1511 = _1502 & _1510;
+    assign _1444 = _1267[25:24];
     always @* begin
-        case (_1438)
+        case (_1444)
         0:
-            _1439 <= _929;
+            _1445 <= _935;
         1:
-            _1439 <= _932;
+            _1445 <= _938;
         2:
-            _1439 <= _935;
+            _1445 <= _941;
         default:
-            _1439 <= _935;
+            _1445 <= _941;
         endcase
     end
-    assign _1441 = _1439 == _1998;
-    assign _1509 = _1441 ? _1508 : _1505;
-    assign _1432 = f_changed_all & f_chgmask2;
-    assign _1434 = _1432 == _755;
-    assign _1435 = ~ _1434;
-    assign _1431 = f_chgmask2 == _755;
-    assign _1436 = _1431 | _1435;
-    assign _1425 = _1261[7:0];
-    assign _1423 = _1261[15:8];
-    assign _1424 = _901 ^ _1423;
-    assign _1426 = _1424 & _1425;
-    assign _1428 = _1426 == _755;
-    assign _1429 = f_valid2 & _1428;
-    assign _1437 = _1429 & _1436;
-    assign _1510 = _1437 & _1509;
-    assign _1515 = _1510 & _1514;
-    assign _1554 = _1515 & _1553;
-    assign _1555 = f_in_eval & _1554;
-    assign _1559 = _1555 & _1558;
-    assign f_fire2 = _1559 & _1282;
-    assign _1704 = f_fire2 ? _2046 : _1961;
-    assign _1281 = f_policy == _2045;
-    assign f_chgmask3 = _1267[23:16];
-    assign f_valid3 = _1267[111:111];
-    assign _1271 = f_valid3 ? f_chgmask3 : _755;
-    assign f_chgmask2 = _1261[23:16];
-    assign f_valid2 = _1261[111:111];
-    assign _1265 = f_valid2 ? f_chgmask2 : _755;
-    assign _1259 = f_valid1 ? f_chgmask1 : _755;
-    assign f_chgmask0 = _897[23:16];
-    assign _1253 = f_valid0 ? f_chgmask0 : _755;
-    assign f_watch = _1250[57:50];
-    assign _1254 = f_watch | _1253;
-    assign _1260 = _1254 | _1259;
+    assign _1447 = _1445 == _2004;
+    assign _1515 = _1447 ? _1514 : _1511;
+    assign _1438 = f_changed_all & f_chgmask2;
+    assign _1440 = _1438 == _761;
+    assign _1441 = ~ _1440;
+    assign _1437 = f_chgmask2 == _761;
+    assign _1442 = _1437 | _1441;
+    assign _1431 = _1267[7:0];
+    assign _1429 = _1267[15:8];
+    assign _1430 = _907 ^ _1429;
+    assign _1432 = _1430 & _1431;
+    assign _1434 = _1432 == _761;
+    assign _1435 = f_valid2 & _1434;
+    assign _1443 = _1435 & _1442;
+    assign _1516 = _1443 & _1515;
+    assign _1521 = _1516 & _1520;
+    assign _1560 = _1521 & _1559;
+    assign _1561 = f_in_eval & _1560;
+    assign _1565 = _1561 & _1564;
+    assign f_fire2 = _1565 & _1288;
+    assign _1710 = f_fire2 ? _2052 : _1967;
+    assign _1287 = f_policy == _2051;
+    assign f_chgmask3 = _1273[23:16];
+    assign f_valid3 = _1273[111:111];
+    assign _1277 = f_valid3 ? f_chgmask3 : _761;
+    assign f_chgmask2 = _1267[23:16];
+    assign f_valid2 = _1267[111:111];
+    assign _1271 = f_valid2 ? f_chgmask2 : _761;
+    assign _1265 = f_valid1 ? f_chgmask1 : _761;
+    assign f_chgmask0 = _903[23:16];
+    assign _1259 = f_valid0 ? f_chgmask0 : _761;
+    assign f_watch = _1256[57:50];
+    assign _1260 = f_watch | _1259;
     assign _1266 = _1260 | _1265;
-    assign f_relevant = _1266 | _1271;
-    assign _1273 = f_multi_eff & f_relevant;
-    assign _1275 = _1273 == _755;
-    assign _1276 = ~ _1275;
-    assign f_amb_now = f_in_eval & _1276;
-    assign _1278 = ~ f_amb_now;
-    assign _1282 = _1278 | _1281;
-    assign _1244 = _914 & f_chg_now;
-    assign _2828 = _914 & f_chg_now;
-    assign _2829 = _1243 | _2828;
-    assign _2825 = _873 == _2046;
-    assign _2827 = _2825 ? _755 : _1243;
-    assign _2824 = _873 == _2045;
-    assign _2830 = _2824 ? _2829 : _2827;
-    assign _2832 = _1893 ? _755 : _2830;
-    assign _110 = _2832;
-    always @(posedge _310) begin
-        if (_308)
-            _1243 <= _755;
+    assign _1272 = _1266 | _1271;
+    assign f_relevant = _1272 | _1277;
+    assign _1279 = f_multi_eff & f_relevant;
+    assign _1281 = _1279 == _761;
+    assign _1282 = ~ _1281;
+    assign f_amb_now = f_in_eval & _1282;
+    assign _1284 = ~ f_amb_now;
+    assign _1288 = _1284 | _1287;
+    assign _1250 = _920 & f_chg_now;
+    assign _2834 = _920 & f_chg_now;
+    assign _2835 = _1249 | _2834;
+    assign _2831 = _879 == _2052;
+    assign _2833 = _2831 ? _761 : _1249;
+    assign _2830 = _879 == _2051;
+    assign _2836 = _2830 ? _2835 : _2833;
+    assign _2838 = _1899 ? _761 : _2836;
+    assign _110 = _2838;
+    always @(posedge _316) begin
+        if (_314)
+            _1249 <= _761;
         else
-            _1243 <= _110;
+            _1249 <= _110;
     end
-    assign f_multi_eff = _1243 | _1244;
-    assign _1417 = f_chgmask1 & f_multi_eff;
-    assign _1419 = _1417 == _755;
-    assign _1410 = _1367 == _1998;
-    assign _1406 = _1367 == _1683;
-    assign _1407 = _1406 & _1387;
-    assign _1404 = _1303 == _1363;
-    assign _1408 = _1404 | _1407;
-    assign _1411 = _1302 ? _1410 : _1408;
-    assign _1401 = _1187[3:0];
-    assign _1403 = _1401 == _1984;
-    assign _1412 = _1403 | _1411;
-    assign _1399 = _1367 == _1998;
-    assign _1395 = _1367 == _1683;
-    assign _1396 = _1395 & _1387;
-    assign _1393 = _1303 == _1363;
-    assign _1397 = _1393 | _1396;
-    assign _1400 = _1302 ? _1399 : _1397;
-    assign _1391 = _1354 == _1998;
-    always @(posedge _310) begin
-        if (_308)
-            _1385 <= _452;
+    assign f_multi_eff = _1249 | _1250;
+    assign _1423 = f_chgmask1 & f_multi_eff;
+    assign _1425 = _1423 == _761;
+    assign _1416 = _1373 == _2004;
+    assign _1412 = _1373 == _1689;
+    assign _1413 = _1412 & _1393;
+    assign _1410 = _1309 == _1369;
+    assign _1414 = _1410 | _1413;
+    assign _1417 = _1308 ? _1416 : _1414;
+    assign _1407 = _1193[3:0];
+    assign _1409 = _1407 == _1990;
+    assign _1418 = _1409 | _1417;
+    assign _1405 = _1373 == _2004;
+    assign _1401 = _1373 == _1689;
+    assign _1402 = _1401 & _1393;
+    assign _1399 = _1309 == _1369;
+    assign _1403 = _1399 | _1402;
+    assign _1406 = _1308 ? _1405 : _1403;
+    assign _1397 = _1360 == _2004;
+    always @(posedge _316) begin
+        if (_314)
+            _1391 <= _458;
         else
-            _1385 <= _1346;
+            _1391 <= _1352;
     end
-    assign _1386 = { _2016,
-                     _1385 };
-    assign _1387 = _1300 < _1386;
-    assign _1381 = _1354 == _1683;
-    assign _1388 = _1381 & _1387;
-    assign _1379 = _1303 == _1351;
-    assign _1389 = _1379 | _1388;
-    assign _1392 = _1302 ? _1391 : _1389;
-    assign _1378 = _1255[104:103];
+    assign _1392 = { _2022,
+                     _1391 };
+    assign _1393 = _1306 < _1392;
+    assign _1387 = _1360 == _1689;
+    assign _1394 = _1387 & _1393;
+    assign _1385 = _1309 == _1357;
+    assign _1395 = _1385 | _1394;
+    assign _1398 = _1308 ? _1397 : _1395;
+    assign _1384 = _1261[104:103];
     always @* begin
-        case (_1378)
+        case (_1384)
         0:
-            _1413 <= vdd;
+            _1419 <= vdd;
         1:
-            _1413 <= _1392;
+            _1419 <= _1398;
         2:
-            _1413 <= _1400;
+            _1419 <= _1406;
         default:
-            _1413 <= _1412;
+            _1419 <= _1418;
         endcase
     end
     assign _112 = host_role;
-    assign _2833 = _1893 ? _112 : _1198;
-    assign _113 = _2833;
-    always @(posedge _310) begin
-        if (_308)
-            _1198 <= _2539;
+    assign _2839 = _1899 ? _112 : _1204;
+    assign _113 = _2839;
+    always @(posedge _316) begin
+        if (_314)
+            _1204 <= _2545;
         else
-            _1198 <= _113;
+            _1204 <= _113;
     end
-    assign _1200 = _1198 == _2046;
-    assign _1377 = ~ _1200;
-    assign _1414 = _1377 | _1413;
-    assign _1374 = _1255[62:62];
-    assign _2837 = _636 ? _1819 : _2835;
-    assign _2835 = _606 ? _1819 : _654;
-    assign _2838 = _591 ? _2837 : _2835;
-    assign _2840 = _493 ? _1817 : _2838;
-    assign _2842 = _491 ? _1817 : _2840;
-    assign _114 = _2842;
-    always @(posedge _310) begin
-        if (_308)
-            _654 <= _1817;
+    assign _1206 = _1204 == _2052;
+    assign _1383 = ~ _1206;
+    assign _1420 = _1383 | _1419;
+    assign _1380 = _1261[62:62];
+    assign _2843 = _642 ? _1825 : _2841;
+    assign _2841 = _612 ? _1825 : _660;
+    assign _2844 = _597 ? _2843 : _2841;
+    assign _2846 = _499 ? _1823 : _2844;
+    assign _2848 = _497 ? _1823 : _2846;
+    assign _114 = _2848;
+    always @(posedge _316) begin
+        if (_314)
+            _660 <= _1823;
         else
-            _654 <= _114;
+            _660 <= _114;
     end
-    assign _116 = host_lane1_sync_mask;
-    assign _118 = host_lane1_sync;
-    assign _2848 = _2847 ^ _118;
-    assign _2849 = _2848 & _116;
-    assign _2851 = _2849 == _1683;
-    assign _2853 = _2851 ? _1819 : _651;
-    assign _2854 = _769 ? _2853 : _651;
-    assign _2855 = _636 ? _651 : _2854;
-    assign _2856 = _591 ? _2855 : _651;
-    assign _2858 = _493 ? _1817 : _2856;
-    assign _2860 = _491 ? _1817 : _2858;
-    assign _119 = _2860;
-    always @(posedge _310) begin
-        if (_308)
-            _651 <= _1817;
+    assign _2855 = _2854 ^ _119;
+    assign _2856 = _2855 & _117;
+    assign _2858 = _2856 == _1689;
+    assign _2849 = ~ _182;
+    assign _2859 = _2849 & _2858;
+    assign _2861 = _2859 ? _1825 : _657;
+    assign _2862 = _775 ? _2861 : _657;
+    assign _2863 = _642 ? _657 : _2862;
+    assign _2864 = _597 ? _2863 : _657;
+    assign _2866 = _499 ? _1823 : _2864;
+    assign _2868 = _497 ? _1823 : _2866;
+    assign _115 = _2868;
+    always @(posedge _316) begin
+        if (_314)
+            _657 <= _1823;
         else
-            _651 <= _119;
+            _657 <= _115;
     end
-    assign _2873 = _627 == _2872;
-    assign _2874 = ~ _2873;
-    assign _2876 = _2867 ? _2875 : g_crc_bad;
-    assign _2877 = _769 ? _2876 : g_crc_bad;
-    assign _2878 = _636 ? g_crc_bad : _2877;
-    assign _2879 = _591 ? _2878 : g_crc_bad;
-    assign _2881 = _493 ? _1817 : _2879;
-    assign _120 = _2881;
-    always @(posedge _310) begin
-        if (_308)
-            g_crc_bad <= _1817;
+    assign _117 = host_lane1_sync_mask;
+    assign _119 = host_lane1_sync;
+    assign _2906 = g_crc[31:16];
+    assign _2907 = _2906 ^ _119;
+    assign _2908 = _2907 & _117;
+    assign _2910 = _2908 == _1689;
+    assign _2881 = _633 == _2880;
+    assign _2882 = ~ _2881;
+    assign _2884 = _2875 ? _2883 : g_crc_bad;
+    assign _2885 = _775 ? _2884 : g_crc_bad;
+    assign _2886 = _642 ? g_crc_bad : _2885;
+    assign _2887 = _597 ? _2886 : g_crc_bad;
+    assign _2889 = _499 ? _1823 : _2887;
+    assign _120 = _2889;
+    always @(posedge _316) begin
+        if (_314)
+            g_crc_bad <= _1823;
         else
             g_crc_bad <= _120;
     end
-    assign _2875 = g_crc_bad | _2874;
-    assign _2884 = ~ _2875;
-    assign _2882 = 6'b000001;
-    assign _2883 = g_left == _2882;
-    assign _2885 = _2883 ? _2884 : _648;
-    assign _2886 = _2867 ? _2885 : _648;
-    assign _2887 = _769 ? _2886 : _648;
-    assign _2888 = _636 ? _648 : _2887;
-    assign _2889 = _591 ? _2888 : _648;
-    assign _2891 = _493 ? _1817 : _2889;
-    assign _2893 = _491 ? _1817 : _2891;
-    assign _121 = _2893;
-    always @(posedge _310) begin
-        if (_308)
-            _648 <= _1817;
+    assign _2883 = g_crc_bad | _2882;
+    assign _2900 = ~ _2883;
+    assign _2898 = 6'b000001;
+    assign _2899 = g_left == _2898;
+    assign _2901 = _2899 ? _2900 : _654;
+    assign _2902 = _2875 ? _2901 : _654;
+    assign _2903 = _775 ? _2902 : _654;
+    assign _2904 = _642 ? _654 : _2903;
+    assign _2905 = _597 ? _2904 : _654;
+    assign _2893 = ~ _497;
+    assign _2891 = ~ _499;
+    assign _2890 = _805 & _182;
+    assign _2892 = _2890 & _2891;
+    assign _2894 = _2892 & _2893;
+    assign _121 = _2894;
+    always @(posedge _316) begin
+        if (_314)
+            g_resid_chk <= _1823;
         else
-            _648 <= _121;
+            g_resid_chk <= _121;
     end
-    assign _2897 = _481 ? _1819 : _2895;
-    assign _2895 = _450 ? _1819 : _666;
-    assign _2898 = _435 ? _2897 : _2895;
-    assign _2900 = _333 ? _1817 : _2898;
-    assign _2902 = _331 ? _1817 : _2900;
-    assign _122 = _2902;
-    always @(posedge _310) begin
-        if (_308)
-            _666 <= _1817;
+    assign _2911 = g_resid_chk ? _2910 : _2905;
+    assign _2913 = _499 ? _1823 : _2911;
+    assign _2915 = _497 ? _1823 : _2913;
+    assign _122 = _2915;
+    always @(posedge _316) begin
+        if (_314)
+            _654 <= _1823;
         else
-            _666 <= _122;
+            _654 <= _122;
     end
-    assign _124 = host_lane0_sync_mask;
-    assign _126 = host_lane0_sync;
-    assign _2908 = _2907 ^ _126;
-    assign _2909 = _2908 & _124;
-    assign _2911 = _2909 == _1683;
-    assign _2913 = _2911 ? _1819 : _663;
-    assign _2914 = _669 ? _2913 : _663;
-    assign _2915 = _481 ? _663 : _2914;
-    assign _2916 = _435 ? _2915 : _663;
-    assign _2918 = _333 ? _1817 : _2916;
-    assign _2920 = _331 ? _1817 : _2918;
-    assign _127 = _2920;
-    always @(posedge _310) begin
-        if (_308)
-            _663 <= _1817;
+    assign _2919 = _487 ? _1825 : _2917;
+    assign _2917 = _456 ? _1825 : _672;
+    assign _2920 = _441 ? _2919 : _2917;
+    assign _2922 = _339 ? _1823 : _2920;
+    assign _2924 = _337 ? _1823 : _2922;
+    assign _123 = _2924;
+    always @(posedge _316) begin
+        if (_314)
+            _672 <= _1823;
         else
-            _663 <= _127;
+            _672 <= _123;
     end
-    assign _2933 = _471 == _2932;
-    assign _2934 = ~ _2933;
-    assign _2936 = _2927 ? _2935 : g_crc_bad_0;
-    assign _2937 = _669 ? _2936 : g_crc_bad_0;
-    assign _2938 = _481 ? g_crc_bad_0 : _2937;
-    assign _2939 = _435 ? _2938 : g_crc_bad_0;
-    assign _2941 = _333 ? _1817 : _2939;
-    assign _128 = _2941;
-    always @(posedge _310) begin
-        if (_308)
-            g_crc_bad_0 <= _1817;
+    assign _2931 = _2930 ^ _128;
+    assign _2932 = _2931 & _126;
+    assign _2934 = _2932 == _1689;
+    assign _2925 = ~ _243;
+    assign _2935 = _2925 & _2934;
+    assign _2937 = _2935 ? _1825 : _669;
+    assign _2938 = _675 ? _2937 : _669;
+    assign _2939 = _487 ? _669 : _2938;
+    assign _2940 = _441 ? _2939 : _669;
+    assign _2942 = _339 ? _1823 : _2940;
+    assign _2944 = _337 ? _1823 : _2942;
+    assign _124 = _2944;
+    always @(posedge _316) begin
+        if (_314)
+            _669 <= _1823;
         else
-            g_crc_bad_0 <= _128;
+            _669 <= _124;
     end
-    assign _2935 = g_crc_bad_0 | _2934;
-    assign _2944 = ~ _2935;
-    assign _2943 = g_left_0 == _2882;
-    assign _2945 = _2943 ? _2944 : _660;
-    assign _2946 = _2927 ? _2945 : _660;
-    assign _2947 = _669 ? _2946 : _660;
-    assign _2948 = _481 ? _660 : _2947;
-    assign _2949 = _435 ? _2948 : _660;
-    assign _2951 = _333 ? _1817 : _2949;
-    assign _2953 = _331 ? _1817 : _2951;
-    assign _129 = _2953;
-    always @(posedge _310) begin
-        if (_308)
-            _660 <= _1817;
+    assign _126 = host_lane0_sync_mask;
+    assign _128 = host_lane0_sync;
+    assign _2982 = g_crc_0[31:16];
+    assign _2983 = _2982 ^ _128;
+    assign _2984 = _2983 & _126;
+    assign _2986 = _2984 == _1689;
+    assign _2957 = _477 == _2956;
+    assign _2958 = ~ _2957;
+    assign _2960 = _2951 ? _2959 : g_crc_bad_0;
+    assign _2961 = _675 ? _2960 : g_crc_bad_0;
+    assign _2962 = _487 ? g_crc_bad_0 : _2961;
+    assign _2963 = _441 ? _2962 : g_crc_bad_0;
+    assign _2965 = _339 ? _1823 : _2963;
+    assign _129 = _2965;
+    always @(posedge _316) begin
+        if (_314)
+            g_crc_bad_0 <= _1823;
         else
-            _660 <= _129;
+            g_crc_bad_0 <= _129;
     end
-    assign _131 = host_match_addr;
-    assign _1190 = _131[6:0];
-    assign _1189 = _1181[7:1];
-    assign _1191 = _1189 == _1190;
-    assign _1186 = 16'b1010110011100001;
-    assign _2958 = _1187[10:10];
-    assign _2957 = _1187[12:12];
-    assign _2959 = _2957 ^ _2958;
-    assign _2956 = _1187[13:13];
-    assign _2960 = _2956 ^ _2959;
-    assign _2955 = _1187[15:15];
-    assign _2961 = _2955 ^ _2960;
-    assign _2954 = _1187[14:0];
-    assign _2962 = { _2954,
-                     _2961 };
-    assign _132 = _2962;
-    always @(posedge _310) begin
-        if (_308)
-            _1187 <= _1186;
+    assign _2959 = g_crc_bad_0 | _2958;
+    assign _2976 = ~ _2959;
+    assign _2975 = g_left_0 == _2898;
+    assign _2977 = _2975 ? _2976 : _666;
+    assign _2978 = _2951 ? _2977 : _666;
+    assign _2979 = _675 ? _2978 : _666;
+    assign _2980 = _487 ? _666 : _2979;
+    assign _2981 = _441 ? _2980 : _666;
+    assign _2969 = ~ _337;
+    assign _2967 = ~ _339;
+    assign _2966 = _705 & _243;
+    assign _2968 = _2966 & _2967;
+    assign _2970 = _2968 & _2969;
+    assign _130 = _2970;
+    always @(posedge _316) begin
+        if (_314)
+            g_resid_chk_0 <= _1823;
         else
-            _1187 <= _132;
+            g_resid_chk_0 <= _130;
     end
+    assign _2987 = g_resid_chk_0 ? _2986 : _2981;
+    assign _2989 = _339 ? _1823 : _2987;
+    assign _2991 = _337 ? _1823 : _2989;
+    assign _131 = _2991;
+    always @(posedge _316) begin
+        if (_314)
+            _666 <= _1823;
+        else
+            _666 <= _131;
+    end
+    assign _133 = host_match_addr;
+    assign _1196 = _133[6:0];
+    assign _1195 = _1187[7:1];
+    assign _1197 = _1195 == _1196;
+    assign _1192 = 16'b1010110011100001;
+    assign _2996 = _1193[10:10];
+    assign _2995 = _1193[12:12];
+    assign _2997 = _2995 ^ _2996;
+    assign _2994 = _1193[13:13];
+    assign _2998 = _2994 ^ _2997;
+    assign _2993 = _1193[15:15];
+    assign _2999 = _2993 ^ _2998;
+    assign _2992 = _1193[14:0];
+    assign _3000 = { _2992,
+                     _2999 };
+    assign _134 = _3000;
+    always @(posedge _316) begin
+        if (_314)
+            _1193 <= _1192;
+        else
+            _1193 <= _134;
+    end
+    assign _1194 = _1193[0:0];
+    assign _3013 = _138 + _2413;
+    assign _3011 = _138 - _2413;
+    assign _3014 = _2478 ? _3013 : _3011;
+    assign _2476 = _138 == _1990;
+    assign _2485 = ~ _2476;
+    assign _136 = host_rx_pop;
+    assign _2486 = _136 & _2485;
+    assign _2477 = ~ _743;
+    assign _3007 = ~ _3006;
+    assign _3003 = _876 | _1724;
+    assign _3001 = _774 | _841;
+    assign _3002 = _741 | _3001;
+    assign _3004 = _3002 | _3003;
+    assign _3008 = _3004 & _3007;
+    assign f_rx_push = _3008;
+    assign _2478 = f_rx_push & _2477;
+    assign _3009 = _2478 ^ _2486;
+    assign _3015 = _3009 ? _3014 : _138;
+    always @(posedge _316) begin
+        if (_314)
+            _3018 <= _1990;
+        else
+            _3018 <= _3015;
+    end
+    assign _138 = _3018;
+    assign _743 = _138 == _1748;
     assign _1188 = _1187[0:0];
-    assign _2975 = _136 + _2407;
-    assign _2973 = _136 - _2407;
-    assign _2976 = _2472 ? _2975 : _2973;
-    assign _2470 = _136 == _1984;
-    assign _2479 = ~ _2470;
-    assign _134 = host_rx_pop;
-    assign _2480 = _134 & _2479;
-    assign _2471 = ~ _737;
-    assign _2969 = ~ _2968;
-    assign _2965 = _870 | _1718;
-    assign _2963 = _768 | _835;
-    assign _2964 = _735 | _2963;
-    assign _2966 = _2964 | _2965;
-    assign _2970 = _2966 & _2969;
-    assign f_rx_push = _2970;
-    assign _2472 = f_rx_push & _2471;
-    assign _2971 = _2472 ^ _2480;
-    assign _2977 = _2971 ? _2976 : _136;
-    always @(posedge _310) begin
-        if (_308)
-            _2980 <= _1984;
+    assign _3953 = _1183[7:1];
+    assign _3954 = { vdd,
+                     _3953 };
+    assign _3951 = _3943[7:7];
+    assign _3950 = _3943[6:6];
+    assign _3949 = _3943[5:5];
+    assign _3948 = _3943[4:4];
+    assign _3947 = _3943[3:3];
+    assign _3946 = _3943[2:2];
+    assign _3945 = _3943[1:1];
+    assign _3944 = _3943[0:0];
+    assign _3952 = { _3944,
+                     _3945,
+                     _3946,
+                     _3947,
+                     _3948,
+                     _3949,
+                     _3950,
+                     _3951 };
+    assign _3936 = _281 + _2413;
+    assign _3934 = _281 - _2413;
+    assign _3937 = _3035 ? _3936 : _3934;
+    assign _745 = _281 == _1748;
+    assign _3034 = ~ _745;
+    assign _3031 = ~ _279;
+    assign _140 = host_tx_push;
+    assign _3032 = _140 & _3031;
+    assign _739 = ~ _705;
+    assign _733 = g_bitpos_0 + _488;
+    assign _728 = ~ _471;
+    assign g_tx_bit = _718 & _726;
+    assign _729 = g_tx_bit & _728;
+    assign _730 = _729 & g_data_left_0;
+    assign _731 = _699 | _730;
+    assign _734 = _731 ? _733 : g_bitpos_0;
+    assign _736 = _734 == _458;
+    assign _737 = ~ _736;
+    assign _708 = _707 & _275;
+    assign _738 = _708 & _737;
+    assign _740 = _738 & _739;
+    assign _704 = g_bitpos_0 == _2470;
+    assign _695 = g_cnt_0[5:0];
+    assign _696 = _695 < _239;
+    assign _697 = ~ _696;
+    assign _691 = g_cnt_0[15:6];
+    assign _693 = _691 == _2019;
+    assign _694 = ~ _693;
+    assign _698 = _694 | _697;
+    assign _3924 = ~ _271;
+    assign _3925 = _275 & _3924;
+    assign _3928 = _3925 ? _2051 : _2052;
+    assign _3917 = ~ _726;
+    assign _3918 = _718 & _3917;
+    assign _3919 = _663 | _3918;
+    assign _3920 = _3919 | _3909;
+    assign _3922 = _3920 ? _2052 : _3916;
+    assign _3903 = g_run_0 + _488;
+    assign _3900 = g_run_0 + _488;
+    assign _3896 = vdd == g_last_0;
+    assign _3894 = g_run_0 == _458;
+    assign _3895 = ~ _3894;
+    assign _3897 = _3895 & _3896;
+    assign _3901 = _3897 ? _3900 : _488;
+    assign _3892 = _253 == _2052;
+    assign _3904 = _3892 ? _3903 : _3901;
+    assign _3905 = _3904 == _143;
+    assign _3886 = g_run_0 + _488;
+    assign _3882 = gnd == g_last_0;
+    assign _3880 = g_run_0 == _458;
+    assign _3881 = ~ _3880;
+    assign _3883 = _3881 & _3882;
+    assign _3887 = _3883 ? _3886 : _488;
+    assign _3878 = _253 == _2052;
+    assign _3889 = _3878 ? _458 : _3887;
+    assign _3890 = _3889 == _143;
+    assign _3906 = _477 ? _3905 : _3890;
+    assign _3907 = _466 & _3906;
+    assign _3908 = ~ _3907;
+    assign _3874 = g_left_0 == _2898;
+    assign _3871 = 6'b000000;
+    assign _3872 = g_left_0 == _3871;
+    assign _3875 = _2951 ? _3874 : _3872;
+    assign _3867 = g_cnt_0 + _4242;
+    assign _3868 = _3867 == _688;
+    assign _3865 = g_cnt_0 == _688;
+    assign _3869 = _690 ? _3868 : _3865;
+    assign _3863 = ~ _487;
+    assign _3864 = _441 & _3863;
+    assign _3870 = _3864 & _3869;
+    assign _3876 = _3870 & _3875;
+    assign _3909 = _3876 & _3908;
+    assign _3911 = _3909 ? _1967 : _3862;
+    assign _3913 = _487 ? _2545 : _3911;
+    assign _3859 = _726 ? _3857 : _1967;
+    assign _3855 = _370 & _368;
+    assign _3857 = _3855 ? _2052 : g_mode_0;
+    assign _3860 = _718 ? _3859 : _3857;
+    assign _3110 = _726 ? _3109 : _3021;
+    assign _3111 = _718 ? _3110 : _3021;
+    assign _141 = _3111;
+    always @(posedge _316) begin
+        if (_314)
+            _3021 <= _1823;
         else
-            _2980 <= _2977;
+            _3021 <= _141;
     end
-    assign _136 = _2980;
-    assign _737 = _136 == _1742;
-    assign _1182 = _1181[0:0];
-    assign _3889 = _1177[7:1];
-    assign _3890 = { vdd,
-                     _3889 };
-    assign _3887 = _3879[7:7];
-    assign _3886 = _3879[6:6];
-    assign _3885 = _3879[5:5];
-    assign _3884 = _3879[4:4];
-    assign _3883 = _3879[3:3];
-    assign _3882 = _3879[2:2];
-    assign _3881 = _3879[1:1];
-    assign _3880 = _3879[0:0];
-    assign _3888 = { _3880,
-                     _3881,
-                     _3882,
-                     _3883,
-                     _3884,
-                     _3885,
-                     _3886,
-                     _3887 };
-    assign _3872 = _275 + _2407;
-    assign _3870 = _275 - _2407;
-    assign _3873 = _2997 ? _3872 : _3870;
-    assign _739 = _275 == _1742;
-    assign _2996 = ~ _739;
-    assign _2993 = ~ _273;
-    assign _138 = host_tx_push;
-    assign _2994 = _138 & _2993;
-    assign _733 = ~ _699;
-    assign _727 = g_bitpos_0 + _482;
-    assign _722 = ~ _465;
-    assign g_tx_bit = _712 & _720;
-    assign _723 = g_tx_bit & _722;
-    assign _724 = _723 & g_data_left_0;
-    assign _725 = _693 | _724;
-    assign _728 = _725 ? _727 : g_bitpos_0;
-    assign _730 = _728 == _452;
-    assign _731 = ~ _730;
-    assign _702 = _701 & _269;
-    assign _732 = _702 & _731;
-    assign _734 = _732 & _733;
-    assign _698 = g_bitpos_0 == _2464;
-    assign _689 = g_cnt_0[5:0];
-    assign _690 = _689 < _235;
-    assign _691 = ~ _690;
-    assign _685 = g_cnt_0[15:6];
-    assign _687 = _685 == _2013;
-    assign _688 = ~ _687;
-    assign _692 = _688 | _691;
-    assign _3860 = ~ _265;
-    assign _3861 = _269 & _3860;
-    assign _3864 = _3861 ? _2045 : _2046;
-    assign _3853 = ~ _720;
-    assign _3854 = _712 & _3853;
-    assign _3855 = _657 | _3854;
-    assign _3856 = _3855 | _3845;
-    assign _3858 = _3856 ? _2046 : _3852;
-    assign _3839 = g_run_0 + _482;
-    assign _3836 = g_run_0 + _482;
-    assign _3832 = vdd == g_last_0;
-    assign _3830 = g_run_0 == _452;
-    assign _3831 = ~ _3830;
-    assign _3833 = _3831 & _3832;
-    assign _3837 = _3833 ? _3836 : _482;
-    assign _3828 = _247 == _2046;
-    assign _3840 = _3828 ? _3839 : _3837;
-    assign _3841 = _3840 == _141;
-    assign _3822 = g_run_0 + _482;
-    assign _3818 = gnd == g_last_0;
-    assign _3816 = g_run_0 == _452;
-    assign _3817 = ~ _3816;
-    assign _3819 = _3817 & _3818;
-    assign _3823 = _3819 ? _3822 : _482;
-    assign _3814 = _247 == _2046;
-    assign _3825 = _3814 ? _452 : _3823;
-    assign _3826 = _3825 == _141;
-    assign _3842 = _471 ? _3841 : _3826;
-    assign _3843 = _460 & _3842;
-    assign _3844 = ~ _3843;
-    assign _3810 = g_left_0 == _2882;
-    assign _3807 = 6'b000000;
-    assign _3808 = g_left_0 == _3807;
-    assign _3811 = _2927 ? _3810 : _3808;
-    assign _3803 = g_cnt_0 + _4178;
-    assign _3804 = _3803 == _682;
-    assign _3801 = g_cnt_0 == _682;
-    assign _3805 = _684 ? _3804 : _3801;
-    assign _3799 = ~ _481;
-    assign _3800 = _435 & _3799;
-    assign _3806 = _3800 & _3805;
-    assign _3812 = _3806 & _3811;
-    assign _3845 = _3812 & _3844;
-    assign _3847 = _3845 ? _1961 : _3798;
-    assign _3849 = _481 ? _2539 : _3847;
-    assign _3795 = _720 ? _3793 : _1961;
-    assign _3791 = _364 & _362;
-    assign _3793 = _3791 ? _2046 : g_mode_0;
-    assign _3796 = _712 ? _3795 : _3793;
-    assign _3072 = _720 ? _3071 : _2983;
-    assign _3073 = _712 ? _3072 : _2983;
-    assign _139 = _3073;
-    always @(posedge _310) begin
-        if (_308)
-            _2983 <= _1817;
-        else
-            _2983 <= _139;
-    end
-    assign _3717 = ~ _3071;
-    assign _3715 = ~ f_lane0_out;
-    assign _3716 = _3071 ? f_lane0_out : _3715;
+    assign _3781 = ~ _3109;
+    assign _3779 = ~ f_lane0_out;
+    assign _3780 = _3109 ? f_lane0_out : _3779;
     always @* begin
-        case (_263)
+        case (_269)
         0:
-            _3718 <= _3071;
+            _3782 <= _3109;
         1:
-            _3718 <= _3716;
+            _3782 <= _3780;
         2:
-            _3718 <= _3717;
+            _3782 <= _3781;
         default:
-            _3718 <= _3071;
+            _3782 <= _3109;
         endcase
     end
-    assign _141 = host_lane0_stuff_len;
-    assign _3699 = g_run_0 + _482;
-    assign _3700 = _471 ? _3699 : _452;
-    assign _3695 = g_run_0 + _482;
-    assign _3691 = _471 == g_last_0;
-    assign _3689 = g_run_0 == _452;
-    assign _3690 = ~ _3689;
-    assign _3692 = _3690 & _3691;
-    assign _3696 = _3692 ? _3695 : _482;
-    assign _3687 = _247 == _2046;
-    assign _3701 = _3687 ? _3700 : _3696;
-    assign _3702 = _481 ? _3685 : _3701;
-    assign _3681 = g_run_0 + _482;
-    assign _3682 = _3071 ? _3681 : _452;
-    assign _3677 = g_run_0 + _482;
-    assign _3068 = _3060[7:7];
-    assign _3067 = _3060[6:6];
-    assign _3066 = _3060[5:5];
-    assign _3065 = _3060[4:4];
-    assign _3064 = _3060[3:3];
-    assign _3063 = _3060[2:2];
-    assign _3062 = _3060[1:1];
-    assign _3058 = _3050[7:7];
-    assign _3057 = _3050[6:6];
-    assign _3056 = _3050[5:5];
-    assign _3055 = _3050[4:4];
-    assign _3054 = _3050[3:3];
-    assign _3053 = _3050[2:2];
-    assign _3052 = _3050[1:1];
-    assign _3044 = _3000 == _2464;
-    assign _3045 = _2997 & _3044;
-    always @(posedge _310) begin
-        if (_308)
-            _3046 <= _755;
+    assign _143 = host_lane0_stuff_len;
+    assign _3763 = g_run_0 + _488;
+    assign _3764 = _477 ? _3763 : _458;
+    assign _3759 = g_run_0 + _488;
+    assign _3755 = _477 == g_last_0;
+    assign _3753 = g_run_0 == _458;
+    assign _3754 = ~ _3753;
+    assign _3756 = _3754 & _3755;
+    assign _3760 = _3756 ? _3759 : _488;
+    assign _3751 = _253 == _2052;
+    assign _3765 = _3751 ? _3764 : _3760;
+    assign _3766 = _487 ? _3749 : _3765;
+    assign _3745 = g_run_0 + _488;
+    assign _3746 = _3109 ? _3745 : _458;
+    assign _3741 = g_run_0 + _488;
+    assign _3106 = _3098[7:7];
+    assign _3105 = _3098[6:6];
+    assign _3104 = _3098[5:5];
+    assign _3103 = _3098[4:4];
+    assign _3102 = _3098[3:3];
+    assign _3101 = _3098[2:2];
+    assign _3100 = _3098[1:1];
+    assign _3096 = _3088[7:7];
+    assign _3095 = _3088[6:6];
+    assign _3094 = _3088[5:5];
+    assign _3093 = _3088[4:4];
+    assign _3092 = _3088[3:3];
+    assign _3091 = _3088[2:2];
+    assign _3090 = _3088[1:1];
+    assign _3082 = _3038 == _2470;
+    assign _3083 = _3035 & _3082;
+    always @(posedge _316) begin
+        if (_314)
+            _3084 <= _761;
         else
-            if (_3045)
-                _3046 <= _2990;
+            if (_3083)
+                _3084 <= _3028;
     end
-    assign _3038 = _3000 == _1863;
-    assign _3039 = _2997 & _3038;
-    always @(posedge _310) begin
-        if (_308)
-            _3040 <= _755;
+    assign _3076 = _3038 == _1869;
+    assign _3077 = _3035 & _3076;
+    always @(posedge _316) begin
+        if (_314)
+            _3078 <= _761;
         else
-            if (_3039)
-                _3040 <= _2990;
+            if (_3077)
+                _3078 <= _3028;
     end
-    assign _3032 = _3000 == _1864;
-    assign _3033 = _2997 & _3032;
-    always @(posedge _310) begin
-        if (_308)
-            _3034 <= _755;
+    assign _3070 = _3038 == _1870;
+    assign _3071 = _3035 & _3070;
+    always @(posedge _316) begin
+        if (_314)
+            _3072 <= _761;
         else
-            if (_3033)
-                _3034 <= _2990;
+            if (_3071)
+                _3072 <= _3028;
     end
-    assign _3026 = _3000 == _455;
-    assign _3027 = _2997 & _3026;
-    always @(posedge _310) begin
-        if (_308)
-            _3028 <= _755;
+    assign _3064 = _3038 == _461;
+    assign _3065 = _3035 & _3064;
+    always @(posedge _316) begin
+        if (_314)
+            _3066 <= _761;
         else
-            if (_3027)
-                _3028 <= _2990;
+            if (_3065)
+                _3066 <= _3028;
     end
-    assign _3020 = _3000 == _1867;
-    assign _3021 = _2997 & _3020;
-    always @(posedge _310) begin
-        if (_308)
-            _3022 <= _755;
+    assign _3058 = _3038 == _1873;
+    assign _3059 = _3035 & _3058;
+    always @(posedge _316) begin
+        if (_314)
+            _3060 <= _761;
         else
-            if (_3021)
-                _3022 <= _2990;
+            if (_3059)
+                _3060 <= _3028;
     end
-    assign _3014 = _3000 == _454;
-    assign _3015 = _2997 & _3014;
-    always @(posedge _310) begin
-        if (_308)
-            _3016 <= _755;
+    assign _3052 = _3038 == _460;
+    assign _3053 = _3035 & _3052;
+    always @(posedge _316) begin
+        if (_314)
+            _3054 <= _761;
         else
-            if (_3015)
-                _3016 <= _2990;
+            if (_3053)
+                _3054 <= _3028;
     end
-    assign _3008 = _3000 == _482;
-    assign _3009 = _2997 & _3008;
-    always @(posedge _310) begin
-        if (_308)
-            _3010 <= _755;
+    assign _3046 = _3038 == _488;
+    assign _3047 = _3035 & _3046;
+    always @(posedge _316) begin
+        if (_314)
+            _3048 <= _761;
         else
-            if (_3009)
-                _3010 <= _2990;
+            if (_3047)
+                _3048 <= _3028;
     end
-    assign _3075 = _3000 + _482;
-    assign _3076 = _2997 ? _3075 : _3000;
-    assign _142 = _3076;
-    always @(posedge _310) begin
-        if (_308)
-            _3000 <= _452;
+    assign _3113 = _3038 + _488;
+    assign _3114 = _3035 ? _3113 : _3038;
+    assign _144 = _3114;
+    always @(posedge _316) begin
+        if (_314)
+            _3038 <= _458;
         else
-            _3000 <= _142;
+            _3038 <= _144;
     end
-    assign _3002 = _3000 == _452;
-    assign _3003 = _2997 & _3002;
-    assign _3143 = _693 ? _3142 : g_byte_0;
-    assign _3144 = _699 ? _3142 : _3143;
-    assign _3094 = _3093 ? _3091 : _3081;
-    assign _3092 = _3078 ? _3091 : _3081;
-    assign _3095 = _839 ? _3094 : _3092;
-    assign _143 = _3095;
-    always @(posedge _310) begin
-        if (_308)
-            _3081 <= _755;
+    assign _3040 = _3038 == _458;
+    assign _3041 = _3035 & _3040;
+    assign _3181 = _699 ? _3180 : g_byte_0;
+    assign _3182 = _705 ? _3180 : _3181;
+    assign _3132 = _3131 ? _3129 : _3119;
+    assign _3130 = _3116 ? _3129 : _3119;
+    assign _3133 = _845 ? _3132 : _3130;
+    assign _145 = _3133;
+    always @(posedge _316) begin
+        if (_314)
+            _3119 <= _761;
         else
-            _3081 <= _143;
+            _3119 <= _145;
     end
-    assign _3090 = _793 ? _3089 : g_byte;
-    assign _3091 = _799 ? _3089 : _3090;
-    assign _3136 = _768 ? _3081 : _3091;
-    assign _3103 = _3102 ? _1181 : _3100;
-    assign _3101 = _3097 ? _1181 : _3100;
-    assign _3104 = _1725 ? _3103 : _3101;
-    assign _144 = _3104;
-    always @(posedge _310) begin
-        if (_308)
-            _3100 <= _755;
+    assign _3128 = _799 ? _3127 : g_byte;
+    assign _3129 = _805 ? _3127 : _3128;
+    assign _3174 = _774 ? _3119 : _3129;
+    assign _3141 = _3140 ? _1187 : _3138;
+    assign _3139 = _3135 ? _1187 : _3138;
+    assign _3142 = _1731 ? _3141 : _3139;
+    assign _146 = _3142;
+    always @(posedge _316) begin
+        if (_314)
+            _3138 <= _761;
         else
-            _3100 <= _144;
+            _3138 <= _146;
     end
-    assign _3121 = _1181[6:0];
-    assign _3122 = { _3121,
-                     _3118 };
-    assign _3119 = _1181[7:1];
-    assign _3117 = _901[7:7];
-    assign _3116 = _901[6:6];
-    assign _3115 = _901[5:5];
-    assign _3114 = _901[4:4];
-    assign _3113 = _901[3:3];
-    assign _3112 = _901[2:2];
-    assign _3111 = _901[1:1];
-    assign _3110 = _901[0:0];
-    assign _3108 = _1267[102:100];
-    assign _3107 = _1261[102:100];
-    assign _3106 = _1255[102:100];
-    assign _3105 = _897[102:100];
+    assign _3159 = _1187[6:0];
+    assign _3160 = { _3159,
+                     _3156 };
+    assign _3157 = _1187[7:1];
+    assign _3155 = _907[7:7];
+    assign _3154 = _907[6:6];
+    assign _3153 = _907[5:5];
+    assign _3152 = _907[4:4];
+    assign _3151 = _907[3:3];
+    assign _3150 = _907[2:2];
+    assign _3149 = _907[1:1];
+    assign _3148 = _907[0:0];
+    assign _3146 = _1273[102:100];
+    assign _3145 = _1267[102:100];
+    assign _3144 = _1261[102:100];
+    assign _3143 = _903[102:100];
     always @* begin
         case (f_winner)
         0:
-            _3109 <= _3105;
+            _3147 <= _3143;
         1:
-            _3109 <= _3106;
+            _3147 <= _3144;
         2:
-            _3109 <= _3107;
+            _3147 <= _3145;
         default:
-            _3109 <= _3108;
+            _3147 <= _3146;
         endcase
     end
     always @* begin
-        case (_3109)
+        case (_3147)
         0:
-            _3118 <= _3110;
+            _3156 <= _3148;
         1:
-            _3118 <= _3111;
+            _3156 <= _3149;
         2:
-            _3118 <= _3112;
+            _3156 <= _3150;
         3:
-            _3118 <= _3113;
+            _3156 <= _3151;
         4:
-            _3118 <= _3114;
+            _3156 <= _3152;
         5:
-            _3118 <= _3115;
+            _3156 <= _3153;
         6:
-            _3118 <= _3116;
+            _3156 <= _3154;
         default:
-            _3118 <= _3117;
+            _3156 <= _3155;
         endcase
     end
-    assign _3120 = { _3118,
-                     _3119 };
+    assign _3158 = { _3156,
+                     _3157 };
     always @* begin
-        case (_1715)
+        case (_1721)
         0:
-            _3123 <= _1181;
+            _3161 <= _1187;
         1:
-            _3123 <= _3120;
+            _3161 <= _3158;
         2:
-            _3123 <= _3122;
+            _3161 <= _3160;
         default:
-            _3123 <= _1181;
+            _3161 <= _1187;
         endcase
     end
-    assign _3124 = _1701 ? _3123 : _1181;
-    assign _145 = _3124;
-    always @(posedge _310) begin
-        if (_308)
-            _1181 <= _755;
+    assign _3162 = _1707 ? _3161 : _1187;
+    assign _147 = _3162;
+    always @(posedge _316) begin
+        if (_314)
+            _1187 <= _761;
         else
-            _1181 <= _145;
+            _1187 <= _147;
     end
-    assign _3102 = _870 & _1718;
-    assign _3128 = _3102 ? _870 : _1817;
-    assign _3096 = ~ _870;
-    assign _3097 = _3096 & _1718;
-    assign _3126 = _3097 ? _1819 : _870;
-    assign _1712 = _1267[97:96];
-    assign _1711 = _1261[97:96];
-    assign _1710 = _1255[97:96];
-    assign _1709 = _897[97:96];
+    assign _3140 = _876 & _1724;
+    assign _3166 = _3140 ? _876 : _1823;
+    assign _3134 = ~ _876;
+    assign _3135 = _3134 & _1724;
+    assign _3164 = _3135 ? _1825 : _876;
+    assign _1718 = _1273[97:96];
+    assign _1717 = _1267[97:96];
+    assign _1716 = _1261[97:96];
+    assign _1715 = _903[97:96];
     always @* begin
         case (f_winner)
         0:
-            _1713 <= _1709;
+            _1719 <= _1715;
         1:
-            _1713 <= _1710;
+            _1719 <= _1716;
         2:
-            _1713 <= _1711;
+            _1719 <= _1717;
         default:
-            _1713 <= _1712;
+            _1719 <= _1718;
         endcase
     end
-    assign _1715 = _881 ? _2539 : _1713;
-    assign f_eng_push = _1715 == _1961;
-    assign _1718 = _1701 & f_eng_push;
-    assign _1724 = _870 | _1718;
-    assign _1721 = _768 | _835;
-    assign _1722 = ~ _1721;
-    assign _1720 = ~ _735;
-    assign _1723 = _1720 & _1722;
-    assign _1725 = _1723 & _1724;
-    assign _3129 = _1725 ? _3128 : _3126;
-    assign _146 = _3129;
-    always @(posedge _310) begin
-        if (_308)
-            _870 <= _1817;
+    assign _1721 = _887 ? _2545 : _1719;
+    assign f_eng_push = _1721 == _1967;
+    assign _1724 = _1707 & f_eng_push;
+    assign _1730 = _876 | _1724;
+    assign _1727 = _774 | _841;
+    assign _1728 = ~ _1727;
+    assign _1726 = ~ _741;
+    assign _1729 = _1726 & _1728;
+    assign _1731 = _1729 & _1730;
+    assign _3167 = _1731 ? _3166 : _3164;
+    assign _148 = _3167;
+    always @(posedge _316) begin
+        if (_314)
+            _876 <= _1823;
         else
-            _870 <= _146;
+            _876 <= _148;
     end
-    assign _3135 = _870 ? _3100 : _1181;
-    assign _3093 = _768 & _835;
-    assign _3133 = _3093 ? _768 : _1817;
-    assign _833 = ~ _799;
-    assign _827 = g_bitpos + _482;
-    assign _822 = ~ _621;
-    assign g_tx_bit_0 = _812 & _820;
-    assign _823 = g_tx_bit_0 & _822;
-    assign _824 = _823 & g_data_left;
-    assign _825 = _793 | _824;
-    assign _828 = _825 ? _827 : g_bitpos;
-    assign _830 = _828 == _452;
-    assign _831 = ~ _830;
-    assign _802 = _801 & _210;
-    assign _832 = _802 & _831;
-    assign _834 = _832 & _833;
-    assign _798 = g_bitpos == _2464;
-    assign _799 = _793 & _798;
-    assign _835 = _799 | _834;
-    assign _3077 = ~ _768;
-    assign _3078 = _3077 & _835;
-    assign _3131 = _3078 ? _1819 : _768;
-    assign _3134 = _839 ? _3133 : _3131;
-    assign _147 = _3134;
-    always @(posedge _310) begin
-        if (_308)
-            _768 <= _1817;
+    assign _3173 = _876 ? _3138 : _1187;
+    assign _3131 = _774 & _841;
+    assign _3171 = _3131 ? _774 : _1823;
+    assign _839 = ~ _805;
+    assign _833 = g_bitpos + _488;
+    assign _828 = ~ _627;
+    assign g_tx_bit_0 = _818 & _826;
+    assign _829 = g_tx_bit_0 & _828;
+    assign _830 = _829 & g_data_left;
+    assign _831 = _799 | _830;
+    assign _834 = _831 ? _833 : g_bitpos;
+    assign _836 = _834 == _458;
+    assign _837 = ~ _836;
+    assign _808 = _807 & _214;
+    assign _838 = _808 & _837;
+    assign _840 = _838 & _839;
+    assign _804 = g_bitpos == _2470;
+    assign _805 = _799 & _804;
+    assign _841 = _805 | _840;
+    assign _3115 = ~ _774;
+    assign _3116 = _3115 & _841;
+    assign _3169 = _3116 ? _1825 : _774;
+    assign _3172 = _845 ? _3171 : _3169;
+    assign _149 = _3172;
+    always @(posedge _316) begin
+        if (_314)
+            _774 <= _1823;
         else
-            _768 <= _147;
+            _774 <= _149;
     end
-    assign _838 = _768 | _835;
-    assign _837 = ~ _735;
-    assign _839 = _837 & _838;
-    assign _3137 = _839 ? _3136 : _3135;
-    assign _3145 = _735 ? _3144 : _3137;
-    assign _148 = _3145;
-    assign _149 = _148;
-    assign _151 = host_tx_data;
-    assign _2990 = _274 ? _149 : _151;
-    always @(posedge _310) begin
-        if (_308)
-            _3004 <= _755;
+    assign _844 = _774 | _841;
+    assign _843 = ~ _741;
+    assign _845 = _843 & _844;
+    assign _3175 = _845 ? _3174 : _3173;
+    assign _3183 = _741 ? _3182 : _3175;
+    assign _150 = _3183;
+    assign _151 = _150;
+    assign _153 = host_tx_data;
+    assign _3028 = _280 ? _151 : _153;
+    always @(posedge _316) begin
+        if (_314)
+            _3042 <= _761;
         else
-            if (_3003)
-                _3004 <= _2990;
+            if (_3041)
+                _3042 <= _3028;
     end
-    assign _3521 = _2989 + _482;
-    assign _3518 = ~ _1184;
-    assign _1812 = ~ _1184;
-    assign _803 = ~ _210;
-    assign _3508 = ~ _208;
-    assign _3509 = _210 & _3508;
-    assign _3512 = _3509 ? _2045 : _2046;
-    assign _3501 = ~ _820;
-    assign _3502 = _812 & _3501;
-    assign _3503 = _645 | _3502;
-    assign _3504 = _3503 | _3493;
-    assign _3506 = _3504 ? _2046 : _3500;
-    assign _3487 = g_run + _482;
-    assign _3484 = g_run + _482;
-    assign _3480 = vdd == g_last;
-    assign _3478 = g_run == _452;
-    assign _3479 = ~ _3478;
-    assign _3481 = _3479 & _3480;
-    assign _3485 = _3481 ? _3484 : _482;
-    assign _3476 = _188 == _2046;
-    assign _3488 = _3476 ? _3487 : _3485;
-    assign _3489 = _3488 == _154;
-    assign _3470 = g_run + _482;
-    assign _3466 = gnd == g_last;
-    assign _3464 = g_run == _452;
-    assign _3465 = ~ _3464;
-    assign _3467 = _3465 & _3466;
-    assign _3471 = _3467 ? _3470 : _482;
-    assign _3462 = _188 == _2046;
-    assign _3473 = _3462 ? _452 : _3471;
-    assign _3474 = _3473 == _154;
-    assign _3490 = _627 ? _3489 : _3474;
-    assign _3491 = _616 & _3490;
-    assign _3492 = ~ _3491;
-    assign _3458 = g_left == _2882;
-    assign _3456 = g_left == _3807;
-    assign _3459 = _2867 ? _3458 : _3456;
-    assign _3451 = g_cnt + _4178;
-    assign _3452 = _3451 == _782;
-    assign _3449 = g_cnt == _782;
-    assign _3453 = _784 ? _3452 : _3449;
-    assign _3447 = ~ _636;
-    assign _3448 = _591 & _3447;
-    assign _3454 = _3448 & _3453;
-    assign _3460 = _3454 & _3459;
-    assign _3493 = _3460 & _3492;
-    assign _3495 = _3493 ? _1961 : _3446;
-    assign _3497 = _636 ? _2539 : _3495;
-    assign _3443 = _820 ? _3441 : _1961;
-    assign _3439 = _520 & _518;
-    assign _3441 = _3439 ? _2046 : g_mode;
-    assign _3444 = _812 ? _3443 : _3441;
-    assign _3173 = _820 ? _3172 : _3148;
-    assign _3174 = _812 ? _3173 : _3148;
-    assign _152 = _3174;
-    always @(posedge _310) begin
-        if (_308)
-            _3148 <= _1817;
+    assign _3572 = _3027 + _488;
+    assign _3569 = ~ _1190;
+    assign _1818 = ~ _1190;
+    assign _809 = ~ _214;
+    assign _3559 = ~ _212;
+    assign _3560 = _214 & _3559;
+    assign _3563 = _3560 ? _2051 : _2052;
+    assign _3552 = ~ _826;
+    assign _3553 = _818 & _3552;
+    assign _3554 = _651 | _3553;
+    assign _3555 = _3554 | _3544;
+    assign _3557 = _3555 ? _2052 : _3551;
+    assign _3538 = g_run + _488;
+    assign _3535 = g_run + _488;
+    assign _3531 = vdd == g_last;
+    assign _3529 = g_run == _458;
+    assign _3530 = ~ _3529;
+    assign _3532 = _3530 & _3531;
+    assign _3536 = _3532 ? _3535 : _488;
+    assign _3527 = _192 == _2052;
+    assign _3539 = _3527 ? _3538 : _3536;
+    assign _3540 = _3539 == _156;
+    assign _3521 = g_run + _488;
+    assign _3517 = gnd == g_last;
+    assign _3515 = g_run == _458;
+    assign _3516 = ~ _3515;
+    assign _3518 = _3516 & _3517;
+    assign _3522 = _3518 ? _3521 : _488;
+    assign _3513 = _192 == _2052;
+    assign _3524 = _3513 ? _458 : _3522;
+    assign _3525 = _3524 == _156;
+    assign _3541 = _633 ? _3540 : _3525;
+    assign _3542 = _622 & _3541;
+    assign _3543 = ~ _3542;
+    assign _3509 = g_left == _2898;
+    assign _3507 = g_left == _3871;
+    assign _3510 = _2875 ? _3509 : _3507;
+    assign _3502 = g_cnt + _4242;
+    assign _3503 = _3502 == _788;
+    assign _3500 = g_cnt == _788;
+    assign _3504 = _790 ? _3503 : _3500;
+    assign _3498 = ~ _642;
+    assign _3499 = _597 & _3498;
+    assign _3505 = _3499 & _3504;
+    assign _3511 = _3505 & _3510;
+    assign _3544 = _3511 & _3543;
+    assign _3546 = _3544 ? _1967 : _3497;
+    assign _3548 = _642 ? _2545 : _3546;
+    assign _3494 = _826 ? _3492 : _1967;
+    assign _3490 = _526 & _524;
+    assign _3492 = _3490 ? _2052 : g_mode;
+    assign _3495 = _818 ? _3494 : _3492;
+    assign _3211 = _826 ? _3210 : _3186;
+    assign _3212 = _818 ? _3211 : _3186;
+    assign _154 = _3212;
+    always @(posedge _316) begin
+        if (_314)
+            _3186 <= _1823;
         else
-            _3148 <= _152;
+            _3186 <= _154;
     end
-    assign _3369 = ~ _3172;
-    assign _3367 = ~ f_lane1_out;
-    assign _3368 = _3172 ? f_lane1_out : _3367;
+    assign _3420 = ~ _3210;
+    assign _3418 = ~ f_lane1_out;
+    assign _3419 = _3210 ? f_lane1_out : _3418;
     always @* begin
-        case (_204)
+        case (_208)
         0:
-            _3370 <= _3172;
+            _3421 <= _3210;
         1:
-            _3370 <= _3368;
+            _3421 <= _3419;
         2:
-            _3370 <= _3369;
+            _3421 <= _3420;
         default:
-            _3370 <= _3172;
+            _3421 <= _3210;
         endcase
     end
-    assign _154 = host_lane1_stuff_len;
-    assign _3351 = g_run + _482;
-    assign _3352 = _627 ? _3351 : _452;
-    assign _3347 = g_run + _482;
-    assign _3343 = _627 == g_last;
-    assign _3341 = g_run == _452;
-    assign _3342 = ~ _3341;
-    assign _3344 = _3342 & _3343;
-    assign _3348 = _3344 ? _3347 : _482;
-    assign _3339 = _188 == _2046;
-    assign _3353 = _3339 ? _3352 : _3348;
-    assign _3354 = _636 ? _3337 : _3353;
-    assign _3333 = g_run + _482;
-    assign _3334 = _3172 ? _3333 : _452;
-    assign _3329 = g_run + _482;
-    assign _3169 = _3161[7:7];
-    assign _3168 = _3161[6:6];
-    assign _3167 = _3161[5:5];
-    assign _3166 = _3161[4:4];
-    assign _3165 = _3161[3:3];
-    assign _3164 = _3161[2:2];
-    assign _3163 = _3161[1:1];
-    assign _3159 = _3151[7:7];
-    assign _3158 = _3151[6:6];
-    assign _3157 = _3151[5:5];
-    assign _3156 = _3151[4:4];
-    assign _3155 = _3151[3:3];
-    assign _3154 = _3151[2:2];
-    assign _3153 = _3151[1:1];
-    assign _3150 = _1184 ? _757 : _3047;
-    assign _3087 = g_byte[7:1];
-    assign _3088 = { _627,
-                     _3087 };
-    assign _3085 = g_byte[6:0];
-    assign _3086 = { _3085,
-                     _627 };
-    assign _3089 = _157 ? _3088 : _3086;
-    assign _3179 = _793 ? _3089 : _3178;
-    assign _3180 = _784 ? _3179 : _3178;
-    assign _3181 = _769 ? _3180 : _3178;
-    assign _3182 = _636 ? _3178 : _3181;
-    assign _3175 = g_data_left ? _3151 : g_byte;
-    assign _3176 = _621 ? g_byte : _3175;
-    assign _3177 = _820 ? _3176 : g_byte;
-    assign _3178 = _812 ? _3177 : g_byte;
-    assign _3183 = _591 ? _3182 : _3178;
-    assign _155 = _3183;
-    always @(posedge _310) begin
-        if (_308)
-            g_byte <= _755;
+    assign _156 = host_lane1_stuff_len;
+    assign _3402 = g_run + _488;
+    assign _3403 = _633 ? _3402 : _458;
+    assign _3398 = g_run + _488;
+    assign _3394 = _633 == g_last;
+    assign _3392 = g_run == _458;
+    assign _3393 = ~ _3392;
+    assign _3395 = _3393 & _3394;
+    assign _3399 = _3395 ? _3398 : _488;
+    assign _3390 = _192 == _2052;
+    assign _3404 = _3390 ? _3403 : _3399;
+    assign _3405 = _642 ? _3388 : _3404;
+    assign _3384 = g_run + _488;
+    assign _3385 = _3210 ? _3384 : _458;
+    assign _3380 = g_run + _488;
+    assign _3207 = _3199[7:7];
+    assign _3206 = _3199[6:6];
+    assign _3205 = _3199[5:5];
+    assign _3204 = _3199[4:4];
+    assign _3203 = _3199[3:3];
+    assign _3202 = _3199[2:2];
+    assign _3201 = _3199[1:1];
+    assign _3197 = _3189[7:7];
+    assign _3196 = _3189[6:6];
+    assign _3195 = _3189[5:5];
+    assign _3194 = _3189[4:4];
+    assign _3193 = _3189[3:3];
+    assign _3192 = _3189[2:2];
+    assign _3191 = _3189[1:1];
+    assign _3188 = _1190 ? _763 : _3085;
+    assign _3125 = g_byte[7:1];
+    assign _3126 = { _633,
+                     _3125 };
+    assign _3123 = g_byte[6:0];
+    assign _3124 = { _3123,
+                     _633 };
+    assign _3127 = _159 ? _3126 : _3124;
+    assign _3217 = _799 ? _3127 : _3216;
+    assign _3218 = _790 ? _3217 : _3216;
+    assign _3219 = _775 ? _3218 : _3216;
+    assign _3220 = _642 ? _3216 : _3219;
+    assign _3213 = g_data_left ? _3189 : g_byte;
+    assign _3214 = _627 ? g_byte : _3213;
+    assign _3215 = _826 ? _3214 : g_byte;
+    assign _3216 = _818 ? _3215 : g_byte;
+    assign _3221 = _597 ? _3220 : _3216;
+    assign _157 = _3221;
+    always @(posedge _316) begin
+        if (_314)
+            g_byte <= _761;
         else
-            g_byte <= _155;
+            g_byte <= _157;
     end
-    assign _1809 = g_bitpos == _452;
-    assign _1806 = ~ _621;
-    assign _1807 = _1806 & g_data_left;
-    assign _1810 = _1807 & _1809;
-    assign _3151 = _1810 ? _3150 : g_byte;
-    assign _3152 = _3151[0:0];
-    assign _3160 = { _3152,
-                     _3153,
-                     _3154,
-                     _3155,
-                     _3156,
-                     _3157,
-                     _3158,
-                     _3159 };
-    assign _157 = host_lane1_lsb_first;
-    assign _3161 = _157 ? _3151 : _3160;
-    assign _3162 = _3161[0:0];
-    assign _3191 = g_bitpos + _482;
-    assign _789 = g_cnt[5:0];
-    assign _790 = _789 < _176;
-    assign _791 = ~ _790;
-    assign _785 = g_cnt[15:6];
-    assign _787 = _785 == _2013;
-    assign _788 = ~ _787;
-    assign _792 = _788 | _791;
-    assign _793 = _784 & _792;
-    assign _3192 = _793 ? _3191 : _3189;
-    assign _3193 = _784 ? _3192 : _3189;
-    assign _3194 = _769 ? _3193 : _3189;
-    assign _3195 = _636 ? _3189 : _3194;
-    assign _3185 = g_bitpos + _482;
-    assign _3186 = g_data_left ? _3185 : g_bitpos;
-    assign _3187 = _621 ? g_bitpos : _3186;
-    assign _3188 = _820 ? _3187 : g_bitpos;
-    assign _3189 = _812 ? _3188 : g_bitpos;
-    assign _3196 = _591 ? _3195 : _3189;
-    assign _3198 = _493 ? _452 : _3196;
-    assign _158 = _3198;
-    always @(posedge _310) begin
-        if (_308)
-            g_bitpos <= _452;
+    assign _1815 = g_bitpos == _458;
+    assign _1812 = ~ _627;
+    assign _1813 = _1812 & g_data_left;
+    assign _1816 = _1813 & _1815;
+    assign _3189 = _1816 ? _3188 : g_byte;
+    assign _3190 = _3189[0:0];
+    assign _3198 = { _3190,
+                     _3191,
+                     _3192,
+                     _3193,
+                     _3194,
+                     _3195,
+                     _3196,
+                     _3197 };
+    assign _159 = host_lane1_lsb_first;
+    assign _3199 = _159 ? _3189 : _3198;
+    assign _3200 = _3199[0:0];
+    assign _3229 = g_bitpos + _488;
+    assign _795 = g_cnt[5:0];
+    assign _796 = _795 < _178;
+    assign _797 = ~ _796;
+    assign _791 = g_cnt[15:6];
+    assign _793 = _791 == _2019;
+    assign _794 = ~ _793;
+    assign _798 = _794 | _797;
+    assign _799 = _790 & _798;
+    assign _3230 = _799 ? _3229 : _3227;
+    assign _3231 = _790 ? _3230 : _3227;
+    assign _3232 = _775 ? _3231 : _3227;
+    assign _3233 = _642 ? _3227 : _3232;
+    assign _3223 = g_bitpos + _488;
+    assign _3224 = g_data_left ? _3223 : g_bitpos;
+    assign _3225 = _627 ? g_bitpos : _3224;
+    assign _3226 = _826 ? _3225 : g_bitpos;
+    assign _3227 = _818 ? _3226 : g_bitpos;
+    assign _3234 = _597 ? _3233 : _3227;
+    assign _3236 = _499 ? _458 : _3234;
+    assign _160 = _3236;
+    always @(posedge _316) begin
+        if (_314)
+            g_bitpos <= _458;
         else
-            g_bitpos <= _158;
+            g_bitpos <= _160;
     end
     always @* begin
         case (g_bitpos)
         0:
-            _3170 <= _3162;
+            _3208 <= _3200;
         1:
-            _3170 <= _3163;
+            _3208 <= _3201;
         2:
-            _3170 <= _3164;
+            _3208 <= _3202;
         3:
-            _3170 <= _3165;
+            _3208 <= _3203;
         4:
-            _3170 <= _3166;
+            _3208 <= _3204;
         5:
-            _3170 <= _3167;
+            _3208 <= _3205;
         6:
-            _3170 <= _3168;
+            _3208 <= _3206;
         default:
-            _3170 <= _3169;
+            _3208 <= _3207;
         endcase
     end
-    assign _160 = host_lane1_crc_inv;
-    assign _162 = host_lane1_init;
-    assign _3240 = g_crc[30:0];
-    assign _3242 = { _3240,
-                     _1817 };
-    assign _3234 = g_crc[31:31];
-    assign _3235 = _627 ^ _3234;
-    assign _3237 = _3235 ? _167 : _2089;
-    assign _3231 = g_crc[30:0];
-    assign _3233 = { _3231,
-                     _1817 };
-    assign _3238 = _3233 ^ _3237;
-    assign _3239 = _784 ? _3238 : _3230;
-    assign _164 = host_lane1_crc_width;
-    assign _3208 = g_left - _2882;
-    assign _3209 = _2867 ? _3208 : _3206;
-    assign _3210 = _769 ? _3209 : _3206;
-    assign _3211 = _636 ? _3206 : _3210;
-    assign _3202 = g_left - _2882;
-    assign _3203 = g_data_left ? g_left : _3202;
-    assign _3204 = _621 ? g_left : _3203;
-    assign _3205 = _820 ? _3204 : g_left;
-    assign _3206 = _812 ? _3205 : g_left;
-    assign _3212 = _591 ? _3211 : _3206;
-    assign _3213 = _3200 ? _164 : _3212;
-    assign _3215 = _493 ? _3807 : _3213;
-    assign _165 = _3215;
-    always @(posedge _310) begin
-        if (_308)
-            g_left <= _3807;
+    assign _162 = host_lane1_crc_inv;
+    assign _164 = host_lane1_init;
+    assign _3289 = g_crc[30:0];
+    assign _3291 = { _3289,
+                     _1823 };
+    assign _3282 = g_crc[31:31];
+    assign _3283 = _633 ^ _3282;
+    assign _3285 = _3283 ? _169 : _2095;
+    assign _3279 = g_crc[30:0];
+    assign _3281 = { _3279,
+                     _1823 };
+    assign _3286 = _3281 ^ _3285;
+    assign _3275 = g_cnt[5:0];
+    assign _3276 = _3275 < _180;
+    assign _3277 = ~ _3276;
+    assign _3270 = g_cnt[15:6];
+    assign _3272 = _3270 == _2019;
+    assign _3273 = ~ _3272;
+    assign _3269 = ~ _182;
+    assign _3274 = _3269 | _3273;
+    assign _3278 = _3274 | _3277;
+    assign _3287 = _3278 ? _3286 : _3268;
+    assign _3288 = _790 ? _3287 : _3268;
+    assign _166 = host_lane1_crc_width;
+    assign _3246 = g_left - _2898;
+    assign _3247 = _2875 ? _3246 : _3244;
+    assign _3248 = _775 ? _3247 : _3244;
+    assign _3249 = _642 ? _3244 : _3248;
+    assign _3240 = g_left - _2898;
+    assign _3241 = g_data_left ? g_left : _3240;
+    assign _3242 = _627 ? g_left : _3241;
+    assign _3243 = _826 ? _3242 : g_left;
+    assign _3244 = _818 ? _3243 : g_left;
+    assign _3250 = _597 ? _3249 : _3244;
+    assign _3251 = _3238 ? _166 : _3250;
+    assign _3253 = _499 ? _3871 : _3251;
+    assign _167 = _3253;
+    always @(posedge _316) begin
+        if (_314)
+            g_left <= _3871;
         else
-            g_left <= _165;
+            g_left <= _167;
     end
-    assign _818 = g_left == _3807;
-    assign _819 = ~ _818;
-    assign _2865 = ~ g_data_left;
-    assign _2864 = _591 & _769;
-    assign _2866 = _2864 & _2865;
-    assign _2867 = _2866 & _819;
-    assign _3243 = _2867 ? _3242 : _3239;
-    assign _3244 = _769 ? _3243 : _3230;
-    assign _3245 = _636 ? _3230 : _3244;
-    assign _167 = host_lane1_poly;
-    assign _3222 = g_crc[31:31];
-    assign _3223 = _3172 ^ _3222;
-    assign _3225 = _3223 ? _167 : _2089;
-    assign _3219 = g_crc[30:0];
-    assign _3221 = { _3219,
-                     _1817 };
-    assign _3226 = _3221 ^ _3225;
-    assign _3216 = g_crc[30:0];
-    assign _3218 = { _3216,
-                     _1817 };
-    assign _3227 = g_data_left ? _3226 : _3218;
-    assign _3228 = _621 ? g_crc : _3227;
-    assign _3229 = _820 ? _3228 : g_crc;
-    assign _3230 = _812 ? _3229 : g_crc;
-    assign _3246 = _591 ? _3245 : _3230;
-    assign _3247 = _493 ? _162 : _3246;
-    assign _3249 = _491 ? _2089 : _3247;
-    assign _168 = _3249;
-    always @(posedge _310) begin
-        if (_308)
-            g_crc <= _2089;
+    assign _824 = g_left == _3871;
+    assign _825 = ~ _824;
+    assign _2873 = ~ g_data_left;
+    assign _2872 = _597 & _775;
+    assign _2874 = _2872 & _2873;
+    assign _2875 = _2874 & _825;
+    assign _3292 = _2875 ? _3291 : _3288;
+    assign _3293 = _775 ? _3292 : _3268;
+    assign _3294 = _642 ? _3268 : _3293;
+    assign _169 = host_lane1_poly;
+    assign _3260 = g_crc[31:31];
+    assign _3261 = _3210 ^ _3260;
+    assign _3263 = _3261 ? _169 : _2095;
+    assign _3257 = g_crc[30:0];
+    assign _3259 = { _3257,
+                     _1823 };
+    assign _3264 = _3259 ^ _3263;
+    assign _3254 = g_crc[30:0];
+    assign _3256 = { _3254,
+                     _1823 };
+    assign _3265 = g_data_left ? _3264 : _3256;
+    assign _3266 = _627 ? g_crc : _3265;
+    assign _3267 = _826 ? _3266 : g_crc;
+    assign _3268 = _818 ? _3267 : g_crc;
+    assign _3295 = _597 ? _3294 : _3268;
+    assign _3296 = _499 ? _164 : _3295;
+    assign _3298 = _497 ? _2095 : _3296;
+    assign _170 = _3298;
+    always @(posedge _316) begin
+        if (_314)
+            g_crc <= _2095;
         else
-            g_crc <= _168;
+            g_crc <= _170;
     end
-    assign _2871 = g_crc[31:31];
-    assign _2872 = _2871 ^ _160;
-    assign _3265 = _3264 ? _3262 : g_lim;
-    assign _3266 = g_len_cap ? _3265 : g_lim;
-    assign _169 = _3266;
-    always @(posedge _310) begin
-        if (_308)
-            g_lim <= _755;
+    assign _2879 = g_crc[31:31];
+    assign _2880 = _2879 ^ _162;
+    assign _3314 = _3313 ? _3311 : g_lim;
+    assign _3315 = g_len_cap ? _3314 : g_lim;
+    assign _171 = _3315;
+    always @(posedge _316) begin
+        if (_314)
+            g_lim <= _761;
         else
-            g_lim <= _169;
+            g_lim <= _171;
     end
-    assign _781 = { _755,
+    assign _787 = { _761,
                     g_lim };
-    assign _171 = host_lane1_frame_bits;
-    assign _2846 = g_sr[14:0];
-    assign _2847 = { _2846,
-                     _627 };
-    assign _3267 = _769 ? _2847 : g_sr;
-    assign _3268 = _636 ? g_sr : _3267;
-    assign _3269 = _591 ? _3268 : g_sr;
-    assign _3271 = _493 ? _1683 : _3269;
-    assign _172 = _3271;
-    always @(posedge _310) begin
-        if (_308)
-            g_sr <= _1683;
+    assign _173 = host_lane1_frame_bits;
+    assign _2853 = g_sr[14:0];
+    assign _2854 = { _2853,
+                     _633 };
+    assign _3316 = _775 ? _2854 : g_sr;
+    assign _3317 = _642 ? g_sr : _3316;
+    assign _3318 = _597 ? _3317 : g_sr;
+    assign _3320 = _499 ? _1689 : _3318;
+    assign _174 = _3320;
+    always @(posedge _316) begin
+        if (_314)
+            g_sr <= _1689;
         else
-            g_sr <= _172;
+            g_sr <= _174;
     end
-    assign _3257 = g_sr[3:0];
-    assign _174 = host_lane1_len_max;
-    assign _3258 = _174 < _3257;
-    assign _3259 = _3258 ? _174 : _3257;
-    assign _3261 = { _1817,
-                     _3259,
-                     _452 };
-    assign _176 = host_lane1_skip;
-    assign _3255 = { _2539,
-                     _176 };
-    assign _3262 = _3255 + _3261;
-    assign _3263 = { _755,
-                     _3262 };
-    assign _3264 = _3263 < _171;
-    assign _3290 = _3264 ? _1819 : g_len_known;
-    assign _178 = host_lane1_len_pos;
-    assign _3276 = g_cnt[5:0];
-    assign _3277 = _3276 == _178;
-    assign _3272 = g_cnt[15:6];
-    assign _3274 = _3272 == _2013;
-    assign _180 = host_lane1_len_en;
-    assign _3275 = _180 & _3274;
-    assign _3278 = _3275 & _3277;
-    assign _3280 = _3278 ? _1819 : g_len_cap;
-    assign _3281 = _784 ? _3280 : g_len_cap;
-    assign _3282 = _769 ? _3281 : g_len_cap;
-    assign _3283 = _636 ? g_len_cap : _3282;
-    assign _3284 = _591 ? _3283 : g_len_cap;
-    assign _3286 = g_len_cap ? _1817 : _3284;
-    assign _3288 = _493 ? _1817 : _3286;
-    assign _181 = _3288;
-    always @(posedge _310) begin
-        if (_308)
-            g_len_cap <= _1817;
+    assign _3306 = g_sr[3:0];
+    assign _176 = host_lane1_len_max;
+    assign _3307 = _176 < _3306;
+    assign _3308 = _3307 ? _176 : _3306;
+    assign _3310 = { _1823,
+                     _3308,
+                     _458 };
+    assign _178 = host_lane1_skip;
+    assign _3304 = { _2545,
+                     _178 };
+    assign _3311 = _3304 + _3310;
+    assign _3312 = { _761,
+                     _3311 };
+    assign _3313 = _3312 < _173;
+    assign _3341 = _3313 ? _1825 : g_len_known;
+    assign _180 = host_lane1_len_pos;
+    assign _3327 = g_cnt[5:0];
+    assign _3328 = _3327 == _180;
+    assign _3323 = g_cnt[15:6];
+    assign _3325 = _3323 == _2019;
+    assign _182 = host_lane1_crc_resid;
+    assign _3321 = ~ _182;
+    assign _184 = host_lane1_len_en;
+    assign _3322 = _184 & _3321;
+    assign _3326 = _3322 & _3325;
+    assign _3329 = _3326 & _3328;
+    assign _3331 = _3329 ? _1825 : g_len_cap;
+    assign _3332 = _790 ? _3331 : g_len_cap;
+    assign _3333 = _775 ? _3332 : g_len_cap;
+    assign _3334 = _642 ? g_len_cap : _3333;
+    assign _3335 = _597 ? _3334 : g_len_cap;
+    assign _3337 = g_len_cap ? _1823 : _3335;
+    assign _3339 = _499 ? _1823 : _3337;
+    assign _185 = _3339;
+    always @(posedge _316) begin
+        if (_314)
+            g_len_cap <= _1823;
         else
-            g_len_cap <= _181;
+            g_len_cap <= _185;
     end
-    assign _3291 = g_len_cap ? _3290 : g_len_known;
-    assign _3293 = _493 ? _1817 : _3291;
-    assign _182 = _3293;
-    always @(posedge _310) begin
-        if (_308)
-            g_len_known <= _1817;
+    assign _3342 = g_len_cap ? _3341 : g_len_known;
+    assign _3344 = _499 ? _1823 : _3342;
+    assign _186 = _3344;
+    always @(posedge _316) begin
+        if (_314)
+            g_len_known <= _1823;
         else
-            g_len_known <= _182;
+            g_len_known <= _186;
     end
-    assign _782 = g_len_known ? _781 : _171;
-    assign _3313 = g_cnt + _4178;
-    assign _770 = _591 & _769;
-    assign _784 = _770 & g_data_left;
-    assign _3314 = _784 ? _3313 : _3311;
-    assign _769 = ~ _621;
-    assign _3315 = _769 ? _3314 : _3311;
-    assign _3296 = _636 ? _3295 : _627;
-    assign _3294 = _820 ? _3172 : g_last;
-    assign _3295 = _812 ? _3294 : g_last;
-    assign _3297 = _591 ? _3296 : _3295;
-    assign _3299 = _493 ? _1819 : _3297;
-    assign _183 = _3299;
-    always @(posedge _310) begin
-        if (_308)
+    assign _788 = g_len_known ? _787 : _173;
+    assign _3364 = g_cnt + _4242;
+    assign _776 = _597 & _775;
+    assign _790 = _776 & g_data_left;
+    assign _3365 = _790 ? _3364 : _3362;
+    assign _775 = ~ _627;
+    assign _3366 = _775 ? _3365 : _3362;
+    assign _3347 = _642 ? _3346 : _633;
+    assign _3345 = _826 ? _3210 : g_last;
+    assign _3346 = _818 ? _3345 : g_last;
+    assign _3348 = _597 ? _3347 : _3346;
+    assign _3350 = _499 ? _1825 : _3348;
+    assign _187 = _3350;
+    always @(posedge _316) begin
+        if (_314)
             g_last <= vdd;
         else
-            g_last <= _183;
+            g_last <= _187;
     end
-    assign _632 = ~ g_last;
-    assign _629 = _188 == _2045;
-    assign _633 = _629 ? _632 : gnd;
-    assign _3301 = _204 == _2045;
-    assign _3302 = _3301 ? _511 : g_prev;
-    assign _3303 = _591 ? _3302 : g_prev;
-    assign _3305 = _493 ? _1819 : _3303;
-    assign _184 = _3305;
-    always @(posedge _310) begin
-        if (_308)
+    assign _638 = ~ g_last;
+    assign _635 = _192 == _2051;
+    assign _639 = _635 ? _638 : gnd;
+    assign _3352 = _208 == _2051;
+    assign _3353 = _3352 ? _517 : g_prev;
+    assign _3354 = _597 ? _3353 : g_prev;
+    assign _3356 = _499 ? _1825 : _3354;
+    assign _188 = _3356;
+    always @(posedge _316) begin
+        if (_314)
             g_prev <= vdd;
         else
-            g_prev <= _184;
+            g_prev <= _188;
     end
-    assign _626 = _511 == g_prev;
-    assign _623 = _204 == _2045;
-    assign _627 = _623 ? _626 : _511;
-    assign _634 = _627 == _633;
-    assign _635 = ~ _634;
-    assign _636 = _621 & _635;
-    assign _3316 = _636 ? _3311 : _3315;
-    assign _3307 = g_cnt + _4178;
-    assign _3308 = g_data_left ? _3307 : g_cnt;
-    assign _3309 = _621 ? g_cnt : _3308;
-    assign _3310 = _820 ? _3309 : g_cnt;
-    assign _3311 = _812 ? _3310 : g_cnt;
-    assign _3317 = _591 ? _3316 : _3311;
-    assign _3319 = _493 ? _1683 : _3317;
-    assign _185 = _3319;
-    always @(posedge _310) begin
-        if (_308)
-            g_cnt <= _1683;
+    assign _632 = _517 == g_prev;
+    assign _629 = _208 == _2051;
+    assign _633 = _629 ? _632 : _517;
+    assign _640 = _633 == _639;
+    assign _641 = ~ _640;
+    assign _642 = _627 & _641;
+    assign _3367 = _642 ? _3362 : _3366;
+    assign _3358 = g_cnt + _4242;
+    assign _3359 = g_data_left ? _3358 : g_cnt;
+    assign _3360 = _627 ? g_cnt : _3359;
+    assign _3361 = _826 ? _3360 : g_cnt;
+    assign _3362 = _818 ? _3361 : g_cnt;
+    assign _3368 = _597 ? _3367 : _3362;
+    assign _3370 = _499 ? _1689 : _3368;
+    assign _189 = _3370;
+    always @(posedge _316) begin
+        if (_314)
+            g_cnt <= _1689;
         else
-            g_cnt <= _185;
+            g_cnt <= _189;
     end
-    assign g_data_left = g_cnt < _782;
-    assign _3171 = g_data_left ? _3170 : _2872;
-    assign _3172 = _621 ? _633 : _3171;
-    assign _3325 = _3172 == g_last;
-    assign _3323 = g_run == _452;
-    assign _3324 = ~ _3323;
-    assign _3326 = _3324 & _3325;
-    assign _3330 = _3326 ? _3329 : _482;
-    assign _3321 = _188 == _2046;
-    assign _3335 = _3321 ? _3334 : _3330;
-    assign _3336 = _820 ? _3335 : g_run;
-    assign _3337 = _812 ? _3336 : g_run;
-    assign _3355 = _591 ? _3354 : _3337;
-    assign _3357 = _493 ? _452 : _3355;
-    assign _186 = _3357;
-    always @(posedge _310) begin
-        if (_308)
-            g_run <= _452;
+    assign g_data_left = g_cnt < _788;
+    assign _3209 = g_data_left ? _3208 : _2880;
+    assign _3210 = _627 ? _639 : _3209;
+    assign _3376 = _3210 == g_last;
+    assign _3374 = g_run == _458;
+    assign _3375 = ~ _3374;
+    assign _3377 = _3375 & _3376;
+    assign _3381 = _3377 ? _3380 : _488;
+    assign _3372 = _192 == _2052;
+    assign _3386 = _3372 ? _3385 : _3381;
+    assign _3387 = _826 ? _3386 : g_run;
+    assign _3388 = _818 ? _3387 : g_run;
+    assign _3406 = _597 ? _3405 : _3388;
+    assign _3408 = _499 ? _458 : _3406;
+    assign _190 = _3408;
+    always @(posedge _316) begin
+        if (_314)
+            g_run <= _458;
         else
-            g_run <= _186;
+            g_run <= _190;
     end
-    assign _620 = g_run == _154;
-    assign _188 = host_lane1_stuff;
-    assign _615 = _188 == _2539;
-    assign _616 = ~ _615;
-    assign _621 = _616 & _620;
-    assign _813 = _621 | g_data_left;
-    assign _820 = _813 | _819;
-    assign _3371 = _820 ? _3370 : _1819;
-    assign _3372 = _812 ? _3371 : f_lane1_out;
-    assign _808 = _564 == _1683;
-    assign _806 = _529 == _1683;
-    assign _809 = _557 ? _808 : _806;
-    assign _810 = _525 ? vdd : _809;
-    assign _811 = _208 ? _589 : _810;
-    assign _3364 = ~ _811;
-    assign _3361 = _204 == _2046;
-    assign _3358 = ~ _210;
-    assign _3359 = _498 & _3358;
-    assign _3362 = _3359 & _3361;
-    assign _3363 = _3362 & _590;
-    assign _3365 = _3363 & _3364;
-    assign _3373 = _3365 ? _3148 : _3372;
-    assign _3375 = _606 ? _1819 : _3373;
-    assign _3377 = _801 ? _1819 : _3375;
-    assign _3379 = _493 ? _1819 : _3377;
-    assign _3381 = _491 ? _1819 : _3379;
-    assign _189 = _3381;
-    always @(posedge _310) begin
-        if (_308)
+    assign _626 = g_run == _156;
+    assign _192 = host_lane1_stuff;
+    assign _621 = _192 == _2545;
+    assign _622 = ~ _621;
+    assign _627 = _622 & _626;
+    assign _819 = _627 | g_data_left;
+    assign _826 = _819 | _825;
+    assign _3422 = _826 ? _3421 : _1825;
+    assign _3423 = _818 ? _3422 : f_lane1_out;
+    assign _814 = _570 == _1689;
+    assign _812 = _535 == _1689;
+    assign _815 = _563 ? _814 : _812;
+    assign _816 = _531 ? vdd : _815;
+    assign _817 = _212 ? _595 : _816;
+    assign _3415 = ~ _817;
+    assign _3412 = _208 == _2052;
+    assign _3409 = ~ _214;
+    assign _3410 = _504 & _3409;
+    assign _3413 = _3410 & _3412;
+    assign _3414 = _3413 & _596;
+    assign _3416 = _3414 & _3415;
+    assign _3424 = _3416 ? _3186 : _3423;
+    assign _3426 = _612 ? _1825 : _3424;
+    assign _3428 = _807 ? _1825 : _3426;
+    assign _3430 = _499 ? _1825 : _3428;
+    assign _3432 = _497 ? _1825 : _3430;
+    assign _193 = _3432;
+    always @(posedge _316) begin
+        if (_314)
             f_lane1_out <= vdd;
         else
-            f_lane1_out <= _189;
+            f_lane1_out <= _193;
     end
-    assign _604 = _511 == f_lane1_out;
+    assign _610 = _517 == f_lane1_out;
+    assign _611 = ~ _610;
+    assign _604 = _208 == _2052;
     assign _605 = ~ _604;
-    assign _598 = _204 == _2046;
-    assign _599 = ~ _598;
-    assign _595 = ~ _208;
-    assign _191 = host_lane1_readback;
-    assign _592 = ~ _210;
-    assign _593 = _498 & _592;
-    assign _594 = _593 & _191;
-    assign _596 = _594 & _595;
-    assign _600 = _596 & _599;
-    assign _601 = _600 & _590;
-    assign _606 = _601 & _605;
-    assign _3446 = _606 ? _2539 : _3444;
-    assign _587 = ~ _581;
-    assign _588 = _584 & _587;
-    always @(posedge _310) begin
-        if (_308)
-            _584 <= _1817;
+    assign _601 = ~ _212;
+    assign _195 = host_lane1_readback;
+    assign _598 = ~ _214;
+    assign _599 = _504 & _598;
+    assign _600 = _599 & _195;
+    assign _602 = _600 & _601;
+    assign _606 = _602 & _605;
+    assign _607 = _606 & _596;
+    assign _612 = _607 & _611;
+    assign _3497 = _612 ? _2545 : _3495;
+    assign _593 = ~ _587;
+    assign _594 = _590 & _593;
+    always @(posedge _316) begin
+        if (_314)
+            _590 <= _1823;
         else
+            _590 <= _587;
+    end
+    assign _591 = ~ _590;
+    assign _583 = _349[7:7];
+    assign _582 = _349[6:6];
+    assign _581 = _349[5:5];
+    assign _580 = _349[4:4];
+    assign _579 = _349[3:3];
+    assign _578 = _349[2:2];
+    assign _577 = _349[1:1];
+    assign _576 = _349[0:0];
+    assign _197 = host_lane1_clk_pin;
+    always @* begin
+        case (_197)
+        0:
+            _584 <= _576;
+        1:
+            _584 <= _577;
+        2:
+            _584 <= _578;
+        3:
+            _584 <= _579;
+        4:
+            _584 <= _580;
+        5:
             _584 <= _581;
-    end
-    assign _585 = ~ _584;
-    assign _577 = _343[7:7];
-    assign _576 = _343[6:6];
-    assign _575 = _343[5:5];
-    assign _574 = _343[4:4];
-    assign _573 = _343[3:3];
-    assign _572 = _343[2:2];
-    assign _571 = _343[1:1];
-    assign _570 = _343[0:0];
-    assign _193 = host_lane1_clk_pin;
-    always @* begin
-        case (_193)
-        0:
-            _578 <= _570;
-        1:
-            _578 <= _571;
-        2:
-            _578 <= _572;
-        3:
-            _578 <= _573;
-        4:
-            _578 <= _574;
-        5:
-            _578 <= _575;
         6:
-            _578 <= _576;
+            _584 <= _582;
         default:
-            _578 <= _577;
+            _584 <= _583;
         endcase
     end
-    always @(posedge _310) begin
-        if (_308)
-            _581 <= _1817;
+    always @(posedge _316) begin
+        if (_314)
+            _587 <= _1823;
         else
-            _581 <= _578;
+            _587 <= _584;
     end
-    assign _586 = _581 & _585;
-    assign _195 = host_lane1_clk_edge;
-    assign _589 = _195 ? _588 : _586;
-    assign _568 = _553 == _1683;
-    assign _565 = _564 == _553;
-    assign _558 = _529 == _553;
-    assign _556 = ~ _520;
-    assign _547 = _197[15:2];
-    assign _548 = { _2539,
+    assign _592 = _587 & _591;
+    assign _199 = host_lane1_clk_edge;
+    assign _595 = _199 ? _594 : _592;
+    assign _574 = _559 == _1689;
+    assign _571 = _570 == _559;
+    assign _564 = _535 == _559;
+    assign _562 = ~ _526;
+    assign _553 = _201[15:2];
+    assign _554 = { _2545,
+                    _553 };
+    assign _550 = _201[15:1];
+    assign _551 = { _1823,
+                    _550 };
+    assign _555 = _551 + _554;
+    assign _547 = _201[15:1];
+    assign _548 = { _1823,
                     _547 };
-    assign _544 = _197[15:1];
-    assign _545 = { _1817,
-                    _544 };
-    assign _549 = _545 + _548;
-    assign _541 = _197[15:1];
-    assign _542 = { _1817,
-                    _541 };
-    assign _539 = _210 & _522;
-    assign _550 = _539 ? _549 : _542;
-    always @(posedge _310) begin
-        if (_308)
-            _553 <= _1683;
+    assign _545 = _214 & _528;
+    assign _556 = _545 ? _555 : _548;
+    always @(posedge _316) begin
+        if (_314)
+            _559 <= _1689;
         else
-            _553 <= _550;
+            _559 <= _556;
     end
-    assign _554 = _529 < _553;
-    assign _531 = _197[15:2];
-    assign _532 = { _2539,
-                    _531 };
-    always @(posedge _310) begin
-        if (_308)
-            _535 <= _1683;
+    assign _560 = _535 < _559;
+    assign _537 = _201[15:2];
+    assign _538 = { _2545,
+                    _537 };
+    always @(posedge _316) begin
+        if (_314)
+            _541 <= _1689;
         else
-            _535 <= _532;
+            _541 <= _538;
     end
-    assign _3427 = ~ _520;
-    assign _3428 = _555 & _3427;
-    assign _3429 = _3428 ? _564 : _529;
-    assign _3431 = _525 ? _1683 : _3429;
-    assign _3433 = _3431 + _4178;
-    assign _3411 = _3405 == _1640;
-    assign _560 = _197[15:1];
-    assign _561 = { _1817,
-                    _560 };
-    always @(posedge _310) begin
-        if (_308)
-            _564 <= _1683;
+    assign _3478 = ~ _526;
+    assign _3479 = _561 & _3478;
+    assign _3480 = _3479 ? _570 : _535;
+    assign _3482 = _531 ? _1689 : _3480;
+    assign _3484 = _3482 + _4242;
+    assign _3462 = _3456 == _1646;
+    assign _566 = _201[15:1];
+    assign _567 = { _1823,
+                    _566 };
+    always @(posedge _316) begin
+        if (_314)
+            _570 <= _1689;
         else
-            _564 <= _561;
+            _570 <= _567;
     end
-    assign _3407 = { gnd,
-                     _564 };
-    assign _3408 = _3407 == _3405;
-    assign _3401 = { gnd,
-                     _197 };
-    always @(posedge _310) begin
-        if (_308)
-            _3404 <= _1640;
+    assign _3458 = { gnd,
+                     _570 };
+    assign _3459 = _3458 == _3456;
+    assign _3452 = { gnd,
+                     _201 };
+    always @(posedge _316) begin
+        if (_314)
+            _3455 <= _1646;
         else
-            _3404 <= _3401;
+            _3455 <= _3452;
     end
-    assign _3396 = 17'b00000000000000001;
-    assign _197 = host_lane1_div_int;
-    assign _3395 = { gnd,
-                     _197 };
-    assign _3397 = _3395 - _3396;
-    always @(posedge _310) begin
-        if (_308)
-            _3400 <= _1640;
+    assign _3447 = 17'b00000000000000001;
+    assign _201 = host_lane1_div_int;
+    assign _3446 = { gnd,
+                     _201 };
+    assign _3448 = _3446 - _3447;
+    always @(posedge _316) begin
+        if (_314)
+            _3451 <= _1646;
         else
-            _3400 <= _3397;
+            _3451 <= _3448;
     end
-    assign _199 = host_lane1_div_frac;
-    assign _3415 = { gnd,
-                     _199 };
-    assign _3417 = _3416[7:0];
-    assign _3418 = _3413 ? _3417 : _3389;
-    assign _3419 = _3386 ? _3418 : _3389;
-    assign _3421 = _493 ? _755 : _3419;
-    assign _200 = _3421;
-    always @(posedge _310) begin
-        if (_308)
-            _3389 <= _755;
+    assign _203 = host_lane1_div_frac;
+    assign _3466 = { gnd,
+                     _203 };
+    assign _3468 = _3467[7:0];
+    assign _3469 = _3464 ? _3468 : _3440;
+    assign _3470 = _3437 ? _3469 : _3440;
+    assign _3472 = _499 ? _761 : _3470;
+    assign _204 = _3472;
+    always @(posedge _316) begin
+        if (_314)
+            _3440 <= _761;
         else
-            _3389 <= _200;
+            _3440 <= _204;
     end
-    assign _3414 = { gnd,
-                     _3389 };
-    assign _3416 = _3414 + _3415;
-    assign _3422 = _3416[8:8];
-    assign _3423 = _3413 ? _3422 : _3394;
-    assign _3424 = _3386 ? _3423 : _3394;
-    assign _3426 = _493 ? _1817 : _3424;
-    assign _201 = _3426;
-    always @(posedge _310) begin
-        if (_308)
-            _3394 <= _1817;
+    assign _3465 = { gnd,
+                     _3440 };
+    assign _3467 = _3465 + _3466;
+    assign _3473 = _3467[8:8];
+    assign _3474 = _3464 ? _3473 : _3445;
+    assign _3475 = _3437 ? _3474 : _3445;
+    assign _3477 = _499 ? _1823 : _3475;
+    assign _205 = _3477;
+    always @(posedge _316) begin
+        if (_314)
+            _3445 <= _1823;
         else
-            _3394 <= _201;
+            _3445 <= _205;
     end
-    assign _3405 = _3394 ? _3404 : _3400;
-    assign _3391 = { gnd,
-                     _529 };
-    assign _3406 = _3391 == _3405;
-    assign _3409 = _557 ? _3408 : _3406;
-    assign _3412 = _525 ? _3411 : _3409;
-    assign _3390 = ~ _208;
-    assign _3413 = _3390 & _3412;
-    assign _3435 = _3413 ? _1683 : _3433;
-    assign _3385 = ~ _208;
-    assign _3383 = _520 & _518;
-    assign _645 = g_mode == _1961;
-    assign _3382 = _498 | _645;
-    assign _3384 = _3382 | _3383;
-    assign _3386 = _3384 & _3385;
-    assign _3436 = _3386 ? _3435 : _529;
-    assign _3438 = _493 ? _1683 : _3436;
-    assign _202 = _3438;
-    always @(posedge _310) begin
-        if (_308)
-            _529 <= _1683;
+    assign _3456 = _3445 ? _3455 : _3451;
+    assign _3442 = { gnd,
+                     _535 };
+    assign _3457 = _3442 == _3456;
+    assign _3460 = _563 ? _3459 : _3457;
+    assign _3463 = _531 ? _3462 : _3460;
+    assign _3441 = ~ _212;
+    assign _3464 = _3441 & _3463;
+    assign _3486 = _3464 ? _1689 : _3484;
+    assign _3436 = ~ _212;
+    assign _3434 = _526 & _524;
+    assign _651 = g_mode == _1967;
+    assign _3433 = _504 | _651;
+    assign _3435 = _3433 | _3434;
+    assign _3437 = _3435 & _3436;
+    assign _3487 = _3437 ? _3486 : _535;
+    assign _3489 = _499 ? _1689 : _3487;
+    assign _206 = _3489;
+    always @(posedge _316) begin
+        if (_314)
+            _535 <= _1689;
         else
-            _529 <= _202;
+            _535 <= _206;
     end
-    assign _536 = _529 < _535;
-    assign _537 = ~ _536;
-    assign _526 = _518 & _522;
-    assign _538 = _526 & _537;
-    assign _555 = _538 & _554;
-    assign _557 = _555 & _556;
-    assign _566 = _557 ? _565 : _558;
-    assign _204 = host_lane1_code;
-    assign _522 = _204 == _2046;
-    assign _523 = ~ _522;
-    assign _520 = g_mode == _2045;
-    assign _524 = _520 | _523;
-    assign _517 = ~ _208;
-    always @(posedge _310) begin
-        if (_308)
-            _514 <= _1817;
+    assign _542 = _535 < _541;
+    assign _543 = ~ _542;
+    assign _532 = _524 & _528;
+    assign _544 = _532 & _543;
+    assign _561 = _544 & _560;
+    assign _563 = _561 & _562;
+    assign _572 = _563 ? _571 : _564;
+    assign _208 = host_lane1_code;
+    assign _528 = _208 == _2052;
+    assign _529 = ~ _528;
+    assign _526 = g_mode == _2051;
+    assign _530 = _526 | _529;
+    assign _523 = ~ _212;
+    always @(posedge _316) begin
+        if (_314)
+            _520 <= _1823;
         else
+            _520 <= _517;
+    end
+    assign _513 = _349[7:7];
+    assign _512 = _349[6:6];
+    assign _511 = _349[5:5];
+    assign _510 = _349[4:4];
+    assign _509 = _349[3:3];
+    assign _508 = _349[2:2];
+    assign _507 = _349[1:1];
+    assign _506 = _349[0:0];
+    assign _210 = host_lane1_data_pin;
+    always @* begin
+        case (_210)
+        0:
+            _514 <= _506;
+        1:
+            _514 <= _507;
+        2:
+            _514 <= _508;
+        3:
+            _514 <= _509;
+        4:
+            _514 <= _510;
+        5:
             _514 <= _511;
-    end
-    assign _507 = _343[7:7];
-    assign _506 = _343[6:6];
-    assign _505 = _343[5:5];
-    assign _504 = _343[4:4];
-    assign _503 = _343[3:3];
-    assign _502 = _343[2:2];
-    assign _501 = _343[1:1];
-    assign _500 = _343[0:0];
-    assign _206 = host_lane1_data_pin;
-    always @* begin
-        case (_206)
-        0:
-            _508 <= _500;
-        1:
-            _508 <= _501;
-        2:
-            _508 <= _502;
-        3:
-            _508 <= _503;
-        4:
-            _508 <= _504;
-        5:
-            _508 <= _505;
         6:
-            _508 <= _506;
+            _514 <= _512;
         default:
-            _508 <= _507;
+            _514 <= _513;
         endcase
     end
-    always @(posedge _310) begin
-        if (_308)
-            _511 <= _1817;
+    always @(posedge _316) begin
+        if (_314)
+            _517 <= _1823;
         else
-            _511 <= _508;
+            _517 <= _514;
     end
-    assign _515 = _511 ^ _514;
-    assign _516 = _210 & _515;
-    assign _518 = _516 & _517;
-    assign _525 = _518 & _524;
-    assign _569 = _525 ? _568 : _566;
-    assign _208 = host_lane1_clk_pin_en;
-    assign _590 = _208 ? _589 : _569;
-    assign _210 = host_lane1_dir;
-    assign _499 = _498 & _210;
-    assign _591 = _499 & _590;
-    assign _3498 = _591 ? _3497 : _3446;
-    assign _801 = _270 == _1863;
-    assign _3500 = _801 ? _2539 : _3498;
-    assign _3200 = _270 == _2464;
-    assign _3507 = _3200 ? _3506 : _3500;
-    assign _493 = _270 == _1864;
-    assign _3513 = _493 ? _3512 : _3507;
-    assign _490 = _270 == _455;
-    assign _491 = _490 | _317;
-    assign _3515 = _491 ? _2539 : _3513;
-    assign _211 = _3515;
-    always @(posedge _310) begin
-        if (_308)
-            g_mode <= _2539;
+    assign _521 = _517 ^ _520;
+    assign _522 = _214 & _521;
+    assign _524 = _522 & _523;
+    assign _531 = _524 & _530;
+    assign _575 = _531 ? _574 : _572;
+    assign _212 = host_lane1_clk_pin_en;
+    assign _596 = _212 ? _595 : _575;
+    assign _214 = host_lane1_dir;
+    assign _505 = _504 & _214;
+    assign _597 = _505 & _596;
+    assign _3549 = _597 ? _3548 : _3497;
+    assign _807 = _276 == _1869;
+    assign _3551 = _807 ? _2545 : _3549;
+    assign _3238 = _276 == _2470;
+    assign _3558 = _3238 ? _3557 : _3551;
+    assign _499 = _276 == _1870;
+    assign _3564 = _499 ? _3563 : _3558;
+    assign _496 = _276 == _461;
+    assign _497 = _496 | _323;
+    assign _3566 = _497 ? _2545 : _3564;
+    assign _215 = _3566;
+    always @(posedge _316) begin
+        if (_314)
+            g_mode <= _2545;
         else
-            g_mode <= _211;
+            g_mode <= _215;
     end
-    assign _498 = g_mode == _2046;
-    assign _804 = _498 & _803;
-    assign _812 = _804 & _811;
-    assign _1811 = _812 & _1810;
-    assign _1813 = _1811 & _1812;
-    assign _1804 = ~ _1184;
-    assign _1803 = _712 & _1802;
-    assign _1805 = _1803 & _1804;
-    assign _1814 = _1805 | _1813;
-    assign _1795 = _1791 == _2046;
-    assign _1793 = _1791 == _2045;
-    assign _1796 = _1793 | _1795;
-    assign _3516 = _1701 & _1796;
-    assign _3517 = _3516 | _1814;
-    assign _212 = _3517;
-    assign _3519 = _212 & _3518;
-    assign _3522 = _3519 ? _3521 : _2989;
-    assign _213 = _3522;
-    always @(posedge _310) begin
-        if (_308)
-            _2989 <= _452;
+    assign _504 = g_mode == _2052;
+    assign _810 = _504 & _809;
+    assign _818 = _810 & _817;
+    assign _1817 = _818 & _1816;
+    assign _1819 = _1817 & _1818;
+    assign _1810 = ~ _1190;
+    assign _1809 = _718 & _1808;
+    assign _1811 = _1809 & _1810;
+    assign _1820 = _1811 | _1819;
+    assign _1801 = _1797 == _2052;
+    assign _1799 = _1797 == _2051;
+    assign _1802 = _1799 | _1801;
+    assign _3567 = _1707 & _1802;
+    assign _3568 = _3567 | _1820;
+    assign _216 = _3568;
+    assign _3570 = _216 & _3569;
+    assign _3573 = _3570 ? _3572 : _3027;
+    assign _217 = _3573;
+    always @(posedge _316) begin
+        if (_314)
+            _3027 <= _458;
         else
-            _2989 <= _213;
+            _3027 <= _217;
     end
     always @* begin
-        case (_2989)
+        case (_3027)
         0:
-            _3047 <= _3004;
+            _3085 <= _3042;
         1:
-            _3047 <= _3010;
+            _3085 <= _3048;
         2:
-            _3047 <= _3016;
+            _3085 <= _3054;
         3:
-            _3047 <= _3022;
+            _3085 <= _3060;
         4:
-            _3047 <= _3028;
+            _3085 <= _3066;
         5:
-            _3047 <= _3034;
+            _3085 <= _3072;
         6:
-            _3047 <= _3040;
+            _3085 <= _3078;
         default:
-            _3047 <= _3046;
+            _3085 <= _3084;
         endcase
     end
-    assign _3049 = _1184 ? _757 : _3047;
-    assign _3140 = g_byte_0[7:1];
-    assign _3141 = { _471,
-                     _3140 };
-    assign _3138 = g_byte_0[6:0];
-    assign _3139 = { _3138,
-                     _471 };
-    assign _3142 = _216 ? _3141 : _3139;
-    assign _3527 = _693 ? _3142 : _3526;
-    assign _3528 = _684 ? _3527 : _3526;
-    assign _3529 = _669 ? _3528 : _3526;
-    assign _3530 = _481 ? _3526 : _3529;
-    assign _3523 = g_data_left_0 ? _3050 : g_byte_0;
-    assign _3524 = _465 ? g_byte_0 : _3523;
-    assign _3525 = _720 ? _3524 : g_byte_0;
-    assign _3526 = _712 ? _3525 : g_byte_0;
-    assign _3531 = _435 ? _3530 : _3526;
-    assign _214 = _3531;
-    always @(posedge _310) begin
-        if (_308)
-            g_byte_0 <= _755;
+    assign _3087 = _1190 ? _763 : _3085;
+    assign _3178 = g_byte_0[7:1];
+    assign _3179 = { _477,
+                     _3178 };
+    assign _3176 = g_byte_0[6:0];
+    assign _3177 = { _3176,
+                     _477 };
+    assign _3180 = _220 ? _3179 : _3177;
+    assign _3578 = _699 ? _3180 : _3577;
+    assign _3579 = _690 ? _3578 : _3577;
+    assign _3580 = _675 ? _3579 : _3577;
+    assign _3581 = _487 ? _3577 : _3580;
+    assign _3574 = g_data_left_0 ? _3088 : g_byte_0;
+    assign _3575 = _471 ? g_byte_0 : _3574;
+    assign _3576 = _726 ? _3575 : g_byte_0;
+    assign _3577 = _718 ? _3576 : g_byte_0;
+    assign _3582 = _441 ? _3581 : _3577;
+    assign _218 = _3582;
+    always @(posedge _316) begin
+        if (_314)
+            g_byte_0 <= _761;
         else
-            g_byte_0 <= _214;
+            g_byte_0 <= _218;
     end
-    assign _1801 = g_bitpos_0 == _452;
-    assign _1798 = ~ _465;
-    assign _1799 = _1798 & g_data_left_0;
-    assign _1802 = _1799 & _1801;
-    assign _3050 = _1802 ? _3049 : g_byte_0;
-    assign _3051 = _3050[0:0];
-    assign _3059 = { _3051,
-                     _3052,
-                     _3053,
-                     _3054,
-                     _3055,
-                     _3056,
-                     _3057,
-                     _3058 };
-    assign _216 = host_lane0_lsb_first;
-    assign _3060 = _216 ? _3050 : _3059;
-    assign _3061 = _3060[0:0];
-    assign _3539 = g_bitpos_0 + _482;
-    assign _3540 = _693 ? _3539 : _3537;
-    assign _3541 = _684 ? _3540 : _3537;
-    assign _3542 = _669 ? _3541 : _3537;
-    assign _3543 = _481 ? _3537 : _3542;
-    assign _3533 = g_bitpos_0 + _482;
-    assign _3534 = g_data_left_0 ? _3533 : g_bitpos_0;
-    assign _3535 = _465 ? g_bitpos_0 : _3534;
-    assign _3536 = _720 ? _3535 : g_bitpos_0;
-    assign _3537 = _712 ? _3536 : g_bitpos_0;
-    assign _3544 = _435 ? _3543 : _3537;
-    assign _3546 = _333 ? _452 : _3544;
-    assign _217 = _3546;
-    always @(posedge _310) begin
-        if (_308)
-            g_bitpos_0 <= _452;
+    assign _1807 = g_bitpos_0 == _458;
+    assign _1804 = ~ _471;
+    assign _1805 = _1804 & g_data_left_0;
+    assign _1808 = _1805 & _1807;
+    assign _3088 = _1808 ? _3087 : g_byte_0;
+    assign _3089 = _3088[0:0];
+    assign _3097 = { _3089,
+                     _3090,
+                     _3091,
+                     _3092,
+                     _3093,
+                     _3094,
+                     _3095,
+                     _3096 };
+    assign _220 = host_lane0_lsb_first;
+    assign _3098 = _220 ? _3088 : _3097;
+    assign _3099 = _3098[0:0];
+    assign _3590 = g_bitpos_0 + _488;
+    assign _3591 = _699 ? _3590 : _3588;
+    assign _3592 = _690 ? _3591 : _3588;
+    assign _3593 = _675 ? _3592 : _3588;
+    assign _3594 = _487 ? _3588 : _3593;
+    assign _3584 = g_bitpos_0 + _488;
+    assign _3585 = g_data_left_0 ? _3584 : g_bitpos_0;
+    assign _3586 = _471 ? g_bitpos_0 : _3585;
+    assign _3587 = _726 ? _3586 : g_bitpos_0;
+    assign _3588 = _718 ? _3587 : g_bitpos_0;
+    assign _3595 = _441 ? _3594 : _3588;
+    assign _3597 = _339 ? _458 : _3595;
+    assign _221 = _3597;
+    always @(posedge _316) begin
+        if (_314)
+            g_bitpos_0 <= _458;
         else
-            g_bitpos_0 <= _217;
+            g_bitpos_0 <= _221;
     end
     always @* begin
         case (g_bitpos_0)
         0:
-            _3069 <= _3061;
+            _3107 <= _3099;
         1:
-            _3069 <= _3062;
+            _3107 <= _3100;
         2:
-            _3069 <= _3063;
+            _3107 <= _3101;
         3:
-            _3069 <= _3064;
+            _3107 <= _3102;
         4:
-            _3069 <= _3065;
+            _3107 <= _3103;
         5:
-            _3069 <= _3066;
+            _3107 <= _3104;
         6:
-            _3069 <= _3067;
+            _3107 <= _3105;
         default:
-            _3069 <= _3068;
+            _3107 <= _3106;
         endcase
     end
-    assign _219 = host_lane0_crc_inv;
-    assign _221 = host_lane0_init;
-    assign _3588 = g_crc_0[30:0];
-    assign _3590 = { _3588,
-                     _1817 };
-    assign _3582 = g_crc_0[31:31];
-    assign _3583 = _471 ^ _3582;
-    assign _3585 = _3583 ? _226 : _2089;
-    assign _3579 = g_crc_0[30:0];
-    assign _3581 = { _3579,
-                     _1817 };
-    assign _3586 = _3581 ^ _3585;
-    assign _3587 = _684 ? _3586 : _3578;
-    assign _223 = host_lane0_crc_width;
-    assign _3556 = g_left_0 - _2882;
-    assign _3557 = _2927 ? _3556 : _3554;
-    assign _3558 = _669 ? _3557 : _3554;
-    assign _3559 = _481 ? _3554 : _3558;
-    assign _3550 = g_left_0 - _2882;
-    assign _3551 = g_data_left_0 ? g_left_0 : _3550;
-    assign _3552 = _465 ? g_left_0 : _3551;
-    assign _3553 = _720 ? _3552 : g_left_0;
-    assign _3554 = _712 ? _3553 : g_left_0;
-    assign _3560 = _435 ? _3559 : _3554;
-    assign _3561 = _3548 ? _223 : _3560;
-    assign _3563 = _333 ? _3807 : _3561;
-    assign _224 = _3563;
-    always @(posedge _310) begin
-        if (_308)
-            g_left_0 <= _3807;
-        else
-            g_left_0 <= _224;
-    end
-    assign _718 = g_left_0 == _3807;
-    assign _719 = ~ _718;
-    assign _2925 = ~ g_data_left_0;
-    assign _2924 = _435 & _669;
-    assign _2926 = _2924 & _2925;
-    assign _2927 = _2926 & _719;
-    assign _3591 = _2927 ? _3590 : _3587;
-    assign _3592 = _669 ? _3591 : _3578;
-    assign _3593 = _481 ? _3578 : _3592;
-    assign _226 = host_lane0_poly;
-    assign _3570 = g_crc_0[31:31];
-    assign _3571 = _3071 ^ _3570;
-    assign _3573 = _3571 ? _226 : _2089;
-    assign _3567 = g_crc_0[30:0];
-    assign _3569 = { _3567,
-                     _1817 };
-    assign _3574 = _3569 ^ _3573;
-    assign _3564 = g_crc_0[30:0];
-    assign _3566 = { _3564,
-                     _1817 };
-    assign _3575 = g_data_left_0 ? _3574 : _3566;
-    assign _3576 = _465 ? g_crc_0 : _3575;
-    assign _3577 = _720 ? _3576 : g_crc_0;
-    assign _3578 = _712 ? _3577 : g_crc_0;
-    assign _3594 = _435 ? _3593 : _3578;
-    assign _3595 = _333 ? _221 : _3594;
-    assign _3597 = _331 ? _2089 : _3595;
-    assign _227 = _3597;
-    always @(posedge _310) begin
-        if (_308)
-            g_crc_0 <= _2089;
-        else
-            g_crc_0 <= _227;
-    end
-    assign _2931 = g_crc_0[31:31];
-    assign _2932 = _2931 ^ _219;
-    assign _3613 = _3612 ? _3610 : g_lim_0;
-    assign _3614 = g_len_cap_0 ? _3613 : g_lim_0;
+    assign _223 = host_lane0_crc_inv;
+    assign _225 = host_lane0_init;
+    assign _3650 = g_crc_0[30:0];
+    assign _3652 = { _3650,
+                     _1823 };
+    assign _3643 = g_crc_0[31:31];
+    assign _3644 = _477 ^ _3643;
+    assign _3646 = _3644 ? _230 : _2095;
+    assign _3640 = g_crc_0[30:0];
+    assign _3642 = { _3640,
+                     _1823 };
+    assign _3647 = _3642 ^ _3646;
+    assign _3636 = g_cnt_0[5:0];
+    assign _3637 = _3636 < _241;
+    assign _3638 = ~ _3637;
+    assign _3631 = g_cnt_0[15:6];
+    assign _3633 = _3631 == _2019;
+    assign _3634 = ~ _3633;
+    assign _3630 = ~ _243;
+    assign _3635 = _3630 | _3634;
+    assign _3639 = _3635 | _3638;
+    assign _3648 = _3639 ? _3647 : _3629;
+    assign _3649 = _690 ? _3648 : _3629;
+    assign _227 = host_lane0_crc_width;
+    assign _3607 = g_left_0 - _2898;
+    assign _3608 = _2951 ? _3607 : _3605;
+    assign _3609 = _675 ? _3608 : _3605;
+    assign _3610 = _487 ? _3605 : _3609;
+    assign _3601 = g_left_0 - _2898;
+    assign _3602 = g_data_left_0 ? g_left_0 : _3601;
+    assign _3603 = _471 ? g_left_0 : _3602;
+    assign _3604 = _726 ? _3603 : g_left_0;
+    assign _3605 = _718 ? _3604 : g_left_0;
+    assign _3611 = _441 ? _3610 : _3605;
+    assign _3612 = _3599 ? _227 : _3611;
+    assign _3614 = _339 ? _3871 : _3612;
     assign _228 = _3614;
-    always @(posedge _310) begin
-        if (_308)
-            g_lim_0 <= _755;
+    always @(posedge _316) begin
+        if (_314)
+            g_left_0 <= _3871;
         else
-            g_lim_0 <= _228;
+            g_left_0 <= _228;
     end
-    assign _681 = { _755,
+    assign _724 = g_left_0 == _3871;
+    assign _725 = ~ _724;
+    assign _2949 = ~ g_data_left_0;
+    assign _2948 = _441 & _675;
+    assign _2950 = _2948 & _2949;
+    assign _2951 = _2950 & _725;
+    assign _3653 = _2951 ? _3652 : _3649;
+    assign _3654 = _675 ? _3653 : _3629;
+    assign _3655 = _487 ? _3629 : _3654;
+    assign _230 = host_lane0_poly;
+    assign _3621 = g_crc_0[31:31];
+    assign _3622 = _3109 ^ _3621;
+    assign _3624 = _3622 ? _230 : _2095;
+    assign _3618 = g_crc_0[30:0];
+    assign _3620 = { _3618,
+                     _1823 };
+    assign _3625 = _3620 ^ _3624;
+    assign _3615 = g_crc_0[30:0];
+    assign _3617 = { _3615,
+                     _1823 };
+    assign _3626 = g_data_left_0 ? _3625 : _3617;
+    assign _3627 = _471 ? g_crc_0 : _3626;
+    assign _3628 = _726 ? _3627 : g_crc_0;
+    assign _3629 = _718 ? _3628 : g_crc_0;
+    assign _3656 = _441 ? _3655 : _3629;
+    assign _3657 = _339 ? _225 : _3656;
+    assign _3659 = _337 ? _2095 : _3657;
+    assign _231 = _3659;
+    always @(posedge _316) begin
+        if (_314)
+            g_crc_0 <= _2095;
+        else
+            g_crc_0 <= _231;
+    end
+    assign _2955 = g_crc_0[31:31];
+    assign _2956 = _2955 ^ _223;
+    assign _3675 = _3674 ? _3672 : g_lim_0;
+    assign _3676 = g_len_cap_0 ? _3675 : g_lim_0;
+    assign _232 = _3676;
+    always @(posedge _316) begin
+        if (_314)
+            g_lim_0 <= _761;
+        else
+            g_lim_0 <= _232;
+    end
+    assign _687 = { _761,
                     g_lim_0 };
-    assign _230 = host_lane0_frame_bits;
-    assign _2906 = g_sr_0[14:0];
-    assign _2907 = { _2906,
-                     _471 };
-    assign _3615 = _669 ? _2907 : g_sr_0;
-    assign _3616 = _481 ? g_sr_0 : _3615;
-    assign _3617 = _435 ? _3616 : g_sr_0;
-    assign _3619 = _333 ? _1683 : _3617;
-    assign _231 = _3619;
-    always @(posedge _310) begin
-        if (_308)
-            g_sr_0 <= _1683;
+    assign _234 = host_lane0_frame_bits;
+    assign _2929 = g_sr_0[14:0];
+    assign _2930 = { _2929,
+                     _477 };
+    assign _3677 = _675 ? _2930 : g_sr_0;
+    assign _3678 = _487 ? g_sr_0 : _3677;
+    assign _3679 = _441 ? _3678 : g_sr_0;
+    assign _3681 = _339 ? _1689 : _3679;
+    assign _235 = _3681;
+    always @(posedge _316) begin
+        if (_314)
+            g_sr_0 <= _1689;
         else
-            g_sr_0 <= _231;
+            g_sr_0 <= _235;
     end
-    assign _3605 = g_sr_0[3:0];
-    assign _233 = host_lane0_len_max;
-    assign _3606 = _233 < _3605;
-    assign _3607 = _3606 ? _233 : _3605;
-    assign _3609 = { _1817,
-                     _3607,
-                     _452 };
-    assign _235 = host_lane0_skip;
-    assign _3603 = { _2539,
-                     _235 };
-    assign _3610 = _3603 + _3609;
-    assign _3611 = { _755,
-                     _3610 };
-    assign _3612 = _3611 < _230;
-    assign _3638 = _3612 ? _1819 : g_len_known_0;
-    assign _237 = host_lane0_len_pos;
-    assign _3624 = g_cnt_0[5:0];
-    assign _3625 = _3624 == _237;
-    assign _3620 = g_cnt_0[15:6];
-    assign _3622 = _3620 == _2013;
-    assign _239 = host_lane0_len_en;
-    assign _3623 = _239 & _3622;
-    assign _3626 = _3623 & _3625;
-    assign _3628 = _3626 ? _1819 : g_len_cap_0;
-    assign _3629 = _684 ? _3628 : g_len_cap_0;
-    assign _3630 = _669 ? _3629 : g_len_cap_0;
-    assign _3631 = _481 ? g_len_cap_0 : _3630;
-    assign _3632 = _435 ? _3631 : g_len_cap_0;
-    assign _3634 = g_len_cap_0 ? _1817 : _3632;
-    assign _3636 = _333 ? _1817 : _3634;
-    assign _240 = _3636;
-    always @(posedge _310) begin
-        if (_308)
-            g_len_cap_0 <= _1817;
+    assign _3667 = g_sr_0[3:0];
+    assign _237 = host_lane0_len_max;
+    assign _3668 = _237 < _3667;
+    assign _3669 = _3668 ? _237 : _3667;
+    assign _3671 = { _1823,
+                     _3669,
+                     _458 };
+    assign _239 = host_lane0_skip;
+    assign _3665 = { _2545,
+                     _239 };
+    assign _3672 = _3665 + _3671;
+    assign _3673 = { _761,
+                     _3672 };
+    assign _3674 = _3673 < _234;
+    assign _3702 = _3674 ? _1825 : g_len_known_0;
+    assign _241 = host_lane0_len_pos;
+    assign _3688 = g_cnt_0[5:0];
+    assign _3689 = _3688 == _241;
+    assign _3684 = g_cnt_0[15:6];
+    assign _3686 = _3684 == _2019;
+    assign _243 = host_lane0_crc_resid;
+    assign _3682 = ~ _243;
+    assign _245 = host_lane0_len_en;
+    assign _3683 = _245 & _3682;
+    assign _3687 = _3683 & _3686;
+    assign _3690 = _3687 & _3689;
+    assign _3692 = _3690 ? _1825 : g_len_cap_0;
+    assign _3693 = _690 ? _3692 : g_len_cap_0;
+    assign _3694 = _675 ? _3693 : g_len_cap_0;
+    assign _3695 = _487 ? g_len_cap_0 : _3694;
+    assign _3696 = _441 ? _3695 : g_len_cap_0;
+    assign _3698 = g_len_cap_0 ? _1823 : _3696;
+    assign _3700 = _339 ? _1823 : _3698;
+    assign _246 = _3700;
+    always @(posedge _316) begin
+        if (_314)
+            g_len_cap_0 <= _1823;
         else
-            g_len_cap_0 <= _240;
+            g_len_cap_0 <= _246;
     end
-    assign _3639 = g_len_cap_0 ? _3638 : g_len_known_0;
-    assign _3641 = _333 ? _1817 : _3639;
-    assign _241 = _3641;
-    always @(posedge _310) begin
-        if (_308)
-            g_len_known_0 <= _1817;
+    assign _3703 = g_len_cap_0 ? _3702 : g_len_known_0;
+    assign _3705 = _339 ? _1823 : _3703;
+    assign _247 = _3705;
+    always @(posedge _316) begin
+        if (_314)
+            g_len_known_0 <= _1823;
         else
-            g_len_known_0 <= _241;
+            g_len_known_0 <= _247;
     end
-    assign _682 = g_len_known_0 ? _681 : _230;
-    assign _3661 = g_cnt_0 + _4178;
-    assign _3662 = _684 ? _3661 : _3659;
-    assign _669 = ~ _465;
-    assign _3663 = _669 ? _3662 : _3659;
-    assign _3644 = _481 ? _3643 : _471;
-    assign _3642 = _720 ? _3071 : g_last_0;
-    assign _3643 = _712 ? _3642 : g_last_0;
-    assign _3645 = _435 ? _3644 : _3643;
-    assign _3647 = _333 ? _1819 : _3645;
-    assign _242 = _3647;
-    always @(posedge _310) begin
-        if (_308)
+    assign _688 = g_len_known_0 ? _687 : _234;
+    assign _3725 = g_cnt_0 + _4242;
+    assign _3726 = _690 ? _3725 : _3723;
+    assign _675 = ~ _471;
+    assign _3727 = _675 ? _3726 : _3723;
+    assign _3708 = _487 ? _3707 : _477;
+    assign _3706 = _726 ? _3109 : g_last_0;
+    assign _3707 = _718 ? _3706 : g_last_0;
+    assign _3709 = _441 ? _3708 : _3707;
+    assign _3711 = _339 ? _1825 : _3709;
+    assign _248 = _3711;
+    always @(posedge _316) begin
+        if (_314)
             g_last_0 <= vdd;
         else
-            g_last_0 <= _242;
+            g_last_0 <= _248;
     end
-    assign _477 = ~ g_last_0;
-    assign _473 = _247 == _2045;
-    assign _478 = _473 ? _477 : gnd;
-    assign _3649 = _263 == _2045;
-    assign _3650 = _3649 ? _355 : g_prev_0;
-    assign _3651 = _435 ? _3650 : g_prev_0;
-    assign _3653 = _333 ? _1819 : _3651;
-    assign _243 = _3653;
-    always @(posedge _310) begin
-        if (_308)
+    assign _483 = ~ g_last_0;
+    assign _479 = _253 == _2051;
+    assign _484 = _479 ? _483 : gnd;
+    assign _3713 = _269 == _2051;
+    assign _3714 = _3713 ? _361 : g_prev_0;
+    assign _3715 = _441 ? _3714 : g_prev_0;
+    assign _3717 = _339 ? _1825 : _3715;
+    assign _249 = _3717;
+    always @(posedge _316) begin
+        if (_314)
             g_prev_0 <= vdd;
         else
-            g_prev_0 <= _243;
+            g_prev_0 <= _249;
     end
-    assign _470 = _355 == g_prev_0;
-    assign _467 = _263 == _2045;
-    assign _471 = _467 ? _470 : _355;
-    assign _479 = _471 == _478;
-    assign _480 = ~ _479;
-    assign _481 = _465 & _480;
-    assign _3664 = _481 ? _3659 : _3663;
-    assign _3655 = g_cnt_0 + _4178;
-    assign _3656 = g_data_left_0 ? _3655 : g_cnt_0;
-    assign _3657 = _465 ? g_cnt_0 : _3656;
-    assign _3658 = _720 ? _3657 : g_cnt_0;
-    assign _3659 = _712 ? _3658 : g_cnt_0;
-    assign _3665 = _435 ? _3664 : _3659;
-    assign _3667 = _333 ? _1683 : _3665;
-    assign _244 = _3667;
-    always @(posedge _310) begin
-        if (_308)
-            g_cnt_0 <= _1683;
+    assign _476 = _361 == g_prev_0;
+    assign _473 = _269 == _2051;
+    assign _477 = _473 ? _476 : _361;
+    assign _485 = _477 == _484;
+    assign _486 = ~ _485;
+    assign _487 = _471 & _486;
+    assign _3728 = _487 ? _3723 : _3727;
+    assign _3719 = g_cnt_0 + _4242;
+    assign _3720 = g_data_left_0 ? _3719 : g_cnt_0;
+    assign _3721 = _471 ? g_cnt_0 : _3720;
+    assign _3722 = _726 ? _3721 : g_cnt_0;
+    assign _3723 = _718 ? _3722 : g_cnt_0;
+    assign _3729 = _441 ? _3728 : _3723;
+    assign _3731 = _339 ? _1689 : _3729;
+    assign _250 = _3731;
+    always @(posedge _316) begin
+        if (_314)
+            g_cnt_0 <= _1689;
         else
-            g_cnt_0 <= _244;
+            g_cnt_0 <= _250;
     end
-    assign g_data_left_0 = g_cnt_0 < _682;
-    assign _3070 = g_data_left_0 ? _3069 : _2932;
-    assign _3071 = _465 ? _478 : _3070;
-    assign _3673 = _3071 == g_last_0;
-    assign _3671 = g_run_0 == _452;
-    assign _3672 = ~ _3671;
-    assign _3674 = _3672 & _3673;
-    assign _3678 = _3674 ? _3677 : _482;
-    assign _3669 = _247 == _2046;
-    assign _3683 = _3669 ? _3682 : _3678;
-    assign _3684 = _720 ? _3683 : g_run_0;
-    assign _3685 = _712 ? _3684 : g_run_0;
-    assign _3703 = _435 ? _3702 : _3685;
-    assign _3705 = _333 ? _452 : _3703;
-    assign _245 = _3705;
-    always @(posedge _310) begin
-        if (_308)
-            g_run_0 <= _452;
+    assign g_data_left_0 = g_cnt_0 < _688;
+    assign _3108 = g_data_left_0 ? _3107 : _2956;
+    assign _3109 = _471 ? _484 : _3108;
+    assign _3737 = _3109 == g_last_0;
+    assign _3735 = g_run_0 == _458;
+    assign _3736 = ~ _3735;
+    assign _3738 = _3736 & _3737;
+    assign _3742 = _3738 ? _3741 : _488;
+    assign _3733 = _253 == _2052;
+    assign _3747 = _3733 ? _3746 : _3742;
+    assign _3748 = _726 ? _3747 : g_run_0;
+    assign _3749 = _718 ? _3748 : g_run_0;
+    assign _3767 = _441 ? _3766 : _3749;
+    assign _3769 = _339 ? _458 : _3767;
+    assign _251 = _3769;
+    always @(posedge _316) begin
+        if (_314)
+            g_run_0 <= _458;
         else
-            g_run_0 <= _245;
+            g_run_0 <= _251;
     end
-    assign _464 = g_run_0 == _141;
-    assign _247 = host_lane0_stuff;
-    assign _459 = _247 == _2539;
-    assign _460 = ~ _459;
-    assign _465 = _460 & _464;
-    assign _713 = _465 | g_data_left_0;
-    assign _720 = _713 | _719;
-    assign _3719 = _720 ? _3718 : _1819;
-    assign _703 = ~ _269;
-    assign _704 = _339 & _703;
-    assign _712 = _704 & _711;
-    assign _3720 = _712 ? _3719 : f_lane0_out;
-    assign _708 = _408 == _1683;
-    assign _706 = _373 == _1683;
-    assign _709 = _401 ? _708 : _706;
-    assign _710 = _369 ? vdd : _709;
-    assign _711 = _265 ? _433 : _710;
-    assign _3712 = ~ _711;
-    assign _3709 = _263 == _2046;
-    assign _3706 = ~ _269;
-    assign _3707 = _339 & _3706;
-    assign _3710 = _3707 & _3709;
-    assign _3711 = _3710 & _434;
-    assign _3713 = _3711 & _3712;
-    assign _3721 = _3713 ? _2983 : _3720;
-    assign _3723 = _450 ? _1819 : _3721;
-    assign _3725 = _701 ? _1819 : _3723;
-    assign _3727 = _333 ? _1819 : _3725;
-    assign _3729 = _331 ? _1819 : _3727;
-    assign _248 = _3729;
-    always @(posedge _310) begin
-        if (_308)
+    assign _470 = g_run_0 == _143;
+    assign _253 = host_lane0_stuff;
+    assign _465 = _253 == _2545;
+    assign _466 = ~ _465;
+    assign _471 = _466 & _470;
+    assign _719 = _471 | g_data_left_0;
+    assign _726 = _719 | _725;
+    assign _3783 = _726 ? _3782 : _1825;
+    assign _709 = ~ _275;
+    assign _710 = _345 & _709;
+    assign _718 = _710 & _717;
+    assign _3784 = _718 ? _3783 : f_lane0_out;
+    assign _714 = _414 == _1689;
+    assign _712 = _379 == _1689;
+    assign _715 = _407 ? _714 : _712;
+    assign _716 = _375 ? vdd : _715;
+    assign _717 = _271 ? _439 : _716;
+    assign _3776 = ~ _717;
+    assign _3773 = _269 == _2052;
+    assign _3770 = ~ _275;
+    assign _3771 = _345 & _3770;
+    assign _3774 = _3771 & _3773;
+    assign _3775 = _3774 & _440;
+    assign _3777 = _3775 & _3776;
+    assign _3785 = _3777 ? _3021 : _3784;
+    assign _3787 = _456 ? _1825 : _3785;
+    assign _3789 = _707 ? _1825 : _3787;
+    assign _3791 = _339 ? _1825 : _3789;
+    assign _3793 = _337 ? _1825 : _3791;
+    assign _254 = _3793;
+    always @(posedge _316) begin
+        if (_314)
             f_lane0_out <= vdd;
         else
-            f_lane0_out <= _248;
+            f_lane0_out <= _254;
     end
-    assign _448 = _355 == f_lane0_out;
-    assign _449 = ~ _448;
-    assign _431 = ~ _425;
-    assign _432 = _428 & _431;
-    always @(posedge _310) begin
-        if (_308)
-            _428 <= _1817;
+    assign _454 = _361 == f_lane0_out;
+    assign _455 = ~ _454;
+    assign _437 = ~ _431;
+    assign _438 = _434 & _437;
+    always @(posedge _316) begin
+        if (_314)
+            _434 <= _1823;
         else
+            _434 <= _431;
+    end
+    assign _435 = ~ _434;
+    assign _427 = _349[7:7];
+    assign _426 = _349[6:6];
+    assign _425 = _349[5:5];
+    assign _424 = _349[4:4];
+    assign _423 = _349[3:3];
+    assign _422 = _349[2:2];
+    assign _421 = _349[1:1];
+    assign _420 = _349[0:0];
+    assign _256 = host_lane0_clk_pin;
+    always @* begin
+        case (_256)
+        0:
+            _428 <= _420;
+        1:
+            _428 <= _421;
+        2:
+            _428 <= _422;
+        3:
+            _428 <= _423;
+        4:
+            _428 <= _424;
+        5:
             _428 <= _425;
-    end
-    assign _429 = ~ _428;
-    assign _421 = _343[7:7];
-    assign _420 = _343[6:6];
-    assign _419 = _343[5:5];
-    assign _418 = _343[4:4];
-    assign _417 = _343[3:3];
-    assign _416 = _343[2:2];
-    assign _415 = _343[1:1];
-    assign _414 = _343[0:0];
-    assign _250 = host_lane0_clk_pin;
-    always @* begin
-        case (_250)
-        0:
-            _422 <= _414;
-        1:
-            _422 <= _415;
-        2:
-            _422 <= _416;
-        3:
-            _422 <= _417;
-        4:
-            _422 <= _418;
-        5:
-            _422 <= _419;
         6:
-            _422 <= _420;
+            _428 <= _426;
         default:
-            _422 <= _421;
+            _428 <= _427;
         endcase
     end
-    always @(posedge _310) begin
-        if (_308)
-            _425 <= _1817;
+    always @(posedge _316) begin
+        if (_314)
+            _431 <= _1823;
         else
-            _425 <= _422;
+            _431 <= _428;
     end
-    assign _430 = _425 & _429;
-    assign _252 = host_lane0_clk_edge;
-    assign _433 = _252 ? _432 : _430;
-    assign _412 = _397 == _1683;
-    assign _409 = _408 == _397;
-    assign _402 = _373 == _397;
-    assign _400 = ~ _364;
-    assign _391 = _254[15:2];
-    assign _392 = { _2539,
+    assign _436 = _431 & _435;
+    assign _258 = host_lane0_clk_edge;
+    assign _439 = _258 ? _438 : _436;
+    assign _418 = _403 == _1689;
+    assign _415 = _414 == _403;
+    assign _408 = _379 == _403;
+    assign _406 = ~ _370;
+    assign _397 = _260[15:2];
+    assign _398 = { _2545,
+                    _397 };
+    assign _394 = _260[15:1];
+    assign _395 = { _1823,
+                    _394 };
+    assign _399 = _395 + _398;
+    assign _391 = _260[15:1];
+    assign _392 = { _1823,
                     _391 };
-    assign _388 = _254[15:1];
-    assign _389 = { _1817,
-                    _388 };
-    assign _393 = _389 + _392;
-    assign _385 = _254[15:1];
-    assign _386 = { _1817,
-                    _385 };
-    assign _383 = _269 & _366;
-    assign _394 = _383 ? _393 : _386;
-    always @(posedge _310) begin
-        if (_308)
-            _397 <= _1683;
+    assign _389 = _275 & _372;
+    assign _400 = _389 ? _399 : _392;
+    always @(posedge _316) begin
+        if (_314)
+            _403 <= _1689;
         else
-            _397 <= _394;
+            _403 <= _400;
     end
-    assign _398 = _373 < _397;
-    assign _375 = _254[15:2];
-    assign _376 = { _2539,
-                    _375 };
-    always @(posedge _310) begin
-        if (_308)
-            _379 <= _1683;
+    assign _404 = _379 < _403;
+    assign _381 = _260[15:2];
+    assign _382 = { _2545,
+                    _381 };
+    always @(posedge _316) begin
+        if (_314)
+            _385 <= _1689;
         else
-            _379 <= _376;
+            _385 <= _382;
     end
-    assign _3775 = ~ _364;
-    assign _3776 = _399 & _3775;
-    assign _3777 = _3776 ? _408 : _373;
-    assign _3779 = _369 ? _1683 : _3777;
-    assign _3781 = _3779 + _4178;
-    assign _3759 = _3753 == _1640;
-    assign _404 = _254[15:1];
-    assign _405 = { _1817,
-                    _404 };
-    always @(posedge _310) begin
-        if (_308)
-            _408 <= _1683;
+    assign _3839 = ~ _370;
+    assign _3840 = _405 & _3839;
+    assign _3841 = _3840 ? _414 : _379;
+    assign _3843 = _375 ? _1689 : _3841;
+    assign _3845 = _3843 + _4242;
+    assign _3823 = _3817 == _1646;
+    assign _410 = _260[15:1];
+    assign _411 = { _1823,
+                    _410 };
+    always @(posedge _316) begin
+        if (_314)
+            _414 <= _1689;
         else
-            _408 <= _405;
+            _414 <= _411;
     end
-    assign _3755 = { gnd,
-                     _408 };
-    assign _3756 = _3755 == _3753;
-    assign _3749 = { gnd,
-                     _254 };
-    always @(posedge _310) begin
-        if (_308)
-            _3752 <= _1640;
+    assign _3819 = { gnd,
+                     _414 };
+    assign _3820 = _3819 == _3817;
+    assign _3813 = { gnd,
+                     _260 };
+    always @(posedge _316) begin
+        if (_314)
+            _3816 <= _1646;
         else
-            _3752 <= _3749;
+            _3816 <= _3813;
     end
-    assign _254 = host_lane0_div_int;
-    assign _3743 = { gnd,
-                     _254 };
-    assign _3745 = _3743 - _3396;
-    always @(posedge _310) begin
-        if (_308)
-            _3748 <= _1640;
+    assign _260 = host_lane0_div_int;
+    assign _3807 = { gnd,
+                     _260 };
+    assign _3809 = _3807 - _3447;
+    always @(posedge _316) begin
+        if (_314)
+            _3812 <= _1646;
         else
-            _3748 <= _3745;
+            _3812 <= _3809;
     end
-    assign _256 = host_lane0_div_frac;
-    assign _3763 = { gnd,
-                     _256 };
-    assign _3765 = _3764[7:0];
-    assign _3766 = _3761 ? _3765 : _3737;
-    assign _3767 = _3734 ? _3766 : _3737;
-    assign _3769 = _333 ? _755 : _3767;
-    assign _257 = _3769;
-    always @(posedge _310) begin
-        if (_308)
-            _3737 <= _755;
+    assign _262 = host_lane0_div_frac;
+    assign _3827 = { gnd,
+                     _262 };
+    assign _3829 = _3828[7:0];
+    assign _3830 = _3825 ? _3829 : _3801;
+    assign _3831 = _3798 ? _3830 : _3801;
+    assign _3833 = _339 ? _761 : _3831;
+    assign _263 = _3833;
+    always @(posedge _316) begin
+        if (_314)
+            _3801 <= _761;
         else
-            _3737 <= _257;
+            _3801 <= _263;
     end
-    assign _3762 = { gnd,
-                     _3737 };
-    assign _3764 = _3762 + _3763;
-    assign _3770 = _3764[8:8];
-    assign _3771 = _3761 ? _3770 : _3742;
-    assign _3772 = _3734 ? _3771 : _3742;
-    assign _3774 = _333 ? _1817 : _3772;
-    assign _258 = _3774;
-    always @(posedge _310) begin
-        if (_308)
-            _3742 <= _1817;
+    assign _3826 = { gnd,
+                     _3801 };
+    assign _3828 = _3826 + _3827;
+    assign _3834 = _3828[8:8];
+    assign _3835 = _3825 ? _3834 : _3806;
+    assign _3836 = _3798 ? _3835 : _3806;
+    assign _3838 = _339 ? _1823 : _3836;
+    assign _264 = _3838;
+    always @(posedge _316) begin
+        if (_314)
+            _3806 <= _1823;
         else
-            _3742 <= _258;
+            _3806 <= _264;
     end
-    assign _3753 = _3742 ? _3752 : _3748;
-    assign _3739 = { gnd,
-                     _373 };
-    assign _3754 = _3739 == _3753;
-    assign _3757 = _401 ? _3756 : _3754;
-    assign _3760 = _369 ? _3759 : _3757;
-    assign _3738 = ~ _265;
-    assign _3761 = _3738 & _3760;
-    assign _3783 = _3761 ? _1683 : _3781;
-    assign _3733 = ~ _265;
-    assign _3731 = _364 & _362;
-    assign _657 = g_mode_0 == _1961;
-    assign _3730 = _339 | _657;
-    assign _3732 = _3730 | _3731;
-    assign _3734 = _3732 & _3733;
-    assign _3784 = _3734 ? _3783 : _373;
-    assign _3786 = _333 ? _1683 : _3784;
-    assign _259 = _3786;
-    always @(posedge _310) begin
-        if (_308)
-            _373 <= _1683;
+    assign _3817 = _3806 ? _3816 : _3812;
+    assign _3803 = { gnd,
+                     _379 };
+    assign _3818 = _3803 == _3817;
+    assign _3821 = _407 ? _3820 : _3818;
+    assign _3824 = _375 ? _3823 : _3821;
+    assign _3802 = ~ _271;
+    assign _3825 = _3802 & _3824;
+    assign _3847 = _3825 ? _1689 : _3845;
+    assign _3797 = ~ _271;
+    assign _3795 = _370 & _368;
+    assign _663 = g_mode_0 == _1967;
+    assign _3794 = _345 | _663;
+    assign _3796 = _3794 | _3795;
+    assign _3798 = _3796 & _3797;
+    assign _3848 = _3798 ? _3847 : _379;
+    assign _3850 = _339 ? _1689 : _3848;
+    assign _265 = _3850;
+    always @(posedge _316) begin
+        if (_314)
+            _379 <= _1689;
         else
-            _373 <= _259;
+            _379 <= _265;
     end
-    assign _380 = _373 < _379;
-    assign _381 = ~ _380;
-    assign _370 = _362 & _366;
-    assign _382 = _370 & _381;
-    assign _399 = _382 & _398;
-    assign _401 = _399 & _400;
-    assign _410 = _401 ? _409 : _402;
-    assign _366 = _263 == _2046;
-    assign _367 = ~ _366;
-    assign _364 = g_mode_0 == _2045;
-    assign _368 = _364 | _367;
-    assign _361 = ~ _265;
-    always @(posedge _310) begin
-        if (_308)
-            _358 <= _1817;
+    assign _386 = _379 < _385;
+    assign _387 = ~ _386;
+    assign _376 = _368 & _372;
+    assign _388 = _376 & _387;
+    assign _405 = _388 & _404;
+    assign _407 = _405 & _406;
+    assign _416 = _407 ? _415 : _408;
+    assign _372 = _269 == _2052;
+    assign _373 = ~ _372;
+    assign _370 = g_mode_0 == _2051;
+    assign _374 = _370 | _373;
+    assign _367 = ~ _271;
+    always @(posedge _316) begin
+        if (_314)
+            _364 <= _1823;
         else
+            _364 <= _361;
+    end
+    assign _357 = _349[7:7];
+    assign _356 = _349[6:6];
+    assign _355 = _349[5:5];
+    assign _354 = _349[4:4];
+    assign _353 = _349[3:3];
+    assign _352 = _349[2:2];
+    assign _351 = _349[1:1];
+    assign _350 = _349[0:0];
+    assign _267 = host_lane0_data_pin;
+    always @* begin
+        case (_267)
+        0:
+            _358 <= _350;
+        1:
+            _358 <= _351;
+        2:
+            _358 <= _352;
+        3:
+            _358 <= _353;
+        4:
+            _358 <= _354;
+        5:
             _358 <= _355;
-    end
-    assign _351 = _343[7:7];
-    assign _350 = _343[6:6];
-    assign _349 = _343[5:5];
-    assign _348 = _343[4:4];
-    assign _347 = _343[3:3];
-    assign _346 = _343[2:2];
-    assign _345 = _343[1:1];
-    assign _344 = _343[0:0];
-    assign _261 = host_lane0_data_pin;
-    always @* begin
-        case (_261)
-        0:
-            _352 <= _344;
-        1:
-            _352 <= _345;
-        2:
-            _352 <= _346;
-        3:
-            _352 <= _347;
-        4:
-            _352 <= _348;
-        5:
-            _352 <= _349;
         6:
-            _352 <= _350;
+            _358 <= _356;
         default:
-            _352 <= _351;
+            _358 <= _357;
         endcase
     end
-    always @(posedge _310) begin
-        if (_308)
-            _355 <= _1817;
+    always @(posedge _316) begin
+        if (_314)
+            _361 <= _1823;
         else
-            _355 <= _352;
+            _361 <= _358;
     end
-    assign _359 = _355 ^ _358;
-    assign _360 = _269 & _359;
-    assign _362 = _360 & _361;
-    assign _369 = _362 & _368;
-    assign _413 = _369 ? _412 : _410;
-    assign _434 = _265 ? _433 : _413;
-    assign _263 = host_lane0_code;
-    assign _442 = _263 == _2046;
-    assign _443 = ~ _442;
-    assign _265 = host_lane0_clk_pin_en;
-    assign _439 = ~ _265;
-    assign _267 = host_lane0_readback;
-    assign _269 = host_lane0_dir;
-    assign _436 = ~ _269;
-    assign _437 = _339 & _436;
-    assign _438 = _437 & _267;
-    assign _440 = _438 & _439;
-    assign _444 = _440 & _443;
-    assign _445 = _444 & _434;
-    assign _450 = _445 & _449;
-    assign _3798 = _450 ? _2539 : _3796;
-    assign _3850 = _435 ? _3849 : _3798;
-    assign _701 = _270 == _454;
-    assign _3852 = _701 ? _2539 : _3850;
-    assign _3548 = _270 == _1867;
-    assign _3859 = _3548 ? _3858 : _3852;
-    assign _333 = _270 == _482;
-    assign _3865 = _333 ? _3864 : _3859;
-    assign _2589 = _1267[90:88];
-    assign _2588 = _1261[90:88];
-    assign _2587 = _1255[90:88];
-    assign _2586 = _897[90:88];
+    assign _365 = _361 ^ _364;
+    assign _366 = _275 & _365;
+    assign _368 = _366 & _367;
+    assign _375 = _368 & _374;
+    assign _419 = _375 ? _418 : _416;
+    assign _440 = _271 ? _439 : _419;
+    assign _269 = host_lane0_code;
+    assign _448 = _269 == _2052;
+    assign _449 = ~ _448;
+    assign _271 = host_lane0_clk_pin_en;
+    assign _445 = ~ _271;
+    assign _273 = host_lane0_readback;
+    assign _275 = host_lane0_dir;
+    assign _442 = ~ _275;
+    assign _443 = _345 & _442;
+    assign _444 = _443 & _273;
+    assign _446 = _444 & _445;
+    assign _450 = _446 & _449;
+    assign _451 = _450 & _440;
+    assign _456 = _451 & _455;
+    assign _3862 = _456 ? _2545 : _3860;
+    assign _3914 = _441 ? _3913 : _3862;
+    assign _707 = _276 == _460;
+    assign _3916 = _707 ? _2545 : _3914;
+    assign _3599 = _276 == _1873;
+    assign _3923 = _3599 ? _3922 : _3916;
+    assign _339 = _276 == _488;
+    assign _3929 = _339 ? _3928 : _3923;
+    assign _2595 = _1273[90:88];
+    assign _2594 = _1267[90:88];
+    assign _2593 = _1261[90:88];
+    assign _2592 = _903[90:88];
     always @* begin
         case (f_winner)
         0:
-            _2590 <= _2586;
+            _2596 <= _2592;
         1:
-            _2590 <= _2587;
+            _2596 <= _2593;
         2:
-            _2590 <= _2588;
+            _2596 <= _2594;
         default:
-            _2590 <= _2589;
+            _2596 <= _2595;
         endcase
     end
-    assign _2582 = _1267[87:87];
-    assign _2581 = _1261[87:87];
-    assign _2580 = _1255[87:87];
-    assign _2579 = _897[87:87];
+    assign _2588 = _1273[87:87];
+    assign _2587 = _1267[87:87];
+    assign _2586 = _1261[87:87];
+    assign _2585 = _903[87:87];
     always @* begin
         case (f_winner)
         0:
-            _2583 <= _2579;
+            _2589 <= _2585;
         1:
-            _2583 <= _2580;
+            _2589 <= _2586;
         2:
-            _2583 <= _2581;
+            _2589 <= _2587;
         default:
-            _2583 <= _2582;
+            _2589 <= _2588;
         endcase
     end
-    assign _3787 = ~ _2583;
-    assign _3788 = _1700 & _3787;
-    assign _3790 = _3788 ? _2590 : _452;
-    assign _270 = _3790;
-    assign _330 = _270 == _455;
-    assign _331 = _330 | _317;
-    assign _3867 = _331 ? _2539 : _3865;
-    assign _271 = _3867;
-    always @(posedge _310) begin
-        if (_308)
-            g_mode_0 <= _2539;
+    assign _3851 = ~ _2589;
+    assign _3852 = _1706 & _3851;
+    assign _3854 = _3852 ? _2596 : _458;
+    assign _276 = _3854;
+    assign _336 = _276 == _461;
+    assign _337 = _336 | _323;
+    assign _3931 = _337 ? _2545 : _3929;
+    assign _277 = _3931;
+    always @(posedge _316) begin
+        if (_314)
+            g_mode_0 <= _2545;
         else
-            g_mode_0 <= _271;
+            g_mode_0 <= _277;
     end
-    assign _339 = g_mode_0 == _2046;
-    assign _340 = _339 & _269;
-    assign _435 = _340 & _434;
-    assign _670 = _435 & _669;
-    assign _684 = _670 & g_data_left_0;
-    assign _693 = _684 & _692;
-    assign _699 = _693 & _698;
-    assign _735 = _699 | _734;
-    assign _2967 = _735 | _839;
-    assign _273 = host_rx_to_tx;
-    assign _2968 = _273 & _2967;
-    assign _274 = _2968;
-    assign _2995 = _274 | _2994;
-    assign _2997 = _2995 & _2996;
-    assign _3868 = _2997 ^ _3519;
-    assign _3874 = _3868 ? _3873 : _275;
-    always @(posedge _310) begin
-        if (_308)
-            _3877 <= _1984;
+    assign _345 = g_mode_0 == _2052;
+    assign _346 = _345 & _275;
+    assign _441 = _346 & _440;
+    assign _676 = _441 & _675;
+    assign _690 = _676 & g_data_left_0;
+    assign _699 = _690 & _698;
+    assign _705 = _699 & _704;
+    assign _741 = _705 | _740;
+    assign _3005 = _741 | _845;
+    assign _279 = host_rx_to_tx;
+    assign _3006 = _279 & _3005;
+    assign _280 = _3006;
+    assign _3033 = _280 | _3032;
+    assign _3035 = _3033 & _3034;
+    assign _3932 = _3035 ^ _3570;
+    assign _3938 = _3932 ? _3937 : _281;
+    always @(posedge _316) begin
+        if (_314)
+            _3941 <= _1990;
         else
-            _3877 <= _3874;
+            _3941 <= _3938;
     end
-    assign _275 = _3877;
-    assign _1184 = _275 == _1984;
-    assign _3879 = _1184 ? _757 : _3047;
-    assign _1790 = _1250[28:27];
-    assign _1788 = _1267[95:94];
-    assign _1787 = _1261[95:94];
-    assign _1786 = _1255[95:94];
-    assign _1785 = _897[95:94];
+    assign _281 = _3941;
+    assign _1190 = _281 == _1990;
+    assign _3943 = _1190 ? _763 : _3085;
+    assign _1796 = _1256[28:27];
+    assign _1794 = _1273[95:94];
+    assign _1793 = _1267[95:94];
+    assign _1792 = _1261[95:94];
+    assign _1791 = _903[95:94];
     always @* begin
         case (f_winner)
         0:
-            _1789 <= _1785;
+            _1795 <= _1791;
         1:
-            _1789 <= _1786;
+            _1795 <= _1792;
         2:
-            _1789 <= _1787;
+            _1795 <= _1793;
         default:
-            _1789 <= _1788;
+            _1795 <= _1794;
         endcase
     end
-    assign _1791 = _881 ? _1790 : _1789;
+    assign _1797 = _887 ? _1796 : _1795;
     always @* begin
-        case (_1791)
+        case (_1797)
         0:
-            _3891 <= _1177;
+            _3955 <= _1183;
         1:
-            _3891 <= _3879;
+            _3955 <= _3943;
         2:
-            _3891 <= _3888;
+            _3955 <= _3952;
         default:
-            _3891 <= _3890;
+            _3955 <= _3954;
         endcase
     end
-    assign _3892 = _1701 ? _3891 : _1177;
-    assign _276 = _3892;
-    always @(posedge _310) begin
-        if (_308)
-            _1177 <= _755;
+    assign _3956 = _1707 ? _3955 : _1183;
+    assign _282 = _3956;
+    always @(posedge _316) begin
+        if (_314)
+            _1183 <= _761;
         else
-            _1177 <= _276;
+            _1183 <= _282;
     end
-    assign _1178 = _1177[0:0];
-    assign _3903 = 8'b00001000;
-    assign _3902 = 8'b00000111;
-    assign _3901 = _1172 - _761;
-    assign _3898 = _1250[30:29];
-    assign _3896 = _1267[99:98];
-    assign _3895 = _1261[99:98];
-    assign _3894 = _1255[99:98];
-    assign _3893 = _897[99:98];
+    assign _1184 = _1183[0:0];
+    assign _3967 = 8'b00001000;
+    assign _3966 = 8'b00000111;
+    assign _3965 = _1178 - _767;
+    assign _3962 = _1256[30:29];
+    assign _3960 = _1273[99:98];
+    assign _3959 = _1267[99:98];
+    assign _3958 = _1261[99:98];
+    assign _3957 = _903[99:98];
     always @* begin
         case (f_winner)
         0:
-            _3897 <= _3893;
+            _3961 <= _3957;
         1:
-            _3897 <= _3894;
+            _3961 <= _3958;
         2:
-            _3897 <= _3895;
+            _3961 <= _3959;
         default:
-            _3897 <= _3896;
+            _3961 <= _3960;
         endcase
     end
-    assign _3899 = _881 ? _3898 : _3897;
+    assign _3963 = _887 ? _3962 : _3961;
     always @* begin
-        case (_3899)
+        case (_3963)
         0:
-            _3904 <= _1172;
+            _3968 <= _1178;
         1:
-            _3904 <= _3901;
+            _3968 <= _3965;
         2:
-            _3904 <= _3902;
+            _3968 <= _3966;
         default:
-            _3904 <= _3903;
+            _3968 <= _3967;
         endcase
     end
-    assign _3905 = _1701 ? _3904 : _1172;
-    assign _277 = _3905;
-    always @(posedge _310) begin
-        if (_308)
-            _1172 <= _755;
+    assign _3969 = _1707 ? _3968 : _1178;
+    assign _283 = _3969;
+    always @(posedge _316) begin
+        if (_314)
+            _1178 <= _761;
         else
-            _1172 <= _277;
+            _1178 <= _283;
     end
-    assign _1174 = _1172 == _755;
-    assign _1372 = _1255[61:58];
+    assign _1180 = _1178 == _761;
+    assign _1378 = _1261[61:58];
     always @* begin
-        case (_1372)
+        case (_1378)
         0:
-            _1373 <= vdd;
+            _1379 <= vdd;
         1:
-            _1373 <= _1174;
+            _1379 <= _1180;
         2:
-            _1373 <= _1178;
+            _1379 <= _1184;
         3:
-            _1373 <= _1182;
+            _1379 <= _1188;
         4:
-            _1373 <= _1184;
+            _1379 <= _1190;
         5:
-            _1373 <= _737;
+            _1379 <= _743;
         6:
-            _1373 <= _1188;
+            _1379 <= _1194;
         7:
-            _1373 <= _1191;
+            _1379 <= _1197;
         8:
-            _1373 <= _657;
+            _1379 <= _663;
         9:
-            _1373 <= _660;
+            _1379 <= _666;
         10:
-            _1373 <= _663;
+            _1379 <= _669;
         11:
-            _1373 <= _666;
+            _1379 <= _672;
         12:
-            _1373 <= _645;
+            _1379 <= _651;
         13:
-            _1373 <= _648;
+            _1379 <= _654;
         14:
-            _1373 <= _651;
+            _1379 <= _657;
         default:
-            _1373 <= _654;
+            _1379 <= _660;
         endcase
     end
-    assign _1375 = _1373 ^ _1374;
-    assign _1367 = _1255[57:42];
-    assign _1369 = _1367 == _1998;
-    assign _1358 = _1304[57:42];
-    assign _1359 = { gnd,
-                     _1358 };
-    assign _1360 = _1359 + _1347;
-    always @(posedge _310) begin
-        if (_308)
-            _1363 <= _1640;
+    assign _1381 = _1379 ^ _1380;
+    assign _1373 = _1261[57:42];
+    assign _1375 = _1373 == _2004;
+    assign _1364 = _1310[57:42];
+    assign _1365 = { gnd,
+                     _1364 };
+    assign _1366 = _1365 + _1353;
+    always @(posedge _316) begin
+        if (_314)
+            _1369 <= _1646;
         else
-            _1363 <= _1360;
+            _1369 <= _1366;
     end
-    assign _1364 = _1363 < _1303;
-    assign _1365 = ~ _1364;
-    assign _1354 = _1255[41:26];
-    assign _1356 = _1354 == _1683;
-    assign _1132 = _1128 + _482;
-    assign _3920 = _1128 + _482;
-    assign _3916 = _1128 == _2464;
-    assign _3917 = ~ _3916;
-    assign _3914 = _914[0:0];
-    assign _3918 = _3914 & _3917;
-    assign _3921 = _3918 ? _3920 : _1128;
-    assign _3911 = _914[0:0];
-    assign _3912 = ~ _3911;
-    assign _3910 = f_chg_now[0:0];
-    assign _3913 = _3910 & _3912;
-    assign _3923 = _3913 ? _482 : _3921;
-    assign _3907 = _873 == _2046;
-    assign _3909 = _3907 ? _452 : _1128;
-    assign _3906 = _873 == _2045;
-    assign _3924 = _3906 ? _3923 : _3909;
-    assign _278 = _3924;
-    always @(posedge _310) begin
-        if (_308)
-            _1128 <= _452;
+    assign _1370 = _1369 < _1309;
+    assign _1371 = ~ _1370;
+    assign _1360 = _1261[41:26];
+    assign _1362 = _1360 == _1689;
+    assign _1138 = _1134 + _488;
+    assign _3984 = _1134 + _488;
+    assign _3980 = _1134 == _2470;
+    assign _3981 = ~ _3980;
+    assign _3978 = _920[0:0];
+    assign _3982 = _3978 & _3981;
+    assign _3985 = _3982 ? _3984 : _1134;
+    assign _3975 = _920[0:0];
+    assign _3976 = ~ _3975;
+    assign _3974 = f_chg_now[0:0];
+    assign _3977 = _3974 & _3976;
+    assign _3987 = _3977 ? _488 : _3985;
+    assign _3971 = _879 == _2052;
+    assign _3973 = _3971 ? _458 : _1134;
+    assign _3970 = _879 == _2051;
+    assign _3988 = _3970 ? _3987 : _3973;
+    assign _284 = _3988;
+    always @(posedge _316) begin
+        if (_314)
+            _1134 <= _458;
         else
-            _1128 <= _278;
+            _1134 <= _284;
     end
-    assign _1130 = _1128 == _2464;
-    assign _1133 = _1130 ? _1128 : _1132;
-    assign _1123 = _914[0:0];
-    assign _1124 = ~ _1123;
-    assign _1122 = f_chg_now[0:0];
-    assign _1125 = _1122 & _1124;
-    assign _1135 = _1125 ? _482 : _1133;
-    assign _1119 = f_changed_all[0:0];
-    assign _1120 = f_in_fetch & _1119;
-    assign _1136 = _1120 ? _1135 : _452;
-    assign _1338 = _1308[0:0];
-    assign _1340 = _1338 ? _1136 : _452;
-    assign _1111 = _1107 + _482;
-    assign _3939 = _1107 + _482;
-    assign _3935 = _1107 == _2464;
-    assign _3936 = ~ _3935;
-    assign _3933 = _914[1:1];
-    assign _3937 = _3933 & _3936;
-    assign _3940 = _3937 ? _3939 : _1107;
-    assign _3930 = _914[1:1];
-    assign _3931 = ~ _3930;
-    assign _3929 = f_chg_now[1:1];
-    assign _3932 = _3929 & _3931;
-    assign _3942 = _3932 ? _482 : _3940;
-    assign _3926 = _873 == _2046;
-    assign _3928 = _3926 ? _452 : _1107;
-    assign _3925 = _873 == _2045;
-    assign _3943 = _3925 ? _3942 : _3928;
-    assign _279 = _3943;
-    always @(posedge _310) begin
-        if (_308)
-            _1107 <= _452;
+    assign _1136 = _1134 == _2470;
+    assign _1139 = _1136 ? _1134 : _1138;
+    assign _1129 = _920[0:0];
+    assign _1130 = ~ _1129;
+    assign _1128 = f_chg_now[0:0];
+    assign _1131 = _1128 & _1130;
+    assign _1141 = _1131 ? _488 : _1139;
+    assign _1125 = f_changed_all[0:0];
+    assign _1126 = f_in_fetch & _1125;
+    assign _1142 = _1126 ? _1141 : _458;
+    assign _1344 = _1314[0:0];
+    assign _1346 = _1344 ? _1142 : _458;
+    assign _1117 = _1113 + _488;
+    assign _4003 = _1113 + _488;
+    assign _3999 = _1113 == _2470;
+    assign _4000 = ~ _3999;
+    assign _3997 = _920[1:1];
+    assign _4001 = _3997 & _4000;
+    assign _4004 = _4001 ? _4003 : _1113;
+    assign _3994 = _920[1:1];
+    assign _3995 = ~ _3994;
+    assign _3993 = f_chg_now[1:1];
+    assign _3996 = _3993 & _3995;
+    assign _4006 = _3996 ? _488 : _4004;
+    assign _3990 = _879 == _2052;
+    assign _3992 = _3990 ? _458 : _1113;
+    assign _3989 = _879 == _2051;
+    assign _4007 = _3989 ? _4006 : _3992;
+    assign _285 = _4007;
+    always @(posedge _316) begin
+        if (_314)
+            _1113 <= _458;
         else
-            _1107 <= _279;
+            _1113 <= _285;
     end
-    assign _1109 = _1107 == _2464;
-    assign _1112 = _1109 ? _1107 : _1111;
-    assign _1102 = _914[1:1];
-    assign _1103 = ~ _1102;
-    assign _1101 = f_chg_now[1:1];
-    assign _1104 = _1101 & _1103;
-    assign _1114 = _1104 ? _482 : _1112;
-    assign _1098 = f_changed_all[1:1];
-    assign _1099 = f_in_fetch & _1098;
-    assign _1115 = _1099 ? _1114 : _452;
-    assign _1335 = _1308[1:1];
-    assign _1337 = _1335 ? _1115 : _452;
-    assign _1341 = _1337 < _1340;
-    assign _1342 = _1341 ? _1340 : _1337;
-    assign _1088 = _1084 + _482;
-    assign _3958 = _1084 + _482;
-    assign _3954 = _1084 == _2464;
-    assign _3955 = ~ _3954;
-    assign _3952 = _914[2:2];
-    assign _3956 = _3952 & _3955;
-    assign _3959 = _3956 ? _3958 : _1084;
-    assign _3949 = _914[2:2];
-    assign _3950 = ~ _3949;
-    assign _3948 = f_chg_now[2:2];
-    assign _3951 = _3948 & _3950;
-    assign _3961 = _3951 ? _482 : _3959;
-    assign _3945 = _873 == _2046;
-    assign _3947 = _3945 ? _452 : _1084;
-    assign _3944 = _873 == _2045;
-    assign _3962 = _3944 ? _3961 : _3947;
-    assign _280 = _3962;
-    always @(posedge _310) begin
-        if (_308)
-            _1084 <= _452;
+    assign _1115 = _1113 == _2470;
+    assign _1118 = _1115 ? _1113 : _1117;
+    assign _1108 = _920[1:1];
+    assign _1109 = ~ _1108;
+    assign _1107 = f_chg_now[1:1];
+    assign _1110 = _1107 & _1109;
+    assign _1120 = _1110 ? _488 : _1118;
+    assign _1104 = f_changed_all[1:1];
+    assign _1105 = f_in_fetch & _1104;
+    assign _1121 = _1105 ? _1120 : _458;
+    assign _1341 = _1314[1:1];
+    assign _1343 = _1341 ? _1121 : _458;
+    assign _1347 = _1343 < _1346;
+    assign _1348 = _1347 ? _1346 : _1343;
+    assign _1094 = _1090 + _488;
+    assign _4022 = _1090 + _488;
+    assign _4018 = _1090 == _2470;
+    assign _4019 = ~ _4018;
+    assign _4016 = _920[2:2];
+    assign _4020 = _4016 & _4019;
+    assign _4023 = _4020 ? _4022 : _1090;
+    assign _4013 = _920[2:2];
+    assign _4014 = ~ _4013;
+    assign _4012 = f_chg_now[2:2];
+    assign _4015 = _4012 & _4014;
+    assign _4025 = _4015 ? _488 : _4023;
+    assign _4009 = _879 == _2052;
+    assign _4011 = _4009 ? _458 : _1090;
+    assign _4008 = _879 == _2051;
+    assign _4026 = _4008 ? _4025 : _4011;
+    assign _286 = _4026;
+    always @(posedge _316) begin
+        if (_314)
+            _1090 <= _458;
         else
-            _1084 <= _280;
+            _1090 <= _286;
     end
-    assign _1086 = _1084 == _2464;
-    assign _1089 = _1086 ? _1084 : _1088;
-    assign _1079 = _914[2:2];
-    assign _1080 = ~ _1079;
-    assign _1078 = f_chg_now[2:2];
-    assign _1081 = _1078 & _1080;
-    assign _1091 = _1081 ? _482 : _1089;
-    assign _1075 = f_changed_all[2:2];
-    assign _1076 = f_in_fetch & _1075;
-    assign _1092 = _1076 ? _1091 : _452;
-    assign _1330 = _1308[2:2];
-    assign _1332 = _1330 ? _1092 : _452;
-    assign _1067 = _1063 + _482;
-    assign _3977 = _1063 + _482;
-    assign _3973 = _1063 == _2464;
-    assign _3974 = ~ _3973;
-    assign _3971 = _914[3:3];
-    assign _3975 = _3971 & _3974;
-    assign _3978 = _3975 ? _3977 : _1063;
-    assign _3968 = _914[3:3];
-    assign _3969 = ~ _3968;
-    assign _3967 = f_chg_now[3:3];
-    assign _3970 = _3967 & _3969;
-    assign _3980 = _3970 ? _482 : _3978;
-    assign _3964 = _873 == _2046;
-    assign _3966 = _3964 ? _452 : _1063;
-    assign _3963 = _873 == _2045;
-    assign _3981 = _3963 ? _3980 : _3966;
-    assign _281 = _3981;
-    always @(posedge _310) begin
-        if (_308)
-            _1063 <= _452;
+    assign _1092 = _1090 == _2470;
+    assign _1095 = _1092 ? _1090 : _1094;
+    assign _1085 = _920[2:2];
+    assign _1086 = ~ _1085;
+    assign _1084 = f_chg_now[2:2];
+    assign _1087 = _1084 & _1086;
+    assign _1097 = _1087 ? _488 : _1095;
+    assign _1081 = f_changed_all[2:2];
+    assign _1082 = f_in_fetch & _1081;
+    assign _1098 = _1082 ? _1097 : _458;
+    assign _1336 = _1314[2:2];
+    assign _1338 = _1336 ? _1098 : _458;
+    assign _1073 = _1069 + _488;
+    assign _4041 = _1069 + _488;
+    assign _4037 = _1069 == _2470;
+    assign _4038 = ~ _4037;
+    assign _4035 = _920[3:3];
+    assign _4039 = _4035 & _4038;
+    assign _4042 = _4039 ? _4041 : _1069;
+    assign _4032 = _920[3:3];
+    assign _4033 = ~ _4032;
+    assign _4031 = f_chg_now[3:3];
+    assign _4034 = _4031 & _4033;
+    assign _4044 = _4034 ? _488 : _4042;
+    assign _4028 = _879 == _2052;
+    assign _4030 = _4028 ? _458 : _1069;
+    assign _4027 = _879 == _2051;
+    assign _4045 = _4027 ? _4044 : _4030;
+    assign _287 = _4045;
+    always @(posedge _316) begin
+        if (_314)
+            _1069 <= _458;
         else
-            _1063 <= _281;
+            _1069 <= _287;
     end
-    assign _1065 = _1063 == _2464;
-    assign _1068 = _1065 ? _1063 : _1067;
-    assign _1058 = _914[3:3];
-    assign _1059 = ~ _1058;
-    assign _1057 = f_chg_now[3:3];
-    assign _1060 = _1057 & _1059;
-    assign _1070 = _1060 ? _482 : _1068;
-    assign _1054 = f_changed_all[3:3];
-    assign _1055 = f_in_fetch & _1054;
-    assign _1071 = _1055 ? _1070 : _452;
-    assign _1327 = _1308[3:3];
-    assign _1329 = _1327 ? _1071 : _452;
-    assign _1333 = _1329 < _1332;
-    assign _1334 = _1333 ? _1332 : _1329;
-    assign _1343 = _1334 < _1342;
-    assign _1344 = _1343 ? _1342 : _1334;
-    assign _1042 = _1038 + _482;
-    assign _3996 = _1038 + _482;
-    assign _3992 = _1038 == _2464;
-    assign _3993 = ~ _3992;
-    assign _3990 = _914[4:4];
-    assign _3994 = _3990 & _3993;
-    assign _3997 = _3994 ? _3996 : _1038;
-    assign _3987 = _914[4:4];
-    assign _3988 = ~ _3987;
-    assign _3986 = f_chg_now[4:4];
-    assign _3989 = _3986 & _3988;
-    assign _3999 = _3989 ? _482 : _3997;
-    assign _3983 = _873 == _2046;
-    assign _3985 = _3983 ? _452 : _1038;
-    assign _3982 = _873 == _2045;
-    assign _4000 = _3982 ? _3999 : _3985;
-    assign _282 = _4000;
-    always @(posedge _310) begin
-        if (_308)
-            _1038 <= _452;
+    assign _1071 = _1069 == _2470;
+    assign _1074 = _1071 ? _1069 : _1073;
+    assign _1064 = _920[3:3];
+    assign _1065 = ~ _1064;
+    assign _1063 = f_chg_now[3:3];
+    assign _1066 = _1063 & _1065;
+    assign _1076 = _1066 ? _488 : _1074;
+    assign _1060 = f_changed_all[3:3];
+    assign _1061 = f_in_fetch & _1060;
+    assign _1077 = _1061 ? _1076 : _458;
+    assign _1333 = _1314[3:3];
+    assign _1335 = _1333 ? _1077 : _458;
+    assign _1339 = _1335 < _1338;
+    assign _1340 = _1339 ? _1338 : _1335;
+    assign _1349 = _1340 < _1348;
+    assign _1350 = _1349 ? _1348 : _1340;
+    assign _1048 = _1044 + _488;
+    assign _4060 = _1044 + _488;
+    assign _4056 = _1044 == _2470;
+    assign _4057 = ~ _4056;
+    assign _4054 = _920[4:4];
+    assign _4058 = _4054 & _4057;
+    assign _4061 = _4058 ? _4060 : _1044;
+    assign _4051 = _920[4:4];
+    assign _4052 = ~ _4051;
+    assign _4050 = f_chg_now[4:4];
+    assign _4053 = _4050 & _4052;
+    assign _4063 = _4053 ? _488 : _4061;
+    assign _4047 = _879 == _2052;
+    assign _4049 = _4047 ? _458 : _1044;
+    assign _4046 = _879 == _2051;
+    assign _4064 = _4046 ? _4063 : _4049;
+    assign _288 = _4064;
+    always @(posedge _316) begin
+        if (_314)
+            _1044 <= _458;
         else
-            _1038 <= _282;
+            _1044 <= _288;
     end
-    assign _1040 = _1038 == _2464;
-    assign _1043 = _1040 ? _1038 : _1042;
-    assign _1033 = _914[4:4];
-    assign _1034 = ~ _1033;
-    assign _1032 = f_chg_now[4:4];
-    assign _1035 = _1032 & _1034;
-    assign _1045 = _1035 ? _482 : _1043;
-    assign _1029 = f_changed_all[4:4];
-    assign _1030 = f_in_fetch & _1029;
-    assign _1046 = _1030 ? _1045 : _452;
-    assign _1320 = _1308[4:4];
-    assign _1322 = _1320 ? _1046 : _452;
-    assign _1021 = _1017 + _482;
-    assign _4015 = _1017 + _482;
-    assign _4011 = _1017 == _2464;
-    assign _4012 = ~ _4011;
-    assign _4009 = _914[5:5];
-    assign _4013 = _4009 & _4012;
-    assign _4016 = _4013 ? _4015 : _1017;
-    assign _4006 = _914[5:5];
-    assign _4007 = ~ _4006;
-    assign _4005 = f_chg_now[5:5];
-    assign _4008 = _4005 & _4007;
-    assign _4018 = _4008 ? _482 : _4016;
-    assign _4002 = _873 == _2046;
-    assign _4004 = _4002 ? _452 : _1017;
-    assign _4001 = _873 == _2045;
-    assign _4019 = _4001 ? _4018 : _4004;
-    assign _283 = _4019;
-    always @(posedge _310) begin
-        if (_308)
-            _1017 <= _452;
+    assign _1046 = _1044 == _2470;
+    assign _1049 = _1046 ? _1044 : _1048;
+    assign _1039 = _920[4:4];
+    assign _1040 = ~ _1039;
+    assign _1038 = f_chg_now[4:4];
+    assign _1041 = _1038 & _1040;
+    assign _1051 = _1041 ? _488 : _1049;
+    assign _1035 = f_changed_all[4:4];
+    assign _1036 = f_in_fetch & _1035;
+    assign _1052 = _1036 ? _1051 : _458;
+    assign _1326 = _1314[4:4];
+    assign _1328 = _1326 ? _1052 : _458;
+    assign _1027 = _1023 + _488;
+    assign _4079 = _1023 + _488;
+    assign _4075 = _1023 == _2470;
+    assign _4076 = ~ _4075;
+    assign _4073 = _920[5:5];
+    assign _4077 = _4073 & _4076;
+    assign _4080 = _4077 ? _4079 : _1023;
+    assign _4070 = _920[5:5];
+    assign _4071 = ~ _4070;
+    assign _4069 = f_chg_now[5:5];
+    assign _4072 = _4069 & _4071;
+    assign _4082 = _4072 ? _488 : _4080;
+    assign _4066 = _879 == _2052;
+    assign _4068 = _4066 ? _458 : _1023;
+    assign _4065 = _879 == _2051;
+    assign _4083 = _4065 ? _4082 : _4068;
+    assign _289 = _4083;
+    always @(posedge _316) begin
+        if (_314)
+            _1023 <= _458;
         else
-            _1017 <= _283;
+            _1023 <= _289;
     end
-    assign _1019 = _1017 == _2464;
-    assign _1022 = _1019 ? _1017 : _1021;
-    assign _1012 = _914[5:5];
-    assign _1013 = ~ _1012;
-    assign _1011 = f_chg_now[5:5];
-    assign _1014 = _1011 & _1013;
-    assign _1024 = _1014 ? _482 : _1022;
-    assign _1008 = f_changed_all[5:5];
-    assign _1009 = f_in_fetch & _1008;
-    assign _1025 = _1009 ? _1024 : _452;
-    assign _1317 = _1308[5:5];
-    assign _1319 = _1317 ? _1025 : _452;
-    assign _1323 = _1319 < _1322;
-    assign _1324 = _1323 ? _1322 : _1319;
-    assign _998 = _994 + _482;
-    assign _4034 = _994 + _482;
-    assign _4030 = _994 == _2464;
-    assign _4031 = ~ _4030;
-    assign _4028 = _914[6:6];
-    assign _4032 = _4028 & _4031;
-    assign _4035 = _4032 ? _4034 : _994;
-    assign _4025 = _914[6:6];
-    assign _4026 = ~ _4025;
-    assign _4024 = f_chg_now[6:6];
-    assign _4027 = _4024 & _4026;
-    assign _4037 = _4027 ? _482 : _4035;
-    assign _4021 = _873 == _2046;
-    assign _4023 = _4021 ? _452 : _994;
-    assign _4020 = _873 == _2045;
-    assign _4038 = _4020 ? _4037 : _4023;
-    assign _284 = _4038;
-    always @(posedge _310) begin
-        if (_308)
-            _994 <= _452;
+    assign _1025 = _1023 == _2470;
+    assign _1028 = _1025 ? _1023 : _1027;
+    assign _1018 = _920[5:5];
+    assign _1019 = ~ _1018;
+    assign _1017 = f_chg_now[5:5];
+    assign _1020 = _1017 & _1019;
+    assign _1030 = _1020 ? _488 : _1028;
+    assign _1014 = f_changed_all[5:5];
+    assign _1015 = f_in_fetch & _1014;
+    assign _1031 = _1015 ? _1030 : _458;
+    assign _1323 = _1314[5:5];
+    assign _1325 = _1323 ? _1031 : _458;
+    assign _1329 = _1325 < _1328;
+    assign _1330 = _1329 ? _1328 : _1325;
+    assign _1004 = _1000 + _488;
+    assign _4098 = _1000 + _488;
+    assign _4094 = _1000 == _2470;
+    assign _4095 = ~ _4094;
+    assign _4092 = _920[6:6];
+    assign _4096 = _4092 & _4095;
+    assign _4099 = _4096 ? _4098 : _1000;
+    assign _4089 = _920[6:6];
+    assign _4090 = ~ _4089;
+    assign _4088 = f_chg_now[6:6];
+    assign _4091 = _4088 & _4090;
+    assign _4101 = _4091 ? _488 : _4099;
+    assign _4085 = _879 == _2052;
+    assign _4087 = _4085 ? _458 : _1000;
+    assign _4084 = _879 == _2051;
+    assign _4102 = _4084 ? _4101 : _4087;
+    assign _290 = _4102;
+    always @(posedge _316) begin
+        if (_314)
+            _1000 <= _458;
         else
-            _994 <= _284;
+            _1000 <= _290;
     end
-    assign _996 = _994 == _2464;
-    assign _999 = _996 ? _994 : _998;
-    assign _989 = _914[6:6];
-    assign _990 = ~ _989;
-    assign _988 = f_chg_now[6:6];
-    assign _991 = _988 & _990;
-    assign _1001 = _991 ? _482 : _999;
-    assign _985 = f_changed_all[6:6];
-    assign _986 = f_in_fetch & _985;
-    assign _1002 = _986 ? _1001 : _452;
-    assign _1312 = _1308[6:6];
-    assign _1314 = _1312 ? _1002 : _452;
-    assign _977 = _973 + _482;
-    assign _4053 = _973 + _482;
-    assign _4049 = _973 == _2464;
-    assign _4050 = ~ _4049;
-    assign _4047 = _914[7:7];
-    assign _4051 = _4047 & _4050;
-    assign _4054 = _4051 ? _4053 : _973;
-    assign _4044 = _914[7:7];
-    assign _4045 = ~ _4044;
-    assign _4043 = f_chg_now[7:7];
-    assign _4046 = _4043 & _4045;
-    assign _4056 = _4046 ? _482 : _4054;
-    assign _4040 = _873 == _2046;
-    assign _4042 = _4040 ? _452 : _973;
-    assign _4039 = _873 == _2045;
-    assign _4057 = _4039 ? _4056 : _4042;
-    assign _285 = _4057;
-    always @(posedge _310) begin
-        if (_308)
-            _973 <= _452;
+    assign _1002 = _1000 == _2470;
+    assign _1005 = _1002 ? _1000 : _1004;
+    assign _995 = _920[6:6];
+    assign _996 = ~ _995;
+    assign _994 = f_chg_now[6:6];
+    assign _997 = _994 & _996;
+    assign _1007 = _997 ? _488 : _1005;
+    assign _991 = f_changed_all[6:6];
+    assign _992 = f_in_fetch & _991;
+    assign _1008 = _992 ? _1007 : _458;
+    assign _1318 = _1314[6:6];
+    assign _1320 = _1318 ? _1008 : _458;
+    assign _983 = _979 + _488;
+    assign _4117 = _979 + _488;
+    assign _4113 = _979 == _2470;
+    assign _4114 = ~ _4113;
+    assign _4111 = _920[7:7];
+    assign _4115 = _4111 & _4114;
+    assign _4118 = _4115 ? _4117 : _979;
+    assign _4108 = _920[7:7];
+    assign _4109 = ~ _4108;
+    assign _4107 = f_chg_now[7:7];
+    assign _4110 = _4107 & _4109;
+    assign _4120 = _4110 ? _488 : _4118;
+    assign _4104 = _879 == _2052;
+    assign _4106 = _4104 ? _458 : _979;
+    assign _4103 = _879 == _2051;
+    assign _4121 = _4103 ? _4120 : _4106;
+    assign _291 = _4121;
+    always @(posedge _316) begin
+        if (_314)
+            _979 <= _458;
         else
-            _973 <= _285;
+            _979 <= _291;
     end
-    assign _975 = _973 == _2464;
-    assign _978 = _975 ? _973 : _977;
-    assign _968 = _914[7:7];
-    assign _969 = ~ _968;
-    assign _967 = f_chg_now[7:7];
-    assign _970 = _967 & _969;
-    assign _980 = _970 ? _482 : _978;
-    assign _964 = f_changed_all[7:7];
-    assign _965 = f_in_fetch & _964;
-    assign _981 = _965 ? _980 : _452;
-    assign _1308 = _1304[23:16];
-    assign _1309 = _1308[7:7];
-    assign _1311 = _1309 ? _981 : _452;
-    assign _1315 = _1311 < _1314;
-    assign _1316 = _1315 ? _1314 : _1311;
-    assign _1325 = _1316 < _1324;
-    assign _1326 = _1325 ? _1324 : _1316;
-    assign _1345 = _1326 < _1344;
-    assign _1346 = _1345 ? _1344 : _1326;
-    assign _1347 = { _1585,
-                     _1346 };
-    assign _4060 = _878 == _482;
-    assign _4061 = _4060 ? _302 : _895;
-    assign _4058 = _873 == _2045;
-    assign _4062 = _4058 ? _4061 : _895;
-    assign _286 = _4062;
-    always @(posedge _310) begin
-        if (_308)
-            _895 <= _885;
+    assign _981 = _979 == _2470;
+    assign _984 = _981 ? _979 : _983;
+    assign _974 = _920[7:7];
+    assign _975 = ~ _974;
+    assign _973 = f_chg_now[7:7];
+    assign _976 = _973 & _975;
+    assign _986 = _976 ? _488 : _984;
+    assign _970 = f_changed_all[7:7];
+    assign _971 = f_in_fetch & _970;
+    assign _987 = _971 ? _986 : _458;
+    assign _1314 = _1310[23:16];
+    assign _1315 = _1314[7:7];
+    assign _1317 = _1315 ? _987 : _458;
+    assign _1321 = _1317 < _1320;
+    assign _1322 = _1321 ? _1320 : _1317;
+    assign _1331 = _1322 < _1330;
+    assign _1332 = _1331 ? _1330 : _1322;
+    assign _1351 = _1332 < _1350;
+    assign _1352 = _1351 ? _1350 : _1332;
+    assign _1353 = { _1591,
+                     _1352 };
+    assign _4124 = _884 == _488;
+    assign _4125 = _4124 ? _308 : _901;
+    assign _4122 = _879 == _2051;
+    assign _4126 = _4122 ? _4125 : _901;
+    assign _292 = _4126;
+    always @(posedge _316) begin
+        if (_314)
+            _901 <= _891;
         else
-            _895 <= _286;
+            _901 <= _292;
     end
-    assign _953 = _878 == _482;
-    assign _954 = f_in_fetch & _953;
-    assign _955 = _954 ? _302 : _895;
-    assign _4065 = _878 == _454;
-    assign _4066 = _4065 ? _302 : _892;
-    assign _4063 = _873 == _2045;
-    assign _4067 = _4063 ? _4066 : _892;
-    assign _287 = _4067;
-    always @(posedge _310) begin
-        if (_308)
-            _892 <= _885;
+    assign _959 = _884 == _488;
+    assign _960 = f_in_fetch & _959;
+    assign _961 = _960 ? _308 : _901;
+    assign _4129 = _884 == _460;
+    assign _4130 = _4129 ? _308 : _898;
+    assign _4127 = _879 == _2051;
+    assign _4131 = _4127 ? _4130 : _898;
+    assign _293 = _4131;
+    always @(posedge _316) begin
+        if (_314)
+            _898 <= _891;
         else
-            _892 <= _287;
+            _898 <= _293;
     end
-    assign _949 = _878 == _454;
-    assign _950 = f_in_fetch & _949;
-    assign _951 = _950 ? _302 : _892;
-    assign _4070 = _878 == _1867;
-    assign _4071 = _4070 ? _302 : _889;
-    assign _4068 = _873 == _2045;
-    assign _4072 = _4068 ? _4071 : _889;
-    assign _288 = _4072;
-    always @(posedge _310) begin
-        if (_308)
-            _889 <= _885;
+    assign _955 = _884 == _460;
+    assign _956 = f_in_fetch & _955;
+    assign _957 = _956 ? _308 : _898;
+    assign _4134 = _884 == _1873;
+    assign _4135 = _4134 ? _308 : _895;
+    assign _4132 = _879 == _2051;
+    assign _4136 = _4132 ? _4135 : _895;
+    assign _294 = _4136;
+    always @(posedge _316) begin
+        if (_314)
+            _895 <= _891;
         else
-            _889 <= _288;
+            _895 <= _294;
     end
-    assign _945 = _878 == _1867;
-    assign _946 = f_in_fetch & _945;
-    assign _947 = _946 ? _302 : _889;
-    assign _4113 = _4100 | f_sweeping;
-    assign _4107 = ~ f_sweeping;
-    assign _290 = host_rec_we;
-    assign _4106 = _290 & _1833;
-    assign f_store_we = _4106 & _4107;
-    assign _292 = host_rec_wdata;
-    always @(posedge _310) begin
+    assign _951 = _884 == _1873;
+    assign _952 = f_in_fetch & _951;
+    assign _953 = _952 ? _308 : _895;
+    assign _4177 = _4164 | f_sweeping;
+    assign _4171 = ~ f_sweeping;
+    assign _296 = host_rec_we;
+    assign _4170 = _296 & _1839;
+    assign f_store_we = _4170 & _4171;
+    assign _298 = host_rec_wdata;
+    always @(posedge _316) begin
         if (f_store_we)
-            _4109[_4105] <= _292;
+            _4173[_4169] <= _298;
     end
-    assign _4103 = _878[1:0];
-    assign _294 = host_start_loc;
-    assign _1267 = _896[511:400];
-    assign _4085 = _1267[110:105];
-    assign _1261 = _896[399:288];
-    assign _4084 = _1261[110:105];
-    assign _4083 = _1255[110:105];
-    assign _4082 = _897[110:105];
+    assign _4167 = _884[1:0];
+    assign _300 = host_start_loc;
+    assign _1273 = _902[511:400];
+    assign _4149 = _1273[110:105];
+    assign _1267 = _902[399:288];
+    assign _4148 = _1267[110:105];
+    assign _4147 = _1261[110:105];
+    assign _4146 = _903[110:105];
     always @* begin
         case (f_winner)
         0:
-            _4086 <= _4082;
+            _4150 <= _4146;
         1:
-            _4086 <= _4083;
+            _4150 <= _4147;
         2:
-            _4086 <= _4084;
+            _4150 <= _4148;
         default:
-            _4086 <= _4085;
+            _4150 <= _4149;
         endcase
     end
-    assign _4087 = _4086 == _1764;
-    assign _4088 = ~ _4087;
-    assign _4089 = _4088 ? _4086 : _1764;
-    assign _296 = host_recover_loc;
-    assign _4076 = _1893 ? _296 : _4075;
-    assign _297 = _4076;
-    always @(posedge _310) begin
-        if (_308)
-            _4075 <= _3807;
+    assign _4151 = _4150 == _1770;
+    assign _4152 = ~ _4151;
+    assign _4153 = _4152 ? _4150 : _1770;
+    assign _302 = host_recover_loc;
+    assign _4140 = _1899 ? _302 : _4139;
+    assign _303 = _4140;
+    always @(posedge _316) begin
+        if (_314)
+            _4139 <= _3871;
         else
-            _4075 <= _297;
+            _4139 <= _303;
     end
-    assign f_policy = _1250[59:58];
-    assign _4079 = f_policy == _2046;
-    assign _4080 = _4079 ? _4075 : _1764;
-    assign _4081 = f_viol_now ? _4080 : _1764;
-    assign _4090 = _1700 ? _4089 : _4081;
-    assign _4077 = _873 == _2046;
-    assign _4091 = _4077 ? _4090 : _1764;
-    assign _4092 = _1893 ? _294 : _4091;
-    assign _298 = _4092;
-    always @(posedge _310) begin
-        if (_308)
-            _1764 <= _3807;
+    assign f_policy = _1256[59:58];
+    assign _4143 = f_policy == _2052;
+    assign _4144 = _4143 ? _4139 : _1770;
+    assign _4145 = f_viol_now ? _4144 : _1770;
+    assign _4154 = _1706 ? _4153 : _4145;
+    assign _4141 = _879 == _2052;
+    assign _4155 = _4141 ? _4154 : _1770;
+    assign _4156 = _1899 ? _300 : _4155;
+    assign _304 = _4156;
+    always @(posedge _316) begin
+        if (_314)
+            _1770 <= _3871;
         else
-            _1764 <= _298;
+            _1770 <= _304;
     end
-    assign _4104 = { _1764,
-                     _4103 };
-    assign _4096 = f_sw_cnt + _2711;
-    assign _4094 = _2698 ? _2016 : f_sw_cnt;
-    assign _4097 = f_sweeping ? _4096 : _4094;
-    assign _299 = _4097;
-    always @(posedge _310) begin
-        if (_308)
-            f_sw_cnt <= _2016;
+    assign _4168 = { _1770,
+                     _4167 };
+    assign _4160 = f_sw_cnt + _2717;
+    assign _4158 = _2704 ? _2022 : f_sw_cnt;
+    assign _4161 = f_sweeping ? _4160 : _4158;
+    assign _305 = _4161;
+    always @(posedge _316) begin
+        if (_314)
+            f_sw_cnt <= _2022;
         else
-            f_sw_cnt <= _299;
+            f_sw_cnt <= _305;
     end
-    assign _4101 = f_sw_cnt[11:4];
-    assign _301 = host_rec_waddr;
-    assign _4102 = f_sweeping ? _4101 : _301;
-    assign _4099 = _878 < _455;
-    assign _4100 = f_in_fetch & _4099;
-    assign _4105 = _4100 ? _4104 : _4102;
-    assign _4110 = _4109[_4105];
-    always @(posedge _310) begin
-        if (_4113)
-            _4114 <= _4110;
+    assign _4165 = f_sw_cnt[11:4];
+    assign _307 = host_rec_waddr;
+    assign _4166 = f_sweeping ? _4165 : _307;
+    assign _4163 = _884 < _461;
+    assign _4164 = f_in_fetch & _4163;
+    assign _4169 = _4164 ? _4168 : _4166;
+    assign _4174 = _4173[_4169];
+    always @(posedge _316) begin
+        if (_4177)
+            _4178 <= _4174;
     end
-    assign _302 = _4114;
-    assign _941 = _878 == _455;
-    assign _942 = f_in_fetch & _941;
-    assign _943 = _942 ? _302 : _886;
-    assign _956 = { _943,
-                    _947,
-                    _951,
-                    _955 };
-    assign _1304 = _956[287:176];
-    assign _1305 = _1304[41:26];
-    assign _1306 = { gnd,
-                     _1305 };
-    assign _1348 = _1306 + _1347;
-    always @(posedge _310) begin
-        if (_308)
-            _1351 <= _1640;
+    assign _308 = _4178;
+    assign _947 = _884 == _461;
+    assign _948 = f_in_fetch & _947;
+    assign _949 = _948 ? _308 : _892;
+    assign _962 = { _949,
+                    _953,
+                    _957,
+                    _961 };
+    assign _1310 = _962[287:176];
+    assign _1311 = _1310[41:26];
+    assign _1312 = { gnd,
+                     _1311 };
+    assign _1354 = _1312 + _1353;
+    always @(posedge _316) begin
+        if (_314)
+            _1357 <= _1646;
         else
-            _1351 <= _1348;
+            _1357 <= _1354;
     end
     assign gnd = 1'b0;
-    assign _1303 = { gnd,
-                     _1300 };
-    assign _1352 = _1303 < _1351;
-    assign _1353 = ~ _1352;
-    assign _1357 = _1353 | _1356;
-    assign _1366 = _1357 & _1365;
-    assign _4142 = _935 + _4178;
-    assign _4138 = _935 == _1998;
-    assign _4139 = ~ _4138;
-    assign _4140 = _4136 & _4139;
-    assign _4143 = _4140 ? _4142 : _935;
-    assign _4122 = _4121[2:2];
-    assign _4123 = _1701 & _4122;
-    assign _4145 = _4123 ? _1683 : _4143;
-    assign _4147 = _1893 ? _1683 : _4145;
-    assign _303 = _4147;
-    always @(posedge _310) begin
-        if (_308)
-            _935 <= _1683;
+    assign _1309 = { gnd,
+                     _1306 };
+    assign _1358 = _1309 < _1357;
+    assign _1359 = ~ _1358;
+    assign _1363 = _1359 | _1362;
+    assign _1372 = _1363 & _1371;
+    assign _4206 = _941 + _4242;
+    assign _4202 = _941 == _2004;
+    assign _4203 = ~ _4202;
+    assign _4204 = _4200 & _4203;
+    assign _4207 = _4204 ? _4206 : _941;
+    assign _4186 = _4185[2:2];
+    assign _4187 = _1707 & _4186;
+    assign _4209 = _4187 ? _1689 : _4207;
+    assign _4211 = _1899 ? _1689 : _4209;
+    assign _309 = _4211;
+    always @(posedge _316) begin
+        if (_314)
+            _941 <= _1689;
         else
-            _935 <= _303;
+            _941 <= _309;
     end
-    assign _4159 = _932 + _4178;
-    assign _4155 = _932 == _1998;
-    assign _4156 = ~ _4155;
-    assign _4134 = 9'b111111111;
-    assign _4135 = _4127 == _4134;
-    assign _4132 = 6'b111111;
-    assign _4131 = _4127[5:0];
-    assign _4133 = _4131 == _4132;
-    assign _4126 = 9'b000000000;
-    assign _4148 = 9'b000000001;
-    assign _4149 = _4127 + _4148;
-    assign _4151 = _1893 ? _4126 : _4149;
-    assign _304 = _4151;
-    always @(posedge _310) begin
-        if (_308)
-            _4127 <= _4126;
+    assign _4223 = _938 + _4242;
+    assign _4219 = _938 == _2004;
+    assign _4220 = ~ _4219;
+    assign _4198 = 9'b111111111;
+    assign _4199 = _4191 == _4198;
+    assign _4196 = 6'b111111;
+    assign _4195 = _4191[5:0];
+    assign _4197 = _4195 == _4196;
+    assign _4190 = 9'b000000000;
+    assign _4212 = 9'b000000001;
+    assign _4213 = _4191 + _4212;
+    assign _4215 = _1899 ? _4190 : _4213;
+    assign _310 = _4215;
+    always @(posedge _316) begin
+        if (_314)
+            _4191 <= _4190;
         else
-            _4127 <= _304;
+            _4191 <= _310;
     end
-    assign _4128 = _4127[2:0];
-    assign _4130 = _4128 == _2464;
-    assign _4124 = _1250[63:62];
+    assign _4192 = _4191[2:0];
+    assign _4194 = _4192 == _2470;
+    assign _4188 = _1256[63:62];
     always @* begin
-        case (_4124)
+        case (_4188)
         0:
-            _4136 <= vdd;
+            _4200 <= vdd;
         1:
-            _4136 <= _4130;
+            _4200 <= _4194;
         2:
-            _4136 <= _4133;
+            _4200 <= _4197;
         default:
-            _4136 <= _4135;
+            _4200 <= _4199;
         endcase
     end
-    assign _4157 = _4136 & _4156;
-    assign _4160 = _4157 ? _4159 : _932;
-    assign _4152 = _4121[1:1];
-    assign _4153 = _1701 & _4152;
-    assign _4162 = _4153 ? _1683 : _4160;
-    assign _4164 = _1893 ? _1683 : _4162;
-    assign _305 = _4164;
-    always @(posedge _310) begin
-        if (_308)
-            _932 <= _1683;
+    assign _4221 = _4200 & _4220;
+    assign _4224 = _4221 ? _4223 : _938;
+    assign _4216 = _4185[1:1];
+    assign _4217 = _1707 & _4216;
+    assign _4226 = _4217 ? _1689 : _4224;
+    assign _4228 = _1899 ? _1689 : _4226;
+    assign _311 = _4228;
+    always @(posedge _316) begin
+        if (_314)
+            _938 <= _1689;
         else
-            _932 <= _305;
+            _938 <= _311;
     end
-    assign _1299 = _1255[25:24];
+    assign _1305 = _1261[25:24];
     always @* begin
-        case (_1299)
+        case (_1305)
         0:
-            _1300 <= _929;
+            _1306 <= _935;
         1:
-            _1300 <= _932;
+            _1306 <= _938;
         2:
-            _1300 <= _935;
+            _1306 <= _941;
         default:
-            _1300 <= _935;
+            _1306 <= _941;
         endcase
     end
-    assign _1302 = _1300 == _1998;
-    assign _1370 = _1302 ? _1369 : _1366;
-    always @(posedge _310) begin
-        if (_308)
-            _917 <= _755;
+    assign _1308 = _1306 == _2004;
+    assign _1376 = _1308 ? _1375 : _1372;
+    always @(posedge _316) begin
+        if (_314)
+            _923 <= _761;
         else
-            _917 <= _901;
+            _923 <= _907;
     end
-    assign f_chg_now = _901 ^ _917;
-    assign _4166 = _873 == _2046;
-    assign _4168 = _4166 ? _755 : _914;
-    assign _4165 = _873 == _2045;
-    assign _4169 = _4165 ? f_changed_all : _4168;
-    assign _4171 = _1893 ? _755 : _4169;
-    assign _306 = _4171;
-    always @(posedge _310) begin
-        if (_308)
-            _914 <= _755;
+    assign f_chg_now = _907 ^ _923;
+    assign _4230 = _879 == _2052;
+    assign _4232 = _4230 ? _761 : _920;
+    assign _4229 = _879 == _2051;
+    assign _4233 = _4229 ? f_changed_all : _4232;
+    assign _4235 = _1899 ? _761 : _4233;
+    assign _312 = _4235;
+    always @(posedge _316) begin
+        if (_314)
+            _920 <= _761;
         else
-            _914 <= _306;
+            _920 <= _312;
     end
-    assign f_changed_all = _914 | f_chg_now;
-    assign _1293 = f_changed_all & f_chgmask1;
-    assign _1295 = _1293 == _755;
-    assign _1296 = ~ _1295;
-    assign f_chgmask1 = _1255[23:16];
-    assign _1292 = f_chgmask1 == _755;
-    assign _1297 = _1292 | _1296;
-    assign _1286 = _1255[7:0];
-    assign _1284 = _1255[15:8];
+    assign f_changed_all = _920 | f_chg_now;
+    assign _1299 = f_changed_all & f_chgmask1;
+    assign _1301 = _1299 == _761;
+    assign _1302 = ~ _1301;
+    assign f_chgmask1 = _1261[23:16];
+    assign _1298 = f_chgmask1 == _761;
+    assign _1303 = _1298 | _1302;
+    assign _1292 = _1261[7:0];
+    assign _1290 = _1261[15:8];
     assign vdd = 1'b1;
-    assign _308 = clear;
-    assign _310 = clock;
-    assign _312 = pins_in;
-    always @(posedge _310) begin
-        if (_308)
-            _343 <= _755;
+    assign _314 = clear;
+    assign _316 = clock;
+    assign _318 = pins_in;
+    always @(posedge _316) begin
+        if (_314)
+            _349 <= _761;
         else
-            _343 <= _312;
+            _349 <= _318;
     end
-    always @(posedge _310) begin
-        if (_308)
-            _901 <= _755;
+    always @(posedge _316) begin
+        if (_314)
+            _907 <= _761;
         else
-            _901 <= _343;
+            _907 <= _349;
     end
-    assign _1285 = _901 ^ _1284;
-    assign _1287 = _1285 & _1286;
-    assign _1289 = _1287 == _755;
-    assign _1255 = _896[287:176];
-    assign f_valid1 = _1255[111:111];
-    assign _1290 = f_valid1 & _1289;
-    assign _1298 = _1290 & _1297;
-    assign _1371 = _1298 & _1370;
-    assign _1376 = _1371 & _1375;
-    assign _1415 = _1376 & _1414;
-    assign _1416 = f_in_eval & _1415;
-    assign _1420 = _1416 & _1419;
-    assign f_fire1 = _1420 & _1282;
-    assign _1706 = f_fire1 ? _2045 : _1704;
-    assign f_winner = f_fire0 ? _2539 : _1706;
+    assign _1291 = _907 ^ _1290;
+    assign _1293 = _1291 & _1292;
+    assign _1295 = _1293 == _761;
+    assign _1261 = _902[287:176];
+    assign f_valid1 = _1261[111:111];
+    assign _1296 = f_valid1 & _1295;
+    assign _1304 = _1296 & _1303;
+    assign _1377 = _1304 & _1376;
+    assign _1382 = _1377 & _1381;
+    assign _1421 = _1382 & _1420;
+    assign _1422 = f_in_eval & _1421;
+    assign _1426 = _1422 & _1425;
+    assign f_fire1 = _1426 & _1288;
+    assign _1712 = f_fire1 ? _2051 : _1710;
+    assign f_winner = f_fire0 ? _2545 : _1712;
     always @* begin
         case (f_winner)
         0:
-            _4119 <= _4115;
+            _4183 <= _4179;
         1:
-            _4119 <= _4116;
+            _4183 <= _4180;
         2:
-            _4119 <= _4117;
+            _4183 <= _4181;
         default:
-            _4119 <= _4118;
+            _4183 <= _4182;
         endcase
     end
-    assign _4121 = _881 ? _4120 : _4119;
-    assign _4172 = _4121[0:0];
-    assign _880 = _878 == _455;
-    assign f_in_fetch = _873 == _2045;
-    assign _881 = f_in_fetch & _880;
-    assign _1701 = _881 | _1700;
-    assign _4173 = _1701 & _4172;
-    assign _4182 = _4173 ? _1683 : _4180;
-    assign _4184 = _1893 ? _1683 : _4182;
-    assign _313 = _4184;
-    always @(posedge _310) begin
-        if (_308)
-            _929 <= _1683;
+    assign _4185 = _887 ? _4184 : _4183;
+    assign _4236 = _4185[0:0];
+    assign _886 = _884 == _461;
+    assign f_in_fetch = _879 == _2051;
+    assign _887 = f_in_fetch & _886;
+    assign _1707 = _887 | _1706;
+    assign _4237 = _1707 & _4236;
+    assign _4246 = _4237 ? _1689 : _4244;
+    assign _4248 = _1899 ? _1689 : _4246;
+    assign _319 = _4248;
+    always @(posedge _316) begin
+        if (_314)
+            _935 <= _1689;
         else
-            _929 <= _313;
+            _935 <= _319;
     end
-    assign _1941 = _1250[33:32];
+    assign _1947 = _1256[33:32];
     always @* begin
-        case (_1941)
+        case (_1947)
         0:
-            _1942 <= _929;
+            _1948 <= _935;
         1:
-            _1942 <= _932;
+            _1948 <= _938;
         2:
-            _1942 <= _935;
+            _1948 <= _941;
         default:
-            _1942 <= _935;
+            _1948 <= _941;
         endcase
     end
-    assign _1940 = _1250[49:34];
-    assign _1943 = _1940 < _1942;
-    assign _1250 = _896[63:0];
-    assign _1938 = _1250[31:31];
-    assign _1936 = ~ _1700;
-    assign _1937 = f_in_eval & _1936;
-    assign _1939 = _1937 & _1938;
-    assign _1944 = _1939 & _1943;
-    assign _1949 = _1944 & _1948;
-    assign _1957 = _1949 | f_unexp_now;
-    assign f_viol_now = _1957 | f_amb_now;
-    assign _4190 = f_viol_now ? _4189 : _878;
-    assign _4193 = _1700 ? _4192 : _4190;
-    assign _4186 = _873 == _2046;
-    assign _4194 = _4186 ? _4193 : _878;
-    assign _4185 = _873 == _2045;
-    assign _4197 = _4185 ? _4196 : _4194;
-    assign _4199 = _1893 ? _452 : _4197;
-    assign _314 = _4199;
-    always @(posedge _310) begin
-        if (_308)
-            _878 <= _452;
+    assign _1946 = _1256[49:34];
+    assign _1949 = _1946 < _1948;
+    assign _1256 = _902[63:0];
+    assign _1944 = _1256[31:31];
+    assign _1942 = ~ _1706;
+    assign _1943 = f_in_eval & _1942;
+    assign _1945 = _1943 & _1944;
+    assign _1950 = _1945 & _1949;
+    assign _1955 = _1950 & _1954;
+    assign _1963 = _1955 | f_unexp_now;
+    assign f_viol_now = _1963 | f_amb_now;
+    assign _4254 = f_viol_now ? _4253 : _884;
+    assign _4257 = _1706 ? _4256 : _4254;
+    assign _4250 = _879 == _2052;
+    assign _4258 = _4250 ? _4257 : _884;
+    assign _4249 = _879 == _2051;
+    assign _4261 = _4249 ? _4260 : _4258;
+    assign _4263 = _1899 ? _458 : _4261;
+    assign _320 = _4263;
+    always @(posedge _316) begin
+        if (_314)
+            _884 <= _458;
         else
-            _878 <= _314;
+            _884 <= _320;
     end
-    assign _4202 = _878 == _455;
-    assign _4203 = _4202 ? _302 : _886;
-    assign _4200 = _873 == _2045;
-    assign _4204 = _4200 ? _4203 : _886;
-    assign _315 = _4204;
-    always @(posedge _310) begin
-        if (_308)
-            _886 <= _885;
+    assign _4266 = _884 == _461;
+    assign _4267 = _4266 ? _308 : _892;
+    assign _4264 = _879 == _2051;
+    assign _4268 = _4264 ? _4267 : _892;
+    assign _321 = _4268;
+    always @(posedge _316) begin
+        if (_314)
+            _892 <= _891;
         else
-            _886 <= _315;
+            _892 <= _321;
     end
-    assign _896 = { _886,
-                    _889,
-                    _892,
-                    _895 };
-    assign _897 = _896[175:64];
-    assign f_valid0 = _897[111:111];
-    assign _908 = f_valid0 & _907;
-    assign _925 = _908 & _924;
-    assign _1168 = _925 & _1167;
-    assign _1195 = _1168 & _1194;
-    assign _1239 = _1195 & _1238;
-    assign f_in_eval = _873 == _2046;
-    assign _1240 = f_in_eval & _1239;
-    assign _1249 = _1240 & _1248;
-    assign f_fire0 = _1249 & _1282;
-    assign _1422 = f_fire0 | f_fire1;
-    assign _1561 = _1422 | f_fire2;
-    assign _1700 = _1561 | f_fire3;
-    assign _4223 = _1700 ? _4222 : _4220;
-    assign _4208 = _873 == _1961;
-    assign _4210 = _4208 ? _2539 : _873;
-    assign _4206 = _873 == _2046;
-    assign _4224 = _4206 ? _4223 : _4210;
-    assign _4205 = _873 == _2045;
-    assign _4227 = _4205 ? _4226 : _4224;
-    assign _317 = host_stop;
-    assign _4229 = _317 ? _2539 : _4227;
-    assign _4231 = _1893 ? _2045 : _4229;
-    assign _318 = _4231;
-    always @(posedge _310) begin
-        if (_308)
-            _873 <= _2539;
+    assign _902 = { _892,
+                    _895,
+                    _898,
+                    _901 };
+    assign _903 = _902[175:64];
+    assign f_valid0 = _903[111:111];
+    assign _914 = f_valid0 & _913;
+    assign _931 = _914 & _930;
+    assign _1174 = _931 & _1173;
+    assign _1201 = _1174 & _1200;
+    assign _1245 = _1201 & _1244;
+    assign f_in_eval = _879 == _2052;
+    assign _1246 = f_in_eval & _1245;
+    assign _1255 = _1246 & _1254;
+    assign f_fire0 = _1255 & _1288;
+    assign _1428 = f_fire0 | f_fire1;
+    assign _1567 = _1428 | f_fire2;
+    assign _1706 = _1567 | f_fire3;
+    assign _4287 = _1706 ? _4286 : _4284;
+    assign _4272 = _879 == _1967;
+    assign _4274 = _4272 ? _2545 : _879;
+    assign _4270 = _879 == _2052;
+    assign _4288 = _4270 ? _4287 : _4274;
+    assign _4269 = _879 == _2051;
+    assign _4291 = _4269 ? _4290 : _4288;
+    assign _323 = host_stop;
+    assign _4293 = _323 ? _2545 : _4291;
+    assign _4295 = _1899 ? _2051 : _4293;
+    assign _324 = _4295;
+    always @(posedge _316) begin
+        if (_314)
+            _879 <= _2545;
         else
-            _873 <= _318;
+            _879 <= _324;
     end
-    assign _1833 = _873 == _2539;
-    assign _320 = host_verify;
-    assign _2696 = _320 & _1833;
-    assign _2698 = _2696 & _2697;
-    assign _4233 = _2698 ? _1819 : f_sweeping;
-    assign _4243 = f_sweeping ? _4242 : _4233;
-    assign _321 = _4243;
-    always @(posedge _310) begin
-        if (_308)
-            f_sweeping <= _1817;
+    assign _1839 = _879 == _2545;
+    assign _326 = host_verify;
+    assign _2702 = _326 & _1839;
+    assign _2704 = _2702 & _2703;
+    assign _4297 = _2704 ? _1825 : f_sweeping;
+    assign _4307 = f_sweeping ? _4306 : _4297;
+    assign _327 = _4307;
+    always @(posedge _316) begin
+        if (_314)
+            f_sweeping <= _1823;
         else
-            f_sweeping <= _321;
+            f_sweeping <= _327;
     end
-    assign _4255 = f_sweeping ? _4254 : _4248;
-    assign _322 = _4255;
-    always @(posedge _310) begin
-        if (_308)
-            f_image_valid <= _1817;
+    assign _4319 = f_sweeping ? _4318 : _4312;
+    assign _328 = _4319;
+    always @(posedge _316) begin
+        if (_314)
+            f_image_valid <= _1823;
         else
-            f_image_valid <= _322;
+            f_image_valid <= _328;
     end
-    assign _324 = host_start;
-    assign _1893 = _324 & f_image_valid;
-    assign _4279 = _1893 ? _755 : _4277;
-    assign _325 = _4279;
-    always @(posedge _310) begin
-        if (_308)
-            f_pout <= _755;
+    assign _330 = host_start;
+    assign _1899 = _330 & f_image_valid;
+    assign _4343 = _1899 ? _761 : _4341;
+    assign _331 = _4343;
+    always @(posedge _316) begin
+        if (_314)
+            f_pout <= _761;
         else
-            f_pout <= _325;
+            f_pout <= _331;
     end
-    assign _2621 = f_pout[7:7];
-    assign _327 = host_pin_src;
-    assign _2617 = _327[23:21];
+    assign _2627 = f_pout[7:7];
+    assign _333 = host_pin_src;
+    assign _2623 = _333[23:21];
     always @* begin
-        case (_2617)
+        case (_2623)
         0:
-            _2628 <= _2621;
+            _2634 <= _2627;
         1:
-            _2628 <= f_lane0_out;
+            _2634 <= f_lane0_out;
         2:
-            _2628 <= _2622;
+            _2634 <= _2628;
         3:
-            _2628 <= _2623;
+            _2634 <= _2629;
         4:
-            _2628 <= _2625;
+            _2634 <= _2631;
         5:
-            _2628 <= f_lane1_out;
+            _2634 <= f_lane1_out;
         6:
-            _2628 <= _2626;
+            _2634 <= _2632;
         default:
-            _2628 <= _2627;
+            _2634 <= _2633;
         endcase
     end
-    assign _2692 = { _2628,
-                     _2637,
-                     _2646,
-                     _2655,
-                     _2664,
-                     _2673,
-                     _2682,
-                     _2691 };
-    assign _4281 = _2692 & _4280;
-    assign pins_out = _4281;
-    assign pins_oe = _2695;
-    assign st_running = _2552;
+    assign _2698 = { _2634,
+                     _2643,
+                     _2652,
+                     _2661,
+                     _2670,
+                     _2679,
+                     _2688,
+                     _2697 };
+    assign _4345 = _2698 & _4344;
+    assign pins_out = _4345;
+    assign pins_oe = _2701;
+    assign st_running = _2558;
     assign st_in_entry = f_in_fetch;
-    assign st_cur_loc = _1764;
-    assign st_accepting = _2551;
-    assign st_taken = _2549;
-    assign st_taken_edge = _2546;
-    assign st_viol = _2543;
-    assign st_viol_kind = _2540;
+    assign st_cur_loc = _1770;
+    assign st_accepting = _2557;
+    assign st_taken = _2555;
+    assign st_taken_edge = _2552;
+    assign st_viol = _2549;
+    assign st_viol_kind = _2546;
     assign st_timestamp = ts_reg;
-    assign st_tx_full = _739;
-    assign st_tx_empty = _1184;
-    assign st_rx_data = _2535;
-    assign st_rx_empty = _2470;
-    assign st_vlog_data = _2468;
-    assign st_vlog_empty = _1985;
-    assign st_cov_rdata = _2097;
-    assign st_irq = _1989;
-    assign st_halted_viol = _1922;
-    assign st_rx_overflow = _1915;
-    assign st_vlog_overflow = _1903;
-    assign st_cov_overrun = _1896;
-    assign st_host_err = _1880;
-    assign st_host_err_cause = _1885;
-    assign st_lane_active = _1831;
+    assign st_tx_full = _745;
+    assign st_tx_empty = _1190;
+    assign st_rx_data = _2541;
+    assign st_rx_empty = _2476;
+    assign st_vlog_data = _2474;
+    assign st_vlog_empty = _1991;
+    assign st_cov_rdata = _2103;
+    assign st_irq = _1995;
+    assign st_halted_viol = _1928;
+    assign st_rx_overflow = _1921;
+    assign st_vlog_overflow = _1909;
+    assign st_cov_overrun = _1902;
+    assign st_host_err = _1886;
+    assign st_host_err_cause = _1891;
+    assign st_lane_active = _1837;
     assign st_image_valid = f_image_valid;
     assign st_verify_busy = f_sweeping;
-    assign st_tx_collision = _1818;
-    assign st_drops = _1784;
-    assign st_lane_status = _668;
+    assign st_tx_collision = _1824;
+    assign st_drops = _1790;
+    assign st_lane_status = _674;
 
 endmodule

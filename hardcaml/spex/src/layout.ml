@@ -168,6 +168,9 @@ module Lane_cfg = struct
     ; len_en : 'a (** RX: the frame length follows a 4-bit length field *)
     ; len_pos : 'a [@bits 6] (** RX: data-bit index where the length field ends *)
     ; len_max : 'a [@bits 4] (** RX: the field is clipped to this many bytes *)
+    ; crc_resid : 'a
+      (** RX: CRC residual mode: [len_pos] is the CRC start, [sync] / [sync_mask] the residual,
+          [crc_ok] set at each byte boundary (ENGINE.md, CRC residual) *)
     }
   [@@deriving hardcaml]
 end

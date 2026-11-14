@@ -6,7 +6,7 @@ formal/prove_lanes.sh (bit lane, L1-L3) on it.
 
 usage: python3 formal/vacuity.py      (from the repo root, with opam env loaded)
 """
-import subprocess, pathlib, sys, re
+import subprocess, pathlib, sys, re, os
 sys.path.insert(0, "mutation")
 from mutate import MUTANTS, LANE_MUTANTS
 
@@ -44,6 +44,12 @@ LANE_TARGETS = {
     "len_max ignored": "L5 (RX skip and length field match the reference)",
     "data pin register one cycle late (fed from pins_s)": "L5 (RX skip and length field match the reference)",
     "cq fed from cs's input (no clock edge ever seen)": "L5 (RX skip and length field match the reference)",
+    "residual mode: CRC start (len_pos) ignored": "L6 (CRC residual: crc_ok after each byte)",
+    "residual compared in the push cycle (byte's last bit not in)": "L6 (CRC residual: crc_ok after each byte)",
+    "residual crc_ok sticky (only ever set)": "L6 (CRC residual: crc_ok after each byte)",
+    "residual compares the CRC's low half": "L6 (CRC residual: crc_ok after each byte)",
+    "sync_hit not suppressed in residual mode": "L6 (CRC residual: crc_ok after each byte)",
+    "residual mode: len_en not ignored": "L5 (RX skip and length field match the reference)",
 }
 
 def main():
@@ -52,8 +58,9 @@ def main():
     out = pathlib.Path("formal/mut"); out.mkdir(exist_ok=True)
     rows = []
     try:
+        only = os.environ.get("ONLY")
         for name, old, new in MUTANTS:
-            if name not in TARGETS: continue
+            if name not in TARGETS or (only and only not in name): continue
             SRC.write_text(original.replace(old, new))
             g = subprocess.run(f"dune exec bin/gen.exe -- {out}", shell=True, capture_output=True, text=True)
             if g.returncode != 0:
@@ -66,7 +73,7 @@ def main():
         SRC.write_text(original)
         lane_original = LANE.read_text()
         for name, old, new in LANE_MUTANTS:
-            if name not in LANE_TARGETS: continue
+            if name not in LANE_TARGETS or (only and only not in name): continue
             LANE.write_text(lane_original.replace(old, new))
             g = subprocess.run(f"dune exec bin/gen.exe -- {out}", shell=True, capture_output=True, text=True)
             LANE.write_text(lane_original)
