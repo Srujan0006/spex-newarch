@@ -12,7 +12,7 @@ module spex_props (
     input host_tx_push, input [7:0] pins_in, input host_stop, input host_start,
     input host_cov_re, input [1:0] host_lane_we, input host_err_clear,
     input host_verify, input [31:0] host_crc_expect, input host_crc_expect_we,
-    input [2:0] host_rx_wm, input [2:0] host_tx_wm, input host_tx_wm_en, input host_drop_clear,
+    input [4:0] host_rx_wm, input [4:0] host_tx_wm, input host_tx_wm_en, input host_drop_clear,
     input host_rx_to_tx,
     input [5:0] host_lane0_skip, input host_lane0_len_en, input [5:0] host_lane0_len_pos, input [3:0] host_lane0_len_max, input host_lane0_crc_resid,
     input [5:0] host_lane1_skip, input host_lane1_len_en, input [5:0] host_lane1_len_pos, input [3:0] host_lane1_len_max, input host_lane1_crc_resid,

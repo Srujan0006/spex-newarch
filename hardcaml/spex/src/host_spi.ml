@@ -34,7 +34,8 @@
     locations; 0x18..0x1B crc_expect (little-endian; any write clears image_valid); CTRL
     bit 4 = verify (ENGINE.md, Image validation).
 
-    CSR 0x1C (read/write) WATERMARK {tx_wm_en, tx_wm 3, 0, rx_wm 3}. CSRs 0x20..0x24
+    CSR 0x1C (read/write) WATERMARK {tx_wm_en, 0, 0, rx_wm 5}, 0x1D (read/write) TX_WM
+    {0, 0, 0, tx_wm 5} (since F2, 2026-11-14: FIFOs 32 deep; 0x1E / 0x1F read 0). CSRs 0x20..0x24
     (read) drop counters: RX lane 0, RX lane 1, RX engine, violation log, coverage
     (saturating at 255). CTRL bit 5 clears them; CTRL bit 3 also clears tx_collision.
 
@@ -175,7 +176,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let crc_we_p = rv 1 in
   let verify_p = rv 1 in
   let drop_clear_p = rv 1 in
-  let wm = rv 7 in
+  let wm = rv 6 in (* {tx_wm_en, rx_wm 5} *)
+  let wm_tx = rv 5 in
   let lane_regs = List.init 2 ~f:(fun _ -> List.init lane_bytes ~f:(fun _ -> rv 8)) in
   (* host-side strobes and data, one cycle after the byte that causes them *)
   let start_p = rv 1 in
@@ -242,7 +244,11 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
             ; of_int ~width:8 Layout.num_locs
             ]
           @ List.map crc_expect ~f:(fun r -> r.value)
-          @ [ concat_msb [ select wm.value 6 3; gnd; select wm.value 2 0 ] ]))
+          @ [ concat_msb [ wm.value.:(5); zero 2; select wm.value 4 0 ]
+            ; uresize wm_tx.value 8
+            ; zero 8
+            ; zero 8
+            ]))
       csr_rd
   in
   let csr_rd =
@@ -294,7 +300,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; (* writes *)
       when_
         (wr_data &: sp Space.csr &: ~:(a.:(5)) &: a.:(4))
-        [ when_ (select a 3 0 ==:. 12) [ wm <-- concat_msb [ select byte 7 4; select byte 2 0 ] ]
+        [ when_ (select a 3 0 ==:. 12) [ wm <-- concat_msb [ byte.:(7); select byte 4 0 ] ]
+        ; when_ (select a 3 0 ==:. 13) [ wm_tx <-- select byte 4 0 ]
         ; proc (List.mapi pin_src ~f:(fun k r -> when_ (select a 3 0 ==:. k) [ r <-- byte ]))
         ; proc
             (List.mapi crc_expect ~f:(fun k r ->
@@ -392,9 +399,9 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; verify = verify_p.value
     ; crc_expect = concat_msb (List.rev_map crc_expect ~f:(fun r -> r.value))
     ; crc_expect_we = crc_we_p.value
-    ; rx_wm = select wm.value 2 0
-    ; tx_wm = select wm.value 5 3
-    ; tx_wm_en = wm.value.:(6)
+    ; rx_wm = select wm.value 4 0
+    ; tx_wm = wm_tx.value
+    ; tx_wm_en = wm.value.:(5)
     ; drop_clear = drop_clear_p.value
     ; rx_to_tx = config.value.:(3)
     }

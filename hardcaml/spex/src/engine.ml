@@ -44,8 +44,8 @@ module Host_in = struct
     ; verify : 'a (** start the image check sweep (idle only) *)
     ; crc_expect : 'a [@bits 32] (** CRC-32 the host expects over the whole store *)
     ; crc_expect_we : 'a (** crc_expect was written: clears image_valid *)
-    ; rx_wm : 'a [@bits 3] (** IRQ while the RX FIFO holds >= rx_wm bytes (0 acts as 1) *)
-    ; tx_wm : 'a [@bits 3]
+    ; rx_wm : 'a [@bits 5] (** IRQ while the RX FIFO holds >= rx_wm bytes (0 acts as 1) *)
+    ; tx_wm : 'a [@bits 5]
     ; tx_wm_en : 'a (** IRQ while the TX FIFO holds <= tx_wm bytes *)
     ; drop_clear : 'a (** clears the drop counters *)
     ; rx_to_tx : 'a
@@ -141,6 +141,11 @@ end
 
 (** Register FIFO: push when full is dropped, pop when empty is ignored, [q] shows
     the head combinationally. *)
+(** FIFO depths (ENGINE.md, Limits): TX and RX 32 bytes since review F2 (2026-11-14; 8
+    before), the violation log 8 entries (48 bits each, the costly one to deepen). *)
+let data_fifo_depth = 32
+let vlog_depth = 8
+
 let small_fifo spec ~depth ~push ~pop ~d =
   let ab = Int.ceil_log2 depth in
   let used = wire (ab + 1) in
@@ -222,7 +227,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let tx_q, tx_empty, tx_full, _, tx_used =
     small_fifo
       spec
-      ~depth:8
+      ~depth:data_fifo_depth
       ~push:(br_push |: (h.tx_push &: ~:(h.rx_to_tx)))
       ~pop:tx_pop
       ~d:(mux2 br_push br_d h.tx_data)
@@ -230,7 +235,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let rx_push = wire 1 in
   let rx_push_d = wire 8 in
   let rx_q, rx_empty, rx_full, rx_drop, rx_used =
-    small_fifo spec ~depth:8 ~push:rx_push ~pop:h.rx_pop ~d:rx_push_d
+    small_fifo spec ~depth:data_fifo_depth ~push:rx_push ~pop:h.rx_pop ~d:rx_push_d
   in
   (* ---- bit lanes ---- *)
   let lane_cmd = wire 3 in
@@ -262,7 +267,7 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
   let vlog_push = wire 1 in
   let vlog_d = wire 48 in
   let vlog_q, vlog_empty, _, vlog_drop, _ =
-    small_fifo spec ~depth:8 ~push:vlog_push ~pop:h.vlog_pop ~d:vlog_d
+    small_fifo spec ~depth:vlog_depth ~push:vlog_push ~pop:h.vlog_pop ~d:vlog_d
   in
   (* ---- guard evaluation ---- *)
   let flags =
@@ -827,8 +832,8 @@ let create (_ : Scope.t) (i : _ I.t) : _ O.t =
     ; vlog_empty
     ; cov_rdata = mux2 (in_idle &: ~:(sweeping.value)) i.ram.cov_rdata (zero 32)
     ; irq =
-        rx_used >=: uresize (mux2 (h.rx_wm ==:. 0) (of_int ~width:3 1) h.rx_wm) 4
-        |: (h.tx_wm_en &: (tx_used <=: uresize h.tx_wm 4))
+        rx_used >=: uresize (mux2 (h.rx_wm ==:. 0) (of_int ~width:5 1) h.rx_wm) (width rx_used)
+        |: (h.tx_wm_en &: (tx_used <=: uresize h.tx_wm (width tx_used)))
         |: ~:vlog_empty
         |: halted_viol.value
         |: irq_flag.value

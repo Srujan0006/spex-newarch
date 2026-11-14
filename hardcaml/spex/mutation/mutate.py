@@ -129,8 +129,8 @@ LANE_MUTANTS = [
     # CAN -> UART bridge: header skip and DLC length field (test_bridge.ml)
     ("skip one bit short (18 for CAN)", "(select cnt.value 5 0 >=: c.skip)", "(select cnt.value 5 0 >=: c.skip -:. 1)"),
     ("skip one bit long (20 for CAN)", "(select cnt.value 5 0 >=: c.skip)", "(select cnt.value 5 0 >: c.skip)"),
-    ("skipped bits left out of the CRC", "[ crc <-- crc_next rbit\n                    ; cnt <-- cnt.value +:. 1",
-     "[ crc <-- mux2 past_skip (crc_next rbit) crc.value\n                    ; cnt <-- cnt.value +:. 1"),
+    ("skipped bits left out of the CRC", "[ when_ crc_in [ crc <-- crc_next rbit ]",
+     "[ when_ (crc_in &: past_skip) [ crc <-- crc_next rbit ]"),
     ("length field read one bit late", "(select cnt.value 5 0 ==: c.len_pos))", "(select cnt.value 5 0 ==: c.len_pos +:. 1))"),
     ("len_max ignored", "let n = mux2 (f >: c.len_max) c.len_max f in", "let n = f in"),
     # lane-private pin registers (review T1)

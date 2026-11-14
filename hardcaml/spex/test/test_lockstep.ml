@@ -183,9 +183,9 @@ let%expect_test "random specs: RTL and model agree on every output, every cycle"
   [%expect {|
     runs where a lane left Idle 14, cycles with a push waiting 0, runs ending with a lane error 2
     image checks passed during the runs 0, runs whose first host error is a refused start 3
-    runs ending with a non-zero drop counter 15, with tx_collision set 0
+    runs ending with a non-zero drop counter 14, with tx_collision set 0
     300 specs x 3000 cycles = 900000 cycles in lockstep, no mismatch
-    runs ending with: coverage overrun 1, halted on violation 129, rx overflow 3, log overflow 10
+    runs ending with: coverage overrun 1, halted on violation 129, rx overflow 2, log overflow 10
     |}]
 ;;
 

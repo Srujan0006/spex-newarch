@@ -76,8 +76,8 @@ module tb;
   reg [0:0] host_verify;
   reg [31:0] host_crc_expect;
   reg [0:0] host_crc_expect_we;
-  reg [2:0] host_rx_wm;
-  reg [2:0] host_tx_wm;
+  reg [4:0] host_rx_wm;
+  reg [4:0] host_tx_wm;
   reg [0:0] host_tx_wm_en;
   reg [0:0] host_drop_clear;
   reg [0:0] host_rx_to_tx;
@@ -154,7 +154,7 @@ module tb;
       if (r == 1) begin
         if (flag == 1) begin
           for (k = 0; k < 256; k = k + 1) dut._2092[k] = 0;
-          for (k = 0; k < 256; k = k + 1) dut._4173[k] = 0;
+          for (k = 0; k < 256; k = k + 1) dut._4461[k] = 0;
           clear = 1; tick; clear = 0;
         end
         r = $fscanf(fd, "%h", pins_in);

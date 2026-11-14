@@ -34,18 +34,19 @@ let%expect_test "engine RX drops: counted per push, saturate at 255, cleared by 
   let t = H.create () in
   H.load t pusher;
   H.start t ();
-  H.cycles t 60;
-  printf "after 60 cycles:   %s (rx_overflow %d)\n" (drops t) (H.get t.o.status.rx_overflow);
+  (* the RX FIFO is 32 deep: full after about 96 cycles *)
+  H.cycles t 120;
+  printf "after 120 cycles:  %s (rx_overflow %d)\n" (drops t) (H.get t.o.status.rx_overflow);
   H.cycles t 1000;
-  printf "after 1060 cycles: %s\n" (drops t);
+  printf "after 1120 cycles: %s\n" (drops t);
   (* a restart clears rx_overflow but not the counters *)
   H.start t ();
   printf "after a restart:   %s (rx_overflow %d)\n" (drops t) (H.get t.o.status.rx_overflow);
   H.pulse t t.i.host.drop_clear 1;
   printf "after drop_clear:  %s\n" (drops t);
   [%expect {|
-    after 60 cycles:   rx lane0 0, rx lane1 0, rx engine 11, log 0, coverage 0 (rx_overflow 1)
-    after 1060 cycles: rx lane0 0, rx lane1 0, rx engine 255, log 0, coverage 0
+    after 120 cycles:  rx lane0 0, rx lane1 0, rx engine 7, log 0, coverage 0 (rx_overflow 1)
+    after 1120 cycles: rx lane0 0, rx lane1 0, rx engine 255, log 0, coverage 0
     after a restart:   rx lane0 0, rx lane1 0, rx engine 255, log 0, coverage 0 (rx_overflow 0)
     after drop_clear:  rx lane0 0, rx lane1 0, rx engine 0, log 0, coverage 0
     |}]
@@ -108,17 +109,14 @@ let%expect_test "watermarks: IRQ while RX holds >= rx_wm bytes, or TX holds <= t
   H.load t pusher;
   let h = t.i.host in
   (* RX: the engine fills the FIFO one byte every 3 cycles *)
-  List.iter [ 0; 4 ] ~f:(fun wm ->
+  List.iter [ 0; 4; 20 ] ~f:(fun wm ->
     H.set h.rx_wm wm;
-    H.start t ();
-    (* empty the FIFO left by the last run *)
-    H.set h.rx_pop 1;
-    H.cycles t 12;
-    H.set h.rx_pop 0;
+    (* empty the FIFO left by the last run, with the engine stopped *)
     H.pulse t h.stop 1;
+    ignore (H.drain_rx t : int list);
     H.start t ();
     let seen = ref [] in
-    for _ = 1 to 40 do
+    for _ = 1 to 75 do
       H.cycle t;
       let e = Queue.length t.model.rx_fifo, H.get t.o.status.irq in
       if not (List.mem !seen e ~equal:Poly.equal) then seen := e :: !seen
@@ -145,8 +143,9 @@ let%expect_test "watermarks: IRQ while RX holds >= rx_wm bytes, or TX holds <= t
   H.cycle t;
   printf "tx_wm_en 0, tx_wm 7, %d bytes: irq %d\n" (Queue.length t.model.tx_fifo) (H.get t.o.status.irq);
   [%expect {|
-    rx_wm 0: (bytes, irq) (1,1) (2,1) (3,1) (4,1) (5,1) (6,1) (7,1) (8,1)
-    rx_wm 4: (bytes, irq) (1,0) (2,0) (3,0) (4,1) (5,1) (6,1) (7,1) (8,1)
+    rx_wm 0: (bytes, irq) (0,0) (1,1) (2,1) (3,1) (4,1) (5,1) (6,1) (7,1) (8,1) (9,1) (10,1) (11,1) (12,1) (13,1) (14,1) (15,1) (16,1) (17,1) (18,1) (19,1) (20,1) (21,1) (22,1) (23,1) (24,1)
+    rx_wm 4: (bytes, irq) (0,0) (1,0) (2,0) (3,0) (4,1) (5,1) (6,1) (7,1) (8,1) (9,1) (10,1) (11,1) (12,1) (13,1) (14,1) (15,1) (16,1) (17,1) (18,1) (19,1) (20,1) (21,1) (22,1) (23,1) (24,1)
+    rx_wm 20: (bytes, irq) (0,0) (1,0) (2,0) (3,0) (4,0) (5,0) (6,0) (7,0) (8,0) (9,0) (10,0) (11,0) (12,0) (13,0) (14,0) (15,0) (16,0) (17,0) (18,0) (19,0) (20,1) (21,1) (22,1) (23,1) (24,1)
     tx_wm 2: 0 bytes, irq 1
     tx_wm 2: 1 bytes, irq 1
     tx_wm 2: 2 bytes, irq 1

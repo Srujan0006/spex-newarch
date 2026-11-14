@@ -20,7 +20,7 @@ test harness stops with the cycle number and both output sets.
 | `pout`, `poe` | 8 each | pin output value and enable registers |
 | `tx_sr`, `rx_sr`, `cnt` | 8 each | data path |
 | LFSR | 16 | reset value 0xACE1, taps 16, 14, 13, 11 |
-| TX FIFO, RX FIFO | 8 x 8 | |
+| TX FIFO, RX FIFO | 32 x 8 | 8 deep before review F2 (2026-11-14) |
 | violation log | 8 x 48 | `{timestamp 32, loc 6, kind 2, pins 8}`; kind 0 AMBIGUOUS, 1 UNEXPECTED, 2 TIMEOUT, 3 both |
 | coverage | 256 x 32 SRAM | `{count 8, min 12, max 12}` per `{loc, edge}` |
 
@@ -243,13 +243,16 @@ whose read-back CRC matches the approved digest.
 
 `start` (role, `start_loc`, `recover_loc`), `stop` (see Host access rules; a `start` while running restarts the engine at `start_loc` and drops the pin changes latched so far; found by formal property P3); location-store and coverage writes are ignored
 while running; TX push, RX pop, log pop. `irq` = RX holds at least `rx_wm` bytes (`rx_wm`
-= 0 acts as 1, so any byte), or TX holds at most `tx_wm` bytes while `tx_wm_en`, or log
+= 0 acts as 1, so any byte; 5 bits, CSR 0x1C), or TX holds at most `tx_wm` bytes while
+`tx_wm_en` (5 bits, CSR 0x1D), or log
 not empty, or halted on violation, or an entry with `irq_on_entry` since the last
 `irq_ack`. FIFO heads are only defined when the FIFO is not empty.
 
 ## Limits and loss accounting
 
-The TX, RX and violation-log FIFOs are 8 entries deep. The host SPI clock is at most
+The TX and RX FIFOs are 32 bytes deep, the violation log 8 entries (review F2,
+2026-11-14: TX / RX were 8; a log entry is 48 bits, so the log stays at 8 and its overflow
+is counted). The host SPI clock is at most
 clk/6 (6.7 MHz at 40 MHz). The host must drain RX at the protocol's byte rate; bytes it
 does not take in time are dropped and counted.
 

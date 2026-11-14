@@ -180,7 +180,9 @@ type t =
   ; mutable s2 : (int * int * int * int) option (* addr, n, min, max *)
   }
 
-let fifo_depth = 8
+(* ENGINE.md, Limits: TX and RX 32 bytes (review F2, 2026-11-14), the violation log 8 *)
+let fifo_depth = 32
+let vlog_depth = 8
 
 (** Bit lanes in the chip; must match [Engine.num_lanes]. *)
 let num_lanes = 2
@@ -654,7 +656,7 @@ let step t (i : inputs) =
   let vlog_pop_now = i.vlog_pop && not (Queue.is_empty t.vlog_fifo) in
   let tx_full_now = Queue.length t.tx_fifo = fifo_depth in
   let rx_full_now = rx_full in
-  let vlog_full_now = Queue.length t.vlog_fifo = fifo_depth in
+  let vlog_full_now = Queue.length t.vlog_fifo = vlog_depth in
   let watched_age =
     List.init 8 ~f:(fun p -> if bit t.changed p && bit h.watch p then t.ages.(p) else 0)
     |> List.fold ~init:0 ~f:max

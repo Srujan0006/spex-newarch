@@ -130,7 +130,7 @@ let slow_host ~q ~every ?(pre = []) ?(tx = []) ~addr steps =
   let sda_drv () = H.get t.o.pins_oe land 2 = 2 && H.get t.o.pins_out land 2 = 0 in
   let last_sda = ref 0 and prev_sda = ref false and min_su = ref Int.max_value in
   (* run until the controller's steps are done (its time stops while stretched) *)
-  while t.cycle - base < len + stretched () + 40 && t.cycle - base < 400_000 do
+  while t.cycle - base < len + stretched () + 40 && t.cycle - base < 2_000_000 do
     let was_low = scl_low () in
     H.cycle t;
     let d = sda_drv () in
@@ -162,23 +162,23 @@ let slow_host ~q ~every ?(pre = []) ?(tx = []) ~addr steps =
 ;;
 
 let%expect_test "I2C target clock stretching: slow host at 100 kHz and 400 kHz" =
-  let data = List.init 12 ~f:(fun i -> 0x10 + i) in
+  let data = List.init 40 ~f:(fun i -> 0x10 + i) in
   List.iter [ "100 kHz", 100; "400 kHz", 25 ] ~f:(fun (name, q) ->
-    printf "%s write of 12 bytes, host reads one byte every 20000 cycles (RX FIFO 8 deep):\n" name;
+    printf "%s write of 40 bytes, host reads one byte every 20000 cycles (RX FIFO 32 deep):\n" name;
     slow_host ~q ~every:20000 ~addr:0x50 (write 0x50 data);
     printf "%s read of 3 bytes, TX FIFO empty, host pushes one byte every 8000 cycles (expected ACK 0, a5 5a 3c):\n" name;
     slow_host ~q ~every:8000 ~tx:[ 0xA5; 0x5A; 0x3C ] ~addr:0x50 (read 0x50 3);
     printf "%s read of 2 bytes with both in the TX FIFO (no stretch expected):\n" name;
     slow_host ~q ~every:1_000_000 ~pre:[ 0xC3; 0x81 ] ~addr:0x50 (read 0x50 2));
   [%expect {|
-    100 kHz write of 12 bytes, host reads one byte every 20000 cycles (RX FIFO 8 deep):
-      RX: [10 11 12 13 14 15 16 17 18 19 1a 1b], controller sampled SDA: 0000000000000, SCL stretched 33015 cycles (longest hold 16590, data setup at release >= 13 cycles), violations 0, location 0
+    100 kHz write of 40 bytes, host reads one byte every 20000 cycles (RX FIFO 32 deep):
+      RX: [10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37], controller sampled SDA: 00000000000000000000000000000000000000000, SCL stretched 12215 cycles (longest hold 12405, data setup at release >= 13 cycles), violations 0, location 0
     100 kHz read of 3 bytes, TX FIFO empty, host pushes one byte every 8000 cycles (expected ACK 0, a5 5a 3c):
       RX: [], controller sampled SDA: 0101001010101101000111100, SCL stretched 12621 cycles (longest hold 4596, data setup at release >= 13 cycles), violations 0, location 0
     100 kHz read of 2 bytes with both in the TX FIFO (no stretch expected):
       RX: [], controller sampled SDA: 01100001110000001, SCL stretched 0 cycles (longest hold 0, data setup at release >= - cycles), violations 0, location 0
-    400 kHz write of 12 bytes, host reads one byte every 20000 cycles (RX FIFO 8 deep):
-      RX: [10 11 12 13 14 15 16 17 18 19 1a 1b], controller sampled SDA: 0000000000000, SCL stretched 68265 cycles (longest hold 19140, data setup at release >= 13 cycles), violations 0, location 0
+    400 kHz write of 40 bytes, host reads one byte every 20000 cycles (RX FIFO 32 deep):
+      RX: [10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20 21 22 23 24 25 26 27 28 29 2a 2b 2c 2d 2e 2f 30 31 32 33 34 35 36 37], controller sampled SDA: 00000000000000000000000000000000000000000, SCL stretched 123065 cycles (longest hold 19140, data setup at release >= 13 cycles), violations 0, location 0
     400 kHz read of 3 bytes, TX FIFO empty, host pushes one byte every 8000 cycles (expected ACK 0, a5 5a 3c):
       RX: [], controller sampled SDA: 0101001010101101000111100, SCL stretched 21171 cycles (longest hold 7146, data setup at release >= 13 cycles), violations 0, location 0
     400 kHz read of 2 bytes with both in the TX FIFO (no stretch expected):
