@@ -394,7 +394,9 @@ let spi_target_setup = 3
     edge arrived (ENGINE.md: windows use the change's age). 3 is the largest value that
     keeps the top speed (4 gives 4.00 / 3.33 MHz). An edge that comes earlier matches no
     edge of the watched location and is UNEXPECTED (the engine halts). Every location but
-    [idle] watches SCK.
+    [idle] watches SCK. With an uneven SCK duty cycle the phase from the MISO-changing
+    edge to the sampling edge must be at least 4 engine cycles; shorter is a violation
+    in every mode [Measured: test_spi_target.ml, uneven duty sweep, 2026-11-14].
     A partial byte when CS rises is dropped. *)
 let spi_target ?(setup = spi_target_setup) ~cpol ~cpha ~cs ~sck ~mosi ~miso () =
   let lead g = if cpol = 0 then rises sck g else falls sck g in

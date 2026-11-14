@@ -6,15 +6,19 @@ module H = Harness
 let cs, sck, mosi, miso = 0, 1, 2, 3
 let bitv v p = (v lsr p) land 1
 
-(* A software SPI controller. [hp] = cycles per SCK half period, SCK runs without
-   gaps between bytes, CS falls [lead] cycles before the first edge and rises [lead]
-   cycles after the last. Returns the bytes it read on MISO. *)
-let spi_controller ~cpol ~cpha ~hp ~lead bytes =
+(* A software SPI controller. [hp] = cycles from a leading SCK edge to the trailing
+   edge, [hp_b] (default [hp]) from a trailing edge to the next leading one, so an
+   uneven duty cycle is [hp_b <> hp]. SCK runs without gaps between bytes, CS falls
+   [lead] cycles before the first edge and rises [lead] cycles after the last. Returns
+   the bytes it read on MISO. *)
+let spi_controller ?hp_b ~cpol ~cpha ~hp ~lead bytes =
+  let hp_b = Option.value hp_b ~default:hp in
+  let per = hp + hp_b in
   let n = 8 * List.length bytes in
   let bytes = Array.of_list bytes in
   let t0 = 20 in
   let first = t0 + lead in
-  let last = first + ((2 * n) - 1) * hp in
+  let last = first + ((n - 1) * per) + hp in
   let t_end = last + lead in
   let now = ref 0 in
   let got = Array.create ~len:(Array.length bytes) 0 in
@@ -24,14 +28,19 @@ let spi_controller ~cpol ~cpha ~hp ~lead bytes =
     Int.incr now;
     let c = if t >= t0 && t < t_end then 0 else 1 in
     (* number of SCK edges that have happened by time t *)
-    let edges = if t < first then 0 else min (2 * n) (((t - first) / hp) + 1) in
+    let edges =
+      if t < first then 0
+      else (
+        let d = t - first in
+        min (2 * n) ((2 * (d / per)) + if d % per >= hp then 2 else 1))
+    in
     let k = if cpol = 0 then edges % 2 else 1 - (edges % 2) in
     let bit_index =
       if cpha = 0 then edges / 2 (* changes on trailing edges *) else (edges - 1) / 2
     in
     let m = tx_bit (max bit_index 0) in
     (* sample MISO on the sampling edge *)
-    if t >= first && t <= last && (t - first) % hp = 0
+    if t >= first && t <= last && ((t - first) % per = 0 || (t - first) % per = hp)
     then (
       let j = edges - 1 in
       let sampling = if cpha = 0 then j % 2 = 0 else j % 2 = 1 in
@@ -48,7 +57,7 @@ let spi_controller ~cpol ~cpha ~hp ~lead bytes =
 
 let pr l = String.concat ~sep:" " (List.map l ~f:(Printf.sprintf "%02x"))
 
-let run ?setup ~mode ~hp () =
+let run ?setup ?hp_b ~mode ~hp () =
   let cpol = mode / 2
   and cpha = mode % 2 in
   let t = H.create () in
@@ -57,7 +66,7 @@ let run ?setup ~mode ~hp () =
   H.push_tx t [ 0xC3; 0x5A; 0x01; 0x80 ];
   H.start t ();
   let sent = [ 0x9F; 0x00; 0xA5; 0x7E ] in
-  let device, t_end, got = spi_controller ~cpol ~cpha ~hp ~lead:(2 * hp + 12) sent in
+  let device, t_end, got = spi_controller ?hp_b ~cpol ~cpha ~hp ~lead:(2 * hp + 12) sent in
   let base = t.cycle in
   t.device <- device;
   H.run_until t (fun () -> t.cycle - base > t_end + 30);
@@ -122,4 +131,40 @@ let%expect_test "SPI target: top speed per mode" =
     |}]
 ;;
 
+(* Uneven duty cycle (review F5, 2026-11-14): with an even SCK the setup rule is never
+   the limit on its own (MISO always has a whole half period), so here only the phase
+   from the edge that changes MISO to the sampling edge is shortened, the other phase
+   stays at 12 cycles. CPHA 0 changes MISO on trailing edges and samples on leading
+   ones (that phase is [hp_b]); CPHA 1 changes on leading edges and samples on trailing
+   ones ([hp]). Expected: every phase at or above a threshold passes with no violation,
+   every shorter one fails with a violation. Planted bug in the same sweep: the setup
+   window removed ([~setup:0]) must give silently wrong data at some phase. *)
+let%expect_test "SPI target: uneven SCK duty cycle, setup phase swept" =
+  let run_phase ?setup ~mode s =
+    if mode % 2 = 0 then run ?setup ~mode ~hp:12 ~hp_b:s () else run ?setup ~mode ~hp:s ~hp_b:12 ()
+  in
+  for mode = 0 to 3 do
+    let res = List.map (List.range 2 13) ~f:(fun s ->
+      let ok, _, _, viol, _ = run_phase ~mode s in
+      s, ok && List.is_empty viol, (not ok) && not (List.is_empty viol)) in
+    let thr = List.find_map res ~f:(fun (s, pass, _) -> if pass then Some s else None) in
+    let thr = Option.value thr ~default:0 in
+    let above = List.for_all res ~f:(fun (s, pass, _) -> s < thr || pass) in
+    let below = List.for_all res ~f:(fun (s, _, loud) -> s >= thr || loud) in
+    let silent =
+      List.filter_map (List.range 2 13) ~f:(fun s ->
+        let ok, _, _, viol, _ = run_phase ~setup:0 ~mode s in
+        if (not ok) && List.is_empty viol then Some s else None)
+    in
+    printf "mode %d: setup phase >= %d cycles passes: %b; every shorter phase fails with a violation: %b; with setup 0 (planted bug) silently wrong at phase %s\n"
+      mode thr above below
+      (String.concat ~sep:"," (List.map silent ~f:Int.to_string))
+  done;
+  [%expect {|
+    mode 0: setup phase >= 4 cycles passes: true; every shorter phase fails with a violation: true; with setup 0 (planted bug) silently wrong at phase 2
+    mode 1: setup phase >= 4 cycles passes: true; every shorter phase fails with a violation: true; with setup 0 (planted bug) silently wrong at phase 2
+    mode 2: setup phase >= 4 cycles passes: true; every shorter phase fails with a violation: true; with setup 0 (planted bug) silently wrong at phase 2
+    mode 3: setup phase >= 4 cycles passes: true; every shorter phase fails with a violation: true; with setup 0 (planted bug) silently wrong at phase 2
+    |}]
+;;
 
