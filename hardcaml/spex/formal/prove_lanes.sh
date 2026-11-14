@@ -18,7 +18,9 @@ for g in ${PROPS:-L1 L3 L2 L5 L6}; do
   if [ -n "$BMC" ]; then
     yosys -q -p "read_verilog -formal $V; expose spex_lane/g_*; read_verilog -sv -formal -D$g -DNO_LEMMAS lane_props.sv; prep -top $TOP; flatten; async2sync; dffunmap; opt_clean; setundef -undriven -anyseq; write_smt2 -wires model_$g.smt2"
     r=$(timeout ${T:-900} yosys-smtbmc -s yices -t $BMC model_$g.smt2 | grep -E "Checking assertions in step|Assert failed|Status" | tail -3 | tr '\n' ' ')
-    case "$r" in *FAILED*) echo "counterexample: $r" ;; *) echo "no counterexample to depth $BMC" ;; esac
+    # a BMC that runs to the end prints "Status: PASSED"; anything else is a time-out
+    case "$r" in *FAILED*) echo "counterexample: $r" ;; *PASSED*) echo "no counterexample to depth $BMC" ;;
+      *) echo "TIMED OUT before depth $BMC (${T:-900} s; last: $r)" ;; esac
   elif [ $g = L1 ]; then
     yosys -q -p "read_verilog -formal $V; expose spex_lane/g_*; read_verilog -sv -formal -D$g lane_props.sv; prep -top $TOP; flatten; async2sync; dffunmap; opt_clean; setundef -undriven -anyseq; opt -fast -nosdff -nodffe; techmap; opt -fast -nosdff -nodffe; dffunmap; abc -g AND; opt_clean; write_aiger -zinit model_$g.aig"
     yosys-abc -c "read_aiger model_$g.aig; fold; strash; pdr -T ${T:-900}" 2>&1 | grep -E "Property proved|asserted|Output .* was asserted|failed|UNDECIDED" | tail -1
