@@ -42,6 +42,8 @@ MUTANTS = [
     ("second-change age starts at 0", "&: ~:(multi.value.:(p)))\n                     [ a <--. 1 ]",
      "&: ~:(multi.value.:(p)))\n                     [ a <--. 0 ]"),
     ("FIFO full one entry early", "let full = used ==:. depth in", "let full = used ==:. depth - 1 in"),
+    ("FIFO empty from used's low bits (full reads as empty)", "let empty = used ==:. 0 in",
+     "let empty = select used (ab - 1) 0 ==:. 0 in"),
     ("recover jumps to the start location", "cur_loc <-- recover_lat.value", "cur_loc <-- h.start_loc"),
     ("irq_ack ignored", "when_ h.irq_ack [ irq_flag <--. 0 ]", "when_ gnd [ irq_flag <--. 0 ]"),
     ("UNEXPECTED ignores the watch mask", "(changed_all &: hdr.watch <>:. 0)", "(changed_all <>:. 0)"),

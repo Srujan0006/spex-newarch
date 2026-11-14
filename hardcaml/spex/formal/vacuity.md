@@ -6,7 +6,7 @@ free input (`prove.sh`): the sweep may end on any cycle, an over-approximation, 
 hold for the design while counterexamples no longer need the 4097-cycle sweep first (P1 and P7
 had been UNDECIDED at 900 s without it). P11 counts the sweep length itself instead of using the
 design's `sw_last` (it had missed "the sweep skips the last word"), with a lemma tying its
-counter to the design's. P5 (TX FIFO flags) has no mutant yet. P2 is asserted for `pins_oe`
+counter to the design's. P5 (TX FIFO flags) got its mutant on 2026-11-14 (review F5): empty taken from `used`'s low bits, so a full FIFO also reads empty. P2 is asserted for `pins_oe`
 always and for `pins_out` while every pin's source is the engine.
 
 Bit lanes (`formal/lane_props.sv`, stated against ENGINE.md on the line a lane drives):
@@ -65,6 +65,7 @@ L1 (PDR, 31 s), L2, L3 and L5 (k-induction, seconds) prove with `formal/prove_la
 | NRZI decode inverted | L2 (TX -> RX loopback returns the bytes) | L2          counterexample: Checking assertions in step 5.. Assert failed in lane_loop_props: lane_props.sv:265.59-266.24 ($assert$lane_props.sv:265$597) Status: FAILED |
 | Verilog: timestamp skips odd values | P6 (timestamp counts) | P6          Output 0 of miter "model" was asserted in frame 3.  Time =     0.02 sec |
 | rx_to_tx ignored: lane bytes stay in the RX FIFO | P12 (with rx_to_tx, lane bytes never reach the RX FIFO) | P12         Output 0 of miter "model" was asserted in frame 13.  Time =     9.56 sec (run alone, 2026-11-03) |
+| FIFO empty from used's low bits (full reads as empty) | P5 (TX FIFO never full and empty at once) | P5          Output 0 of miter "model" was asserted in frame 61.  Time =   638.87 sec (2026-11-14; 32 pushes to fill the TX FIFO) |
 | data pin register one cycle late (fed from pins_s) | L5 (RX skip and length field match the reference) | L5          counterexample: Checking assertions in step 6.. Assert failed in lane_len_props: lane_props.sv:388.19-388.39 Status: FAILED (2026-11-12) |
 | cq fed from cs's input (no clock edge ever seen) | L5 (RX skip and length field match the reference) | L5          counterexample: Checking assertions in step 17.. Assert failed in lane_len_props: lane_props.sv:385.32-386.34 Status: FAILED (2026-11-12) |
 | dq fed from d's input (no data edge ever seen) | none: data edges matter only with the divider, which no lane proof covers | killed in simulation (test_lane.ml lockstep), mutation 91/91 |

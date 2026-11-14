@@ -30,6 +30,7 @@ TARGETS = {
     "pin source select read from the next pin's field": "L4 (a lane drives only the pins selected for it)",
     "pin source 'lane 1 AND engine' reads lane 0": "L4 (a lane drives only the pins selected for it)",
     "rx_to_tx ignored: lane bytes stay in the RX FIFO": "P12 (with rx_to_tx, lane bytes never reach the RX FIFO)",
+    "FIFO empty from used's low bits (full reads as empty)": "P5 (TX FIFO never full and empty at once)",
 }
 # bit-lane mutants (src/lane.ml) -> property
 LANE_TARGETS = {
