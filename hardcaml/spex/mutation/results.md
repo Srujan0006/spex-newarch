@@ -73,6 +73,12 @@
 | data pin register one cycle late (fed from pins_s) | KILLED |
 | dq fed from d's input (no data edge ever seen) | KILLED |
 | cq fed from cs's input (no clock edge ever seen) | KILLED |
+| residual mode: CRC start (len_pos) ignored | KILLED |
+| residual compared in the push cycle (byte's last bit not in) | KILLED |
+| residual crc_ok sticky (only ever set) | KILLED |
+| residual compares the CRC's low half | KILLED |
+| sync_hit not suppressed in residual mode | KILLED |
+| residual mode: len_en not ignored | KILLED |
 | SPI samples MOSI on the falling edge | KILLED |
 | SPI address does not auto-increment | KILLED |
 | location store bytes assembled big-endian | KILLED |
@@ -92,4 +98,4 @@
 | compiler: recover jumps nowhere | KILLED |
 | compiler checks an edge's load after its own END | KILLED |
 
-91/91 killed
+97/97 killed
